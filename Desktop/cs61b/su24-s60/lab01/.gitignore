@@ -1,0 +1,2 @@
+*.txt
+!magic_word.txt
