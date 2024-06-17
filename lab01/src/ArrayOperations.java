@@ -9,7 +9,9 @@ public class ArrayOperations {
         if (pos < 0 || pos >= values.length) {
             return;
         }
-        // TODO (OPTIONAL): YOUR CODE HERE
+        // 使用 System.arraycopy 提高效率
+        System.arraycopy(values, pos + 1, values, pos, values.length - 1 - pos);
+        values[values.length - 1] = 0;
     }
 
     /**
@@ -21,16 +23,20 @@ public class ArrayOperations {
         if (pos < 0 || pos >= values.length) {
             return;
         }
-        // TODO (OPTIONAL): YOUR CODE HERE
+        // 使用 System.arraycopy 提高效率
+        System.arraycopy(values, pos, values, pos + 1, values.length - 1 - pos);
+        values[pos] = newInt;
     }
 
-    /** 
+    /**
      * Returns a new array consisting of the elements of A followed by the
-     *  the elements of B. 
+     *  the elements of B.
      */
     public static int[] catenate(int[] A, int[] B) {
-        // TODO (OPTIONAL): YOUR CODE HERE
-        return null;
+        int[] result = new int[A.length + B.length];
+        // 使用 System.arraycopy 提高效率
+        System.arraycopy(A, 0, result, 0, A.length);
+        System.arraycopy(B, 0, result, A.length, B.length);
+        return result;
     }
-
 }

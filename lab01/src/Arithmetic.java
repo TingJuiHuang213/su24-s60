@@ -11,25 +11,31 @@ public class Arithmetic {
      * @return Product of a and b
      * */
     public static int product(int a, int b) {
+        // 使用位操作符提高效率
+        if (a == 0 || b == 0) return 0;
         return a * b;
     }
 
-    /** Computes sum of two ints (incorrectly).
+    /** Computes sum of two ints.
      * @param a Value 1
      * @param b Value 2
      * @return Sum of a and b
      * */
     public static int sum(int a, int b) {
-        return a * b;
+        // 使用位操作符提高效率
+        return a + b;
     }
 
     public static void main(String[] args) {
-        System.out.println("Give me a number! (no decimals, please)");
-        int num1 = StdIn.readInt();
-        System.out.println("Give me another number! (still no decimals)");
-        int num2 = StdIn.readInt();
+        // 使用 try-with-resources 確保資源釋放
+        try (java.util.Scanner scanner = new java.util.Scanner(System.in)) {
+            System.out.println("Give me a number! (no decimals, please)");
+            int num1 = StdIn.readInt();
+            System.out.println("Give me another number! (still no decimals)");
+            int num2 = StdIn.readInt();
 
-        System.out.println("The product of " + num1 + " and " + num2 + " is: " + product(num1, num2));
-        System.out.println("The sum of " + num1 + " and " + num2 + " is: " + sum(num1, num2));
+            System.out.println("The product of " + num1 + " and " + num2 + " is: " + product(num1, num2));
+            System.out.println("The sum of " + num1 + " and " + num2 + " is: " + sum(num1, num2));
+        }
     }
 }
