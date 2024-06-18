@@ -4,27 +4,40 @@
  */
 public class Account {
     private int balance;
-    private Account backupAccount; // 更改变量名称，使其更加个性化
+    private Account parentAccount;
 
     /**
      * Constructor to initialize an account with an initial balance.
      */
     public Account(int initialBalance) {
         this.balance = initialBalance;
-        this.backupAccount = null; // 使用新名称
+        this.parentAccount = null;
     }
 
     /**
-     * Constructor to initialize an account with an initial balance and a backup account.
+     * Constructor to initialize an account with an initial balance and a parent account.
      */
-    public Account(int initialBalance, Account backupAccount) {
+    public Account(int initialBalance, Account parentAccount) {
         this.balance = initialBalance;
-        this.backupAccount = backupAccount; // 使用新名称
+        this.parentAccount = parentAccount;
     }
 
     /**
-     * Attempts to withdraw the specified amount from this account.
-     * If the balance is insufficient, it tries to withdraw the difference from the backup account.
+     * Deposits the specified amount into this account.
+     *
+     * @param amount The amount to deposit.
+     */
+    public void deposit(int amount) {
+        if (amount < 0) {
+            System.out.println("Cannot deposit negative amount");
+        } else {
+            balance += amount;
+        }
+    }
+
+    /**
+     * Withdraws the specified amount from this account if possible.
+     * If the balance is insufficient, it tries to withdraw the difference from the parent account.
      *
      * @param amount The amount to withdraw.
      * @return true if the withdrawal was successful, false otherwise.
@@ -33,17 +46,15 @@ public class Account {
         if (amount <= balance) {
             balance -= amount;
             return true;
-        } else {
-            if (backupAccount != null) {
-                int deficit = amount - balance;
-                if (backupAccount.withdraw(deficit)) {
-                    balance = 0;
-                    return true;
-                }
+        } else if (parentAccount != null) {
+            int needed = amount - balance;
+            if (parentAccount.withdraw(needed)) {
+                balance = 0;
+                return true;
             }
-            System.out.println("Sorry, insufficient funds in both accounts.");
-            return false;
         }
+        System.out.println("Insufficient funds");
+        return false;
     }
 
     /**
@@ -52,8 +63,8 @@ public class Account {
      * @param other The account to merge with this account.
      */
     public void merge(Account other) {
-        this.balance += other.balance; // 增加余额
-        other.balance = 0; // 置零
+        this.balance += other.balance;
+        other.balance = 0;
     }
 
     /**
