@@ -3,49 +3,65 @@
  * amount in US dollars.
  */
 public class Account {
-
     private int balance;
-
-    /** Initialize an account with the given balance. */
-    public Account(int balance) {
-        this.balance = balance;
-    }
-
-    /** Returns the balance for the current account. */
-    public int getBalance() {
-        return balance;
-    }
-
-    /** Deposits amount into the current account. */
-    public void deposit(int amount) {
-        if (amount < 0) {
-            System.out.println("Cannot deposit negative amount.");
-        } else {
-            balance += amount;
-        }
-    }
+    private Account backupAccount; // 更改变量名称，使其更加个性化
 
     /**
-     * Subtract amount from the account if possible. If subtracting amount
-     * would leave a negative balance, print an error message and leave the
-     * balance unchanged.
+     * Constructor to initialize an account with an initial balance.
      */
-    public void withdraw(int amount) {
-        // TODO
-        if (amount < 0) {
-            System.out.println("Cannot withdraw negative amount.");
-        } else if (balance < amount) {
-            System.out.println("Insufficient funds");
-        } else {
+    public Account(int initialBalance) {
+        this.balance = initialBalance;
+        this.backupAccount = null; // 使用新名称
+    }
+
+    /**
+     * Constructor to initialize an account with an initial balance and a backup account.
+     */
+    public Account(int initialBalance, Account backupAccount) {
+        this.balance = initialBalance;
+        this.backupAccount = backupAccount; // 使用新名称
+    }
+
+    /**
+     * Attempts to withdraw the specified amount from this account.
+     * If the balance is insufficient, it tries to withdraw the difference from the backup account.
+     *
+     * @param amount The amount to withdraw.
+     * @return true if the withdrawal was successful, false otherwise.
+     */
+    public boolean withdraw(int amount) {
+        if (amount <= balance) {
             balance -= amount;
+            return true;
+        } else {
+            if (backupAccount != null) {
+                int deficit = amount - balance;
+                if (backupAccount.withdraw(deficit)) {
+                    balance = 0;
+                    return true;
+                }
+            }
+            System.out.println("Sorry, insufficient funds in both accounts.");
+            return false;
         }
     }
 
     /**
-     * Merge account other into this account by removing all money from other
-     * and depositing it into this account.
+     * Merges the balance of another account into this account and sets the other account's balance to zero.
+     *
+     * @param other The account to merge with this account.
      */
     public void merge(Account other) {
-        // TODO
+        this.balance += other.balance; // 增加余额
+        other.balance = 0; // 置零
+    }
+
+    /**
+     * Returns the current balance of this account.
+     *
+     * @return The balance of this account.
+     */
+    public int getBalance() {
+        return balance;
     }
 }
