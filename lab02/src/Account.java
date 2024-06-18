@@ -47,12 +47,15 @@ public class Account {
             balance -= amount;
             return true;
         } else if (parentAccount != null) {
-            int needed = amount - balance;
-            if (parentAccount.withdraw(needed)) {
-                balance = 0;
+            // 计算需要从父账户提取的金额
+            int deficit = amount - balance;
+            // 尝试从父账户提取不足的部分
+            if (parentAccount.withdraw(deficit)) {
+                balance = 0; // 当前账户余额归零
                 return true;
             }
         }
+        // 提取失败，输出提示信息
         System.out.println("Insufficient funds");
         return false;
     }
@@ -63,7 +66,9 @@ public class Account {
      * @param other The account to merge with this account.
      */
     public void merge(Account other) {
+        // 将另一个账户的余额合并到当前账户
         this.balance += other.balance;
+        // 将另一个账户的余额置零
         other.balance = 0;
     }
 

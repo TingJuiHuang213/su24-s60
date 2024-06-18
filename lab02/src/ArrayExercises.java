@@ -2,10 +2,10 @@ public class ArrayExercises {
 
     /** Returns an array [1, 2, 3, 4, 5, 6] */
     public static int[] makeDice() {
-        // 定义一个表示骰子面的数组
+        // 创建一个新的数组来存储骰子的面值
         int[] diceFaces = new int[6];
-        // 使用循环填充数组
-        for (int i = 0; i < 6; i++) {
+        // 使用循环将值填入数组
+        for (int i = 0; i < diceFaces.length; i++) {
             diceFaces[i] = i + 1;
         }
         return diceFaces;
@@ -16,29 +16,25 @@ public class ArrayExercises {
      *  If the customer is Erik, return ["sushi", "pasta", "avocado", "coffee"].
      *  In any other case, return an empty String[] of size 3. */
     public static String[] takeOrder(String customerName) {
-        // 定义两个数组以表示不同客户的订单
-        String[] circleOrder = {"beyti", "pizza", "hamburger", "tea"};
-        String[] erikOrder = {"sushi", "pasta", "avocado", "coffee"};
-
-        // 根据客户名称返回相应的订单
-        switch (customerName) {
-            case "Circle":
-                return circleOrder;
-            case "Erik":
-                return erikOrder;
-            default:
-                return new String[3]; // 返回一个长度为3的空字符串数组
+        // 根据客户名称返回对应的订单
+        if (customerName.equals("Circle")) {
+            return new String[]{"beyti", "pizza", "hamburger", "tea"};
+        } else if (customerName.equals("Erik")) {
+            return new String[]{"sushi", "pasta", "avocado", "coffee"};
+        } else {
+            // 返回一个长度为3的空数组
+            return new String[]{"", "", ""};
         }
     }
 
     /** Returns the positive difference between the maximum element and minimum element of the given array.
      *  Assumes array is nonempty. */
     public static int findMinMax(int[] array) {
-        // 初始化最小值和最大值为数组的第一个元素
+        // 初始化最小值和最大值为数组中的第一个元素
         int minValue = array[0];
         int maxValue = array[0];
 
-        // 遍历数组找出最小值和最大值
+        // 遍历数组以找到最小值和最大值
         for (int value : array) {
             if (value < minValue) {
                 minValue = value;
