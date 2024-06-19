@@ -26,7 +26,7 @@ public class TestTask10 {
                 {2, 0, 0, 0}
         };
         Model before = new Model(board, 0);
-        before.moveTileUpAsFarAsPossible(0, 0);
+        before.tilt(Side.NORTH);
 
         int[][] result = {
                 {4, 0, 0, 0},
@@ -51,7 +51,7 @@ public class TestTask10 {
                 {0, 0, 0, 0}
         };
         Model before = new Model(board, 0);
-        before.tiltColumn(0);
+        before.tilt(Side.NORTH);
 
         int[][] result = {
                 {4, 0, 0, 0},

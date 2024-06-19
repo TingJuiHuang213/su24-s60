@@ -187,18 +187,20 @@ public class Model {
             targetY++;
         }
 
+        // Check for possible merge
         if (targetY < board.size() - 1) {
             Tile aboveTile = board.tile(x, targetY + 1);
             if (aboveTile != null && aboveTile.value() == t.value() && !aboveTile.wasMerged()) {
                 targetY++;
                 score += 2 * t.value();  // Update score
                 board.move(x, targetY, t);
-                t = board.tile(x, targetY);
-                setTileMerged(t, true);  // Mark the tile as merged
+                Tile newTile = board.tile(x, targetY);  // Get the newly moved tile
+                setTileMerged(newTile, true);  // Mark the new tile as merged
                 return;  // Exit to avoid moving the merged tile again
             }
         }
 
+        // Only move if the target position is different from the current position
         if (targetY != y) {
             board.move(x, targetY, t);
         }
@@ -218,6 +220,19 @@ public class Model {
             tiltColumn(x);
         }
         board.setViewingPerspective(Side.NORTH);
+        resetTilesMergedState();  // Reset merged state of all tiles after tilting
+    }
+
+    // Helper method to reset the merged state of all tiles
+    private void resetTilesMergedState() {
+        for (int x = 0; x < board.size(); x++) {
+            for (int y = 0; y < board.size(); y++) {
+                Tile t = board.tile(x, y);
+                if (t != null) {
+                    setTileMerged(t, false);
+                }
+            }
+        }
     }
 
     // Private method to set the merged state of a tile using reflection
