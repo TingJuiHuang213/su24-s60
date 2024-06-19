@@ -206,5 +206,3 @@ public class Model {
         return toString().hashCode();
     }
 }
-
-// Add a newline at the end of the file to resolve NewlineAtEndOfFile error.
