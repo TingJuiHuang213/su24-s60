@@ -6,7 +6,6 @@ import game2048rendering.Tile;
 
 import java.util.Formatter;
 
-
 /** The state of a game of 2048.
  *  @author P. N. Hilfinger + Josh Hug
  */
@@ -85,7 +84,13 @@ public class Model {
      *  Empty spaces are stored as null.
      * */
     public boolean emptySpaceExists() {
-        // TODO: Task 1. Fill in this function.
+        for (int x = 0; x < board.size(); x++) {
+            for (int y = 0; y < board.size(); y++) {
+                if (board.tile(x, y) == null) {
+                    return true;
+                }
+            }
+        }
         return false;
     }
 
@@ -95,7 +100,14 @@ public class Model {
      * given a Tile object t, we get its value with t.value().
      */
     public boolean maxTileExists() {
-        // TODO: Task 2. Fill in this function.
+        for (int x = 0; x < board.size(); x++) {
+            for (int y = 0; y < board.size(); y++) {
+                Tile t = board.tile(x, y);
+                if (t != null && t.value() == MAX_PIECE) {
+                    return true;
+                }
+            }
+        }
         return false;
     }
 
@@ -106,7 +118,22 @@ public class Model {
      * 2. There are two adjacent tiles with the same value.
      */
     public boolean atLeastOneMoveExists() {
-        // TODO: Task 3. Fill in this function.
+        if (emptySpaceExists()) {
+            return true;
+        }
+        for (int x = 0; x < board.size(); x++) {
+            for (int y = 0; y < board.size(); y++) {
+                Tile t = board.tile(x, y);
+                if (t != null) {
+                    if ((x > 0 && board.tile(x - 1, y) != null && board.tile(x - 1, y).value() == t.value()) ||
+                            (x < board.size() - 1 && board.tile(x + 1, y) != null && board.tile(x + 1, y).value() == t.value()) ||
+                            (y > 0 && board.tile(x, y - 1) != null && board.tile(x, y - 1).value() == t.value()) ||
+                            (y < board.size() - 1 && board.tile(x, y + 1) != null && board.tile(x, y + 1).value() == t.value())) {
+                        return true;
+                    }
+                }
+            }
+        }
         return false;
     }
 
