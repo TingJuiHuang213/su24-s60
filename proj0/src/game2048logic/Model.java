@@ -209,14 +209,6 @@ public class Model {
         for (int y = board.size() - 2; y >= 0; y--) {
             moveTileUpAsFarAsPossibleWithMerging(x, y);
         }
-
-        // Reset merged status for all tiles
-        for (int y = 0; y < board.size(); y++) {
-            Tile t = board.tile(x, y);
-            if (t != null) {
-                setTileMerged(t, false);
-            }
-        }
     }
 
     // Tilts the entire board up
@@ -260,7 +252,10 @@ public class Model {
 
     @Override
     public boolean equals(Object o) {
-        return (o instanceof Model m) && this.toString().equals(m.toString());
+        if (o instanceof Model) {
+            return this.toString().equals(o.toString());
+        }
+        return false;
     }
 
     @Override
