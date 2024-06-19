@@ -48,7 +48,7 @@ public class TestTask8 {
         };
 
         Model before = new Model(board, 0);
-        before.tiltWrapper(Side.NORTH);
+        before.tilt(Side.NORTH);
 
         int[][] result = new int[][] {
                 {4, 4, 4, 4},
@@ -74,7 +74,7 @@ public class TestTask8 {
         };
 
         Model before = new Model(board, 0);
-        before.tiltWrapper(Side.NORTH);
+        before.tilt(Side.NORTH);
 
         int[][] result = new int[][] {
                 {4, 8, 4, 4},

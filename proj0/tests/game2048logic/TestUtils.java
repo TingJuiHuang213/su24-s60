@@ -12,7 +12,7 @@ public class TestUtils {
      */
     public static void checkTilt(Model before, Model after, Side direction) {
         String prevBoard = before.toString();
-        before.tiltWrapper(direction);
+        before.tilt(direction);
         String errMsg = String.format("Board incorrect. Before tilting towards"
                         + " %s, your board looked like:%s%nAfter the call to"
                         + " tilt, we expected:%s%nBut your board looks like:%s.",

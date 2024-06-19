@@ -1,4 +1,5 @@
 package game2048logic;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
@@ -26,7 +27,7 @@ public class TestTask6 {
                 {2, 0, 0, 0}
         };
         Model before = new Model(board, 0);
-        before.moveTileUpAsFarAsPossible(0, 0);
+        before.moveTileUpAsFarAsPossibleWithMerging(0, 0);
 
         int[][] result = {
                 {4, 0, 0, 0},
@@ -52,7 +53,7 @@ public class TestTask6 {
         };
 
         Model before = new Model(board, 0);
-        before.moveTileUpAsFarAsPossible(0, 1);
+        before.moveTileUpAsFarAsPossibleWithMerging(0, 1);
 
         int[][] result = new int[][]{
                 {8, 0, 0, 0},
@@ -79,7 +80,7 @@ public class TestTask6 {
         };
 
         Model before = new Model(board, 0);
-        before.moveTileUpAsFarAsPossible(2, 0);
+        before.moveTileUpAsFarAsPossibleWithMerging(2, 0);
 
         int[][] result = new int[][]{
                 {0, 0, 2, 0},
@@ -105,7 +106,7 @@ public class TestTask6 {
         };
 
         Model testing = new Model(board, 0);
-        testing.moveTileUpAsFarAsPossible(2, 1);
+        testing.moveTileUpAsFarAsPossibleWithMerging(2, 1);
 
         int[][] intermediate = new int[][]{
                 {0, 0, 2, 0},
@@ -117,7 +118,7 @@ public class TestTask6 {
         Model after1 = new Model(intermediate, testing.score());
         assertWithMessage("Boards should match:").that(testing.toString()).isEqualTo(after1.toString());
 
-        testing.moveTileUpAsFarAsPossible(2, 0);
+        testing.moveTileUpAsFarAsPossibleWithMerging(2, 0);
 
         int[][] result = new int[][]{
                 {0, 0, 2, 0},

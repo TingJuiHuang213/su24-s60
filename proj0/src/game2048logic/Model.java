@@ -162,19 +162,81 @@ public class Model {
         return false;
     }
 
-    // 空的 tiltWrapper 方法
-    public void tiltWrapper(Side side) {
-        // 空實現，用於避免編譯錯誤
-    }
-
-    // 空的 moveTileUpAsFarAsPossible 方法
+    // Moves a tile up as far as possible without merging
     public void moveTileUpAsFarAsPossible(int x, int y) {
-        // 空實現，用於避免編譯錯誤
+        Tile t = board.tile(x, y);
+        if (t == null) return;
+
+        int targetY = y;
+        while (targetY < board.size() - 1 && board.tile(x, targetY + 1) == null) {
+            targetY++;
+        }
+
+        if (targetY != y) {
+            board.move(x, targetY, t);
+        }
     }
 
-    // 空的 tiltColumn 方法
+    // Moves a tile up and handles merging
+    public void moveTileUpAsFarAsPossibleWithMerging(int x, int y) {
+        Tile t = board.tile(x, y);
+        if (t == null) return;
+
+        int targetY = y;
+        while (targetY < board.size() - 1 && board.tile(x, targetY + 1) == null) {
+            targetY++;
+        }
+
+        if (targetY < board.size() - 1) {
+            Tile aboveTile = board.tile(x, targetY + 1);
+            if (aboveTile != null && aboveTile.value() == t.value() && !aboveTile.wasMerged()) {
+                targetY++;
+                score += 2 * t.value();  // Update score
+                board.move(x, targetY, t);
+                t = board.tile(x, targetY);
+                setTileMerged(t, true);  // Mark the tile as merged
+                return;  // Exit to avoid moving the merged tile again
+            }
+        }
+
+        if (targetY != y) {
+            board.move(x, targetY, t);
+        }
+    }
+
+    // Tilts an entire column up
     public void tiltColumn(int x) {
-        // 空實現，用於避免編譯錯誤
+        for (int y = board.size() - 2; y >= 0; y--) {
+            moveTileUpAsFarAsPossibleWithMerging(x, y);
+        }
+
+        // Reset merged status for all tiles
+        for (int y = 0; y < board.size(); y++) {
+            Tile t = board.tile(x, y);
+            if (t != null) {
+                setTileMerged(t, false);
+            }
+        }
+    }
+
+    // Tilts the entire board up
+    public void tilt(Side side) {
+        board.setViewingPerspective(side);
+        for (int x = 0; x < board.size(); x++) {
+            tiltColumn(x);
+        }
+        board.setViewingPerspective(Side.NORTH);
+    }
+
+    // Private method to set the merged state of a tile using reflection
+    private void setTileMerged(Tile tile, boolean merged) {
+        try {
+            java.lang.reflect.Method method = Tile.class.getDeclaredMethod("setMerged", boolean.class);
+            method.setAccessible(true);
+            method.invoke(tile, merged);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override

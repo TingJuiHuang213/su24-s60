@@ -8,9 +8,8 @@ import java.util.Random;
 import static game2048rendering.Side.*;
 
 /** The input/output and GUI controller for play of a game of 2048.
- *  @author P. N. Hilfinger. */
+ *  @作者 P. N. Hilfinger. */
 class Game {
-
 
     /** Controller for a game represented by MODEL, using GUI as the
      *  source of key inputs. Uses SEED as the random seed. */
@@ -71,7 +70,7 @@ class Game {
                         }
 
                         String stateBefore = _model.toString();
-                        _model.tiltWrapper(keyToSide(cmnd));
+                        _model.tilt(keyToSide(cmnd)); // 修改这里
                         String stateAfter = _model.toString();
 
                         if (!stateBefore.equals(stateAfter)) {
