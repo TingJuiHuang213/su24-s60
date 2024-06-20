@@ -169,7 +169,9 @@ public class Model {
     // Moves a tile up as far as possible without merging
     public void moveTileUpAsFarAsPossible(int x, int y) {
         Tile t = board.tile(x, y);
-        if (t == null) return;
+        if (t == null) {
+            return;
+        }
 
         int targetY = y;
         while (targetY < board.size() - 1 && board.tile(x, targetY + 1) == null) {
@@ -184,7 +186,9 @@ public class Model {
     // Moves a tile up and handles merging
     public void moveTileUpAsFarAsPossibleWithMerging(int x, int y) {
         Tile t = board.tile(x, y);
-        if (t == null) return;
+        if (t == null) {
+            return;
+        }
 
         int targetY = y;
         while (targetY < board.size() - 1 && board.tile(x, targetY + 1) == null) {
@@ -198,7 +202,6 @@ public class Model {
                 targetY++;
                 score += 2 * t.value();  // Update score
                 board.move(x, targetY, t);
-                Tile newTile = board.tile(x, targetY);  // Get the newly moved tile
                 merged[x][targetY] = true;  // Mark the new tile as merged
                 return;  // Exit to avoid moving the merged tile again
             }
@@ -225,6 +228,10 @@ public class Model {
             tiltColumn(x);
         }
         board.setViewingPerspective(Side.NORTH);
+    }
+
+    public void tiltWrapper(Side side) {
+        tilt(side);
     }
 
     @Override
