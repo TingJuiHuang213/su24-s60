@@ -199,10 +199,9 @@ public class Model {
         if (targetY < board.size() - 1) {
             Tile aboveTile = board.tile(x, targetY + 1);
             if (aboveTile != null && aboveTile.value() == t.value() && !merged[x][targetY + 1]) {
-                targetY++;
+                board.move(x, targetY + 1, t);  // Move tile to the merge position
                 score += 2 * t.value();  // Update score
-                board.move(x, targetY, t);
-                merged[x][targetY] = true;  // Mark the new tile as merged
+                merged[x][targetY + 1] = true;  // Mark the new tile as merged
                 return;  // Exit to avoid moving the merged tile again
             }
         }
