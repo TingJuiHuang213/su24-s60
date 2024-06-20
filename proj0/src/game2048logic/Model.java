@@ -16,6 +16,8 @@ public class Model {
     private final Board board;
     /** Current score. */
     private int score;
+    /** Merged state of tiles during a tilt. */
+    private boolean[][] merged;
 
     /* Coordinate System: column x, row y of the board (where x = 0,
      * y = 0 is the lower-left corner of the board) will correspond
@@ -31,6 +33,7 @@ public class Model {
     public Model(int size) {
         board = new Board(size);
         score = 0;
+        merged = new boolean[size][size];
     }
 
     /** A new 2048 game where RAWVALUES contain the values of the tiles
@@ -41,6 +44,7 @@ public class Model {
     public Model(int[][] rawValues, int score) {
         board = new Board(rawValues);
         this.score = score;
+        merged = new boolean[board.size()][board.size()];
     }
 
     /** Return the current Tile at (x, y), where 0 <= x < size(),
@@ -190,12 +194,12 @@ public class Model {
         // Check for possible merge
         if (targetY < board.size() - 1) {
             Tile aboveTile = board.tile(x, targetY + 1);
-            if (aboveTile != null && aboveTile.value() == t.value() && !aboveTile.wasMerged()) {
+            if (aboveTile != null && aboveTile.value() == t.value() && !merged[x][targetY + 1]) {
                 targetY++;
                 score += 2 * t.value();  // Update score
                 board.move(x, targetY, t);
                 Tile newTile = board.tile(x, targetY);  // Get the newly moved tile
-                setTileMerged(newTile, true);  // Mark the new tile as merged
+                merged[x][targetY] = true;  // Mark the new tile as merged
                 return;  // Exit to avoid moving the merged tile again
             }
         }
@@ -216,34 +220,11 @@ public class Model {
     // Tilts the entire board up
     public void tilt(Side side) {
         board.setViewingPerspective(side);
+        merged = new boolean[board.size()][board.size()];  // Reset merged state
         for (int x = 0; x < board.size(); x++) {
             tiltColumn(x);
         }
         board.setViewingPerspective(Side.NORTH);
-        resetTilesMergedState();  // Reset merged state of all tiles after tilting
-    }
-
-    // Helper method to reset the merged state of all tiles
-    private void resetTilesMergedState() {
-        for (int x = 0; x < board.size(); x++) {
-            for (int y = 0; y < board.size(); y++) {
-                Tile t = board.tile(x, y);
-                if (t != null) {
-                    setTileMerged(t, false);
-                }
-            }
-        }
-    }
-
-    // Private method to set the merged state of a tile using reflection
-    private void setTileMerged(Tile tile, boolean merged) {
-        try {
-            java.lang.reflect.Method method = Tile.class.getDeclaredMethod("setMerged", boolean.class);
-            method.setAccessible(true);
-            method.invoke(tile, merged);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
     }
 
     @Override
