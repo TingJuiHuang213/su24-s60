@@ -10,6 +10,8 @@ abstract class Triangle {
      /** Given points (x1, y1), (x2, y2), and (x3, y3), return whether they could form a valid triangle in a 2-D plane. */
      abstract boolean pointsFormTriangle(int x1, int y1, int x2, int y2, int x3, int y3);
 
+     public abstract int pointsFormTriangle(int side1, int side2, int side3);
+
      /** Given triangle side lengths side1, side2, and side3, return whether the triangle is
       * Scalene (all sides are different lengths), Isosceles (two sides are different lengths), or Equilateral (all sides are the same length).
       * You may assume that the side lengths actually form a triangle together (no need to check first). */
