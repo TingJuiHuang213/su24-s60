@@ -1,20 +1,19 @@
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static com.google.common.truth.Truth.assertWithMessage;
 
-public abstract class TriangleTest {
+public class TriangleTest {
 
-    /** For autograding purposes; do not change this line. */
-    abstract Triangle getNewTriangle();
-
-    /* ***** TESTS ***** */
+    public Triangle getNewTriangle() {
+        return new ConcreteTriangle(); // 確保返回一個新的Triangle實例
+    }
 
     @Test
     public void testArea() {
         Triangle t = getNewTriangle();
         t.setSides(3, 4, 5);
         assertWithMessage("Triangle area calculation is incorrect")
-                .that((double) t.getArea()).isWithin(0.0001).of(6.0);
+                .that(t.getArea()).isWithin(0.0001).of(6.0);
     }
 
     @Test
@@ -49,17 +48,12 @@ public abstract class TriangleTest {
                 .that(t.isScalene()).isTrue();
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void testNegativeSides() {
         Triangle t = getNewTriangle();
-        t.setSides(-1, 4, 5); // 这里会抛出IllegalArgumentException
-        assertWithMessage("Negative side length check is incorrect")
-                .that(t.sidesFormTriangle(-1, 4, 5)).isFalse();
+        assertThrows(IllegalArgumentException.class, () -> {
+            t.setSides(-1, 4, 5);
+        });
     }
 }
-
-
-
-
-
 

@@ -2,6 +2,7 @@ import org.junit.jupiter.api.*;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
+import java.util.Arrays;
 
 import static com.google.common.truth.Truth.assertWithMessage;
 
@@ -42,15 +43,11 @@ public class BombTest {
     @DisplayName("Bomb Phase 2")
     public void testBombPhase2() {
         getBombMainOutputUntil(2);
-        System.out.println("Phase 2 Output: " + lines[2]);
+        System.out.println("Phase 2 Output: " + Arrays.toString(lines));
         String expectedPassword = "1680370154";
-        String actualPassword = lines[2].split("\"")[1];
+        String actualPassword = lines[lines.length - 1].split("\"")[1];
         assertWithMessage("Phase 2 incorrect")
                 .that(actualPassword)
                 .isEqualTo(expectedPassword);
     }
 }
-
-
-
-

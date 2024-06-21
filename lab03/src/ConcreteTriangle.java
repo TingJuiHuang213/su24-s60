@@ -13,9 +13,9 @@ public class ConcreteTriangle extends Triangle {
     }
 
     @Override
-    public int getArea() {
-        double s = (side1 + side2 + side3) / 2.0;
-        return (int) Math.sqrt(s * (s - side1) * (s - side2) * (s - side3));
+    public double getArea() {
+        double s = getPerimeter() / 2.0;
+        return Math.sqrt(s * (s - side1) * (s - side2) * (s - side3));
     }
 
     @Override
@@ -30,26 +30,30 @@ public class ConcreteTriangle extends Triangle {
 
     @Override
     public boolean isIsosceles() {
-        return side1 == side2 || side2 == side3 || side1 == side3;
+        return side1 == side2 || side1 == side3 || side2 == side3;
     }
 
     @Override
     public boolean isScalene() {
-        return side1 != side2 && side2 != side3 && side1 != side3;
+        return side1 != side2 && side1 != side3 && side2 != side3;
     }
 
     @Override
-    boolean sidesFormTriangle(int side1, int side2, int side3) {
-        return (side1 + side2 > side3) && (side1 + side3 > side2) && (side2 + side3 > side1);
+    public boolean sidesFormTriangle(int side1, int side2, int side3) {
+        return side1 + side2 > side3 && side1 + side3 > side2 && side2 + side3 > side1;
+    }
+
+@Override
+    public boolean pointsFormTriangle(int x1, int y1, int x2, int y2, int x3, int y3) {
+        // 計算兩個向量的叉積是否為零
+        return (x2 - x1) * (y3 - y1) != (x3 - x1) * (y2 - y1);
     }
 
     @Override
-    boolean pointsFormTriangle(int x1, int y1, int x2, int y2, int x3, int y3) {
-        return (x1 * (y2 - y3) + x2 * (y3 - y1) + x3 * (y1 - y2)) != 0;
-    }
-
-    @Override
-    String triangleType(int side1, int side2, int side3) {
+    public String triangleType(int side1, int side2, int side3) {
+        if (!sidesFormTriangle(side1, side2, side3)) {
+            return "Not a triangle";
+        }
         if (side1 == side2 && side2 == side3) {
             return "Equilateral";
         } else if (side1 == side2 || side2 == side3 || side1 == side3) {
@@ -60,10 +64,7 @@ public class ConcreteTriangle extends Triangle {
     }
 
     @Override
-    int squaredHypotenuse(int side1, int side2) {
+    public int squaredHypotenuse(int side1, int side2) {
         return side1 * side1 + side2 * side2;
     }
 }
-
-
-
