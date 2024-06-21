@@ -84,8 +84,21 @@ public class Model {
         for (int x = 0; x < board.size(); x++) {
             for (int y = 0; y < board.size(); y++) {
                 Tile t = board.tile(x, y);
-                if (t != null && hasMergeableNeighbor(x, y, t)) {
-                    return true;
+                if (t != null) {
+                    if ((x > 0
+                            && board.tile(x - 1, y) != null
+                            && board.tile(x - 1, y).value() == t.value())
+                            || (x < board.size() - 1
+                            && board.tile(x + 1, y) != null
+                            && board.tile(x + 1, y).value() == t.value())
+                            || (y > 0
+                            && board.tile(x, y - 1) != null
+                            && board.tile(x, y - 1).value() == t.value())
+                            || (y < board.size() - 1
+                            && board.tile(x, y + 1) != null
+                            && board.tile(x, y + 1).value() == t.value())) {
+                        return true;
+                    }
                 }
             }
         }
