@@ -2,12 +2,13 @@ import org.junit.jupiter.api.*;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
-import java.util.Arrays;
 
 import static com.google.common.truth.Truth.assertWithMessage;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class BombTest {
+    // You won't be able to find any passwords here, sorry!
+
     public static String[] lines;
 
     /** Runs up to the given phase in BombMain and modifies the lines variable to have its output.*/
@@ -43,11 +44,10 @@ public class BombTest {
     @DisplayName("Bomb Phase 2")
     public void testBombPhase2() {
         getBombMainOutputUntil(2);
-        System.out.println("Phase 2 Output: " + Arrays.toString(lines));
-        String expectedPassword = "1680370154";
-        String actualPassword = lines[lines.length - 1].split("\"")[1];
         assertWithMessage("Phase 2 incorrect")
-                .that(actualPassword)
-                .isEqualTo(expectedPassword);
+                .that(lines[2].split("\"")[1].split(" ")[1337].hashCode())
+                .isEqualTo(1097364068);
     }
+
 }
+
