@@ -7,8 +7,6 @@ import static com.google.common.truth.Truth.assertWithMessage;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class BombTest {
-    // You won't be able to find any passwords here, sorry!
-
     public static String[] lines;
 
     /** Runs up to the given phase in BombMain and modifies the lines variable to have its output.*/
@@ -44,9 +42,15 @@ public class BombTest {
     @DisplayName("Bomb Phase 2")
     public void testBombPhase2() {
         getBombMainOutputUntil(2);
+        System.out.println("Phase 2 Output: " + lines[2]);
+        String expectedPassword = "1680370154";
+        String actualPassword = lines[2].split("\"")[1];
         assertWithMessage("Phase 2 incorrect")
-                .that(lines[2].split("\"")[1].split(" ")[1337].hashCode())
-                .isEqualTo(1097364068);
+                .that(actualPassword)
+                .isEqualTo(expectedPassword);
     }
-
 }
+
+
+
+
