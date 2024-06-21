@@ -237,4 +237,3 @@ public class Model {
         return toString().hashCode();
     }
 }
-
