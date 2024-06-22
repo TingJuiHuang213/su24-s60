@@ -22,20 +22,17 @@ public class Model {
     /** Largest piece value. */
     public static final int MAX_PIECE = 2048;
 
-    /** A new 2048 game on a board of size SIZE with no pieces
-     *  and score 0. Initializes an empty board with the given size.
-     */
+    /** Initializes a new 2048 game on a board of size SIZE with no pieces
+     *  and score 0. */
     public Model(int size) {
         board = new Board(size);
         score = 0;
         merged = new boolean[size][size];
     }
 
-    /** A new 2048 game where RAWVALUES contain the values of the tiles
+    /** Initializes a new 2048 game where RAWVALUES contain the values of the tiles
      *  (0 if null). VALUES is indexed by (x, y) with (0, 0) corresponding
-     *  to the bottom-left corner. Used for testing purposes. Initializes the board
-     *  with the given raw values and sets the score.
-     */
+     *  to the bottom-left corner. Used for testing purposes. */
     public Model(int[][] rawValues, int score) {
         board = new Board(rawValues);
         this.score = score;
@@ -43,8 +40,7 @@ public class Model {
     }
 
     /** Return the current Tile at (x, y), where 0 <= x < size(),
-     *  0 <= y < size(). Returns null if there is no tile there.
-     */
+     *  0 <= y < size(). Returns null if there is no tile there. */
     public Tile tile(int x, int y) {
         return board.tile(x, y);
     }
@@ -63,6 +59,7 @@ public class Model {
     public void clear() {
         score = 0;
         board.clear();
+        resetMerged();
     }
 
     /** Add TILE to the board. There must be no Tile currently at the
@@ -85,6 +82,11 @@ public class Model {
     /** Returns true if at least one space on the board is empty.
      *  Empty spaces are stored as null. */
     public boolean emptySpaceExists() {
+        return findEmptySpace();
+    }
+
+    /** Helper method to find an empty space on the board. */
+    private boolean findEmptySpace() {
         for (int x = 0; x < board.size(); x++) {
             for (int y = 0; y < board.size(); y++) {
                 if (board.tile(x, y) == null) {
@@ -98,6 +100,11 @@ public class Model {
     /** Returns true if any tile is equal to the maximum valid value.
      *  Maximum valid value is given by MAX_PIECE. */
     public boolean maxTileExists() {
+        return checkMaxTile();
+    }
+
+    /** Helper method to check for the maximum tile. */
+    private boolean checkMaxTile() {
         for (int x = 0; x < board.size(); x++) {
             for (int y = 0; y < board.size(); y++) {
                 Tile t = board.tile(x, y);
@@ -114,34 +121,38 @@ public class Model {
      * 1. There is at least one empty space on the board.
      * 2. There are two adjacent tiles with the same value. */
     public boolean atLeastOneMoveExists() {
-        if (emptySpaceExists()) {
-            return true;
-        }
+        return findEmptySpace() || checkAdjacentMerge();
+    }
+
+    /** Checks if a tile can merge with any of its neighbors. */
+    private boolean checkAdjacentMerge() {
         for (int x = 0; x < board.size(); x++) {
             for (int y = 0; y < board.size(); y++) {
                 Tile t = board.tile(x, y);
-                if (t != null) {
-                    if (canMergeWithNeighbor(x, y, t.value())) {
-                        return true;
-                    }
+                if (t != null && canMergeWithNeighbor(x, y, t.value())) {
+                    return true;
                 }
             }
         }
         return false;
     }
 
-    // Helper method to check if a tile can merge with any of its neighbors
     private boolean canMergeWithNeighbor(int x, int y, int value) {
-        return (x > 0 && board.tile(x - 1, y) != null && board.tile(x - 1, y).value() == value)
-                || (x < board.size() - 1 && board.tile(x + 1, y) != null && board.tile(x + 1, y).value() == value)
-                || (y > 0 && board.tile(x, y - 1) != null && board.tile(x, y - 1).value() == value)
-                || (y < board.size() - 1 && board.tile(x, y + 1) != null && board.tile(x, y + 1).value() == value);
+        return (x > 0 && canMerge(x - 1, y, value))
+                || (x < board.size() - 1 && canMerge(x + 1, y, value))
+                || (y > 0 && canMerge(x, y - 1, value))
+                || (y < board.size() - 1 && canMerge(x, y + 1, value));
     }
 
-    // Moves a tile up and handles merging
+    private boolean canMerge(int x, int y, int value) {
+        Tile neighbor = board.tile(x, y);
+        return neighbor != null && neighbor.value() == value;
+    }
+
+    /** Moves a tile up as far as possible and handles merging. */
     public void moveTileUpAsFarAsPossible(int x, int y) {
-        Tile t = board.tile(x, y);
-        if (t == null) {
+        Tile tile = board.tile(x, y);
+        if (tile == null) {
             return;
         }
 
@@ -150,43 +161,44 @@ public class Model {
             targetY++;
         }
 
-        // Check for possible merge
-        if (targetY < board.size() - 1) {
-            Tile aboveTile = board.tile(x, targetY + 1);
-            if (aboveTile != null && aboveTile.value() == t.value() && !merged[x][targetY + 1]) {
-                board.move(x, targetY + 1, t);  // Move tile to the merge position
-                score += 2 * t.value();  // Update score
-                merged[x][targetY + 1] = true;  // Mark the new tile as merged
-                return;  // Exit to avoid moving the merged tile again
-            }
-        }
-
-        // Only move if the target position is different from the current position
-        if (targetY != y) {
-            board.move(x, targetY, t);
+        if (targetY < board.size() - 1 && canMerge(x, targetY + 1, tile.value()) && !merged[x][targetY + 1]) {
+            board.move(x, targetY + 1, tile);
+            score += tile.value() * 2;
+            merged[x][targetY + 1] = true;
+        } else if (targetY != y) {
+            board.move(x, targetY, tile);
         }
     }
 
-    // 添加 moveTileUpAsFarAsPossibleWithMerging 方法，调用 moveTileUpAsFarAsPossible 方法
+    /** Adds moveTileUpAsFarAsPossibleWithMerging method that calls moveTileUpAsFarAsPossible. */
     public void moveTileUpAsFarAsPossibleWithMerging(int x, int y) {
         moveTileUpAsFarAsPossible(x, y);
     }
 
-    // Tilts an entire column up
+    /** Tilts an entire column up. */
     public void tiltColumn(int x) {
         for (int y = board.size() - 2; y >= 0; y--) {
             moveTileUpAsFarAsPossible(x, y);
         }
     }
 
-    // Tilts the entire board up
+    /** Tilts the entire board up. */
     public void tilt(Side side) {
         board.setViewingPerspective(side);
-        merged = new boolean[board.size()][board.size()];  // Reset merged state
+        resetMerged();
         for (int x = 0; x < board.size(); x++) {
             tiltColumn(x);
         }
         board.setViewingPerspective(Side.NORTH);
+    }
+
+    /** Resets the merged state for all tiles. */
+    private void resetMerged() {
+        for (int i = 0; i < merged.length; i++) {
+            for (int j = 0; j < merged[i].length; j++) {
+                merged[i][j] = false;
+            }
+        }
     }
 
     public void tiltWrapper(Side side) {
