@@ -138,25 +138,8 @@ public class Model {
                 || (y < board.size() - 1 && board.tile(x, y + 1) != null && board.tile(x, y + 1).value() == value);
     }
 
-    // Moves a tile up as far as possible without merging
-    public void moveTileUpAsFarAsPossible(int x, int y) {
-        Tile t = board.tile(x, y);
-        if (t == null) {
-            return;
-        }
-
-        int targetY = y;
-        while (targetY < board.size() - 1 && board.tile(x, targetY + 1) == null) {
-            targetY++;
-        }
-
-        if (targetY != y) {
-            board.move(x, targetY, t);
-        }
-    }
-
     // Moves a tile up and handles merging
-    public void moveTileUpAsFarAsPossibleWithMerging(int x, int y) {
+    public void moveTileUpAsFarAsPossible(int x, int y) {
         Tile t = board.tile(x, y);
         if (t == null) {
             return;
@@ -184,10 +167,15 @@ public class Model {
         }
     }
 
+    // 添加 moveTileUpAsFarAsPossibleWithMerging 方法，调用 moveTileUpAsFarAsPossible 方法
+    public void moveTileUpAsFarAsPossibleWithMerging(int x, int y) {
+        moveTileUpAsFarAsPossible(x, y);
+    }
+
     // Tilts an entire column up
     public void tiltColumn(int x) {
         for (int y = board.size() - 2; y >= 0; y--) {
-            moveTileUpAsFarAsPossibleWithMerging(x, y);
+            moveTileUpAsFarAsPossible(x, y);
         }
     }
 
