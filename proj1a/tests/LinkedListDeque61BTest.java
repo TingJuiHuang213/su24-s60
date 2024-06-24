@@ -5,7 +5,7 @@ import static com.google.common.truth.Truth.assertThat;
 public class LinkedListDeque61BTest {
 
     @Test
-    /** In this test, we有三 different assert statements that verify that addFirst works correctly. */
+    /** In this test, we have three different assert statements that verify that addFirst works correctly. */
     public void addFirstTestBasic() {
         Deque61B<String> lld1 = new LinkedListDeque61B<>();
         lld1.addFirst("back");
@@ -53,6 +53,7 @@ public class LinkedListDeque61BTest {
         assertThat(lld1.get(1)).isEqualTo("middle");
         assertThat(lld1.get(2)).isEqualTo("back");
         assertThat(lld1.get(3)).isNull();
+        assertThat(lld1.get(-1)).isNull(); // 新增测试
     }
 
     @Test
@@ -65,6 +66,7 @@ public class LinkedListDeque61BTest {
         assertThat(lld1.getRecursive(1)).isEqualTo("middle");
         assertThat(lld1.getRecursive(2)).isEqualTo("back");
         assertThat(lld1.getRecursive(3)).isNull();
+        assertThat(lld1.getRecursive(-1)).isNull(); // 新增测试
     }
 
     @Test
@@ -95,7 +97,23 @@ public class LinkedListDeque61BTest {
         assertThat(lld1.toList()).isEmpty();
     }
 
-    // 新增的测试用例
+    @Test
+    public void addAfterRemoveTest() {
+        Deque61B<String> lld1 = new LinkedListDeque61B<>();
+        lld1.addLast("front");
+        lld1.addLast("middle");
+        lld1.addLast("back");
+        assertThat(lld1.removeFirst()).isEqualTo("front");
+        assertThat(lld1.removeFirst()).isEqualTo("middle");
+        assertThat(lld1.removeFirst()).isEqualTo("back");
+        assertThat(lld1.isEmpty()).isTrue();
+
+        lld1.addFirst("newFront");
+        assertThat(lld1.toList()).containsExactly("newFront").inOrder();
+        lld1.addLast("newBack");
+        assertThat(lld1.toList()).containsExactly("newFront", "newBack").inOrder();
+    }
+
     @Test
     public void addFirstAndLastTest() {
         Deque61B<Integer> lld1 = new LinkedListDeque61B<>();
@@ -119,13 +137,13 @@ public class LinkedListDeque61BTest {
 
     @Test
     public void multipleRemovalsTest() {
-        Deque61B<Integer> lld1 = new LinkedListDeque61B<>();
-        lld1.addLast(1);
-        lld1.addLast(2);
-        lld1.addLast(3);
-        lld1.addLast(4);
-        assertThat(lld1.removeFirst()).isEqualTo(1);
-        assertThat(lld1.removeLast()).isEqualTo(4);
-        assertThat(lld1.toList()).containsExactly(2, 3).inOrder();
+        Deque61B<String> lld1 = new LinkedListDeque61B<>();
+        lld1.addFirst("1");
+        lld1.addFirst("2");
+        lld1.addFirst("3");
+        assertThat(lld1.removeFirst()).isEqualTo("3");
+        assertThat(lld1.removeFirst()).isEqualTo("2");
+        assertThat(lld1.removeFirst()).isEqualTo("1");
+        assertThat(lld1.isEmpty()).isTrue();
     }
 }
