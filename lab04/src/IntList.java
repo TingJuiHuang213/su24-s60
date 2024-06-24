@@ -24,137 +24,176 @@ public class IntList {
      * IntList L = IntList.list(1, 2, 3);
      * System.out.println(L.toString()) // Prints 1 2 3 */
     public static IntList of(int... items) {
-        /** Check for cases when we have no element given. */
         if (items.length == 0) {
             return null;
         }
-        /** Create the first element. */
         IntList head = new IntList(items[0]);
-        IntList last = head;
-        /** Create rest of the list. */
+        IntList current = head;
         for (int i = 1; i < items.length; i++) {
-            last.next = new IntList(items[i]);
-            last = last.next;
+            current.next = new IntList(items[i]);
+            current = current.next;
         }
         return head;
     }
 
     /**
-     * Returns [position]th item in this list. Throws IllegalArgumentException
-     * if index out of bounds.
+     * Returns the item at the specified position in this list. Throws IllegalArgumentException
+     * if the position is out of bounds.
      *
-     * @param position, the position of element.
-     * @return The element at [position]
+     * @param position the position of the element to return
+     * @return the element at the specified position
      */
     public int get(int position) {
-        //TODO: YOUR CODE HERE
-        return -1;
+        if (position < 0) {
+            throw new IllegalArgumentException("Position must be non-negative");
+        }
+        IntList current = this;
+        for (int i = 0; i < position; i++) {
+            if (current.next == null) {
+                throw new IllegalArgumentException("Position is out of bounds");
+            }
+            current = current.next;
+        }
+        return current.item;
     }
 
     /**
      * Returns the string representation of the list. For the list (1, 2, 3),
      * returns "1 2 3".
      *
-     * @return The String representation of the list.
+     * @return the string representation of the list
      */
+    @Override
     public String toString() {
-        //TODO: YOUR CODE HERE
-        return null;
+        return String.join(" ", toStringHelper(this, new StringBuilder())).trim();
+    }
+
+    private String toStringHelper(IntList list, StringBuilder sb) {
+        if (list == null) {
+            return sb.toString();
+        }
+        sb.append(list.item).append(" ");
+        return toStringHelper(list.next, sb);
     }
 
     /**
-     * Returns whether this and the given list or object are equal.
+     * Compares this list to the specified object. The result is true if and only if
+     * the argument is not null and is an IntList object that contains the same integers
+     * in the same order as this list.
      *
-     * NOTE: A full implementation of equals requires checking if the
-     * object passed in is of the correct type, as the parameter is of
-     * type Object. This also requires we convert the Object to an
-     * IntList, if that is legal. The operation we use to do this is called
-     * casting, and it is done by specifying the desired type in
-     * parentheses. An example of this is `IntList otherLst = (IntList) obj;`
-     *
-     * @param obj, another list (object)
-     * @return Whether the two lists are equal.
+     * @param obj the object to compare this IntList against
+     * @return true if the given object represents an IntList equivalent to this list, false otherwise
      */
+    @Override
     public boolean equals(Object obj) {
-        if (obj == null) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null || getClass() != obj.getClass()) {
             return false;
         }
-        if (!(obj instanceof IntList)) {
+        IntList other = (IntList) obj;
+        return equalsHelper(this, other);
+    }
+
+    private boolean equalsHelper(IntList a, IntList b) {
+        if (a == null && b == null) {
+            return true;
+        }
+        if (a == null || b == null || a.item != b.item) {
             return false;
         }
-        IntList otherLst = (IntList) obj;
-
-        //TODO: YOUR CODE HERE
-
-        return false;
+        return equalsHelper(a.next, b.next);
     }
 
     /**
-     * Adds the given value at the end of the list.
+     * Appends the specified value to the end of this list.
      *
-     * @param value, the int to be added.
+     * @param value the value to be appended to this list
      */
     public void add(int value) {
-        //TODO: YOUR CODE HERE
+        if (this.next == null) {
+            this.next = new IntList(value);
+        } else {
+            this.next.add(value);
+        }
     }
 
     /**
-     * Returns the smallest element in the list.
+     * Returns the smallest element in this list.
      *
-     * @return smallest element in the list
+     * @return the smallest element in this list
      */
     public int smallest() {
-        //TODO: YOUR CODE HERE
-        return -1;
+        if (this == null) {
+            throw new IllegalArgumentException("Cannot find smallest element of an empty list");
+        }
+        return smallestHelper(this, this.item);
+    }
+
+    private int smallestHelper(IntList list, int min) {
+        if (list == null) {
+            return min;
+        }
+        if (list.item < min) {
+            min = list.item;
+        }
+        return smallestHelper(list.next, min);
     }
 
     /**
-     * Returns the sum of squares of all elements in the list.
+     * Returns the sum of the squares of all elements in this list.
      *
-     * @return The sum of squares of all elements.
+     * @return the sum of the squares of all elements in this list
      */
     public int squaredSum() {
-        //TODO: YOUR CODE HERE
-        return -1;
+        return squaredSumHelper(this, 0);
+    }
+
+    private int squaredSumHelper(IntList list, int sum) {
+        if (list == null) {
+            return sum;
+        }
+        return squaredSumHelper(list.next, sum + list.item * list.item);
     }
 
     /**
      * Destructively squares each item of the list.
      *
-     * @param L list to destructively square.
+     * @param L the list to destructively square
      */
     public static void dSquareList(IntList L) {
-        while (L != null) {
-            L.item = L.item * L.item;
-            L = L.next;
+        if (L == null) {
+            return;
         }
+        L.item *= L.item;
+        dSquareList(L.next);
     }
 
     /**
      * Returns a list equal to L with all elements squared. Non-destructive.
      *
-     * @param L list to non-destructively square.
-     * @return the squared list.
+     * @param L the list to non-destructively square
+     * @return a new list with all elements squared
      */
     public static IntList squareListIterative(IntList L) {
         if (L == null) {
             return null;
         }
-        IntList res = new IntList(L.item * L.item, null);
-        IntList ptr = res;
-        L = L.next;
-        while (L != null) {
-            ptr.next = new IntList(L.item * L.item, null);
-            L = L.next;
-            ptr = ptr.next;
+        IntList result = new IntList(L.item * L.item, null);
+        IntList current = result;
+        for (IntList p = L.next; p != null; p = p.next) {
+            current.next = new IntList(p.item * p.item, null);
+            current = current.next;
         }
-        return res;
+        return result;
     }
 
-    /** Returns a list equal to L with all elements squared. Non-destructive.
+    /**
+     * Returns a list equal to L with all elements squared. Non-destructive.
      *
-     * @param L list to non-destructively square.
-     * @return the squared list.
+     * @param L the list to non-destructively square
+     * @return a new list with all elements squared
      */
     public static IntList squareListRecursive(IntList L) {
         if (L == null) {
@@ -164,28 +203,65 @@ public class IntList {
     }
 
     /**
-     * Returns a new IntList consisting of A followed by B,
-     * non-destructively.
+     * Returns a new IntList consisting of A followed by B, non-destructively.
      *
-     * @param A list to be on the front of the new list.
-     * @param B list to be on the back of the new list.
-     * @return new list with A followed by B.
+     * @param A the list to be at the front of the new list
+     * @param B the list to be at the back of the new list
+     * @return a new list with A followed by B
      */
     public static IntList catenate(IntList A, IntList B) {
-        //TODO: YOUR CODE HERE
-        return null;
+        if (A == null) return B;
+        IntList result = new IntList(A.item, catenate(A.next, B));
+        return result;
     }
 
     /**
-     * Returns a new IntList consisting of A followed by B,
-     * destructively.
+     * Returns a new IntList consisting of A followed by B, destructively.
      *
-     * @param A list to be on the front of the new list.
-     * @param B list to be on the back of the new list.
-     * @return new list with A followed by B.
+     * @param A the list to be at the front of the new list
+     * @param B the list to be at the back of the new list
+     * @return a new list with A followed by B
      */
     public static IntList dcatenate(IntList A, IntList B) {
-        //TODO: YOUR CODE HERE
-        return null;
+        if (A == null) return B;
+        IntList current = A;
+        while (current.next != null) {
+            current = current.next;
+        }
+        current.next = B;
+        return A;
+    }
+
+    // Additional helper methods for more unique functionality
+
+    /**
+     * Reverses the list non-destructively.
+     *
+     * @return a new list with elements in reverse order
+     */
+    public IntList reverse() {
+        IntList result = null;
+        IntList current = this;
+        while (current != null) {
+            result = new IntList(current.item, result);
+            current = current.next;
+        }
+        return result;
+    }
+
+    /**
+     * Calculates the product of all elements in the list.
+     *
+     * @return the product of all elements in the list
+     */
+    public int product() {
+        return productHelper(this, 1);
+    }
+
+    private int productHelper(IntList list, int product) {
+        if (list == null) {
+            return product;
+        }
+        return productHelper(list.next, product * list.item);
     }
 }

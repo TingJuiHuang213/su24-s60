@@ -141,23 +141,63 @@ public class IntListTest {
     /**
      * Do not use the new keyword in your tests. You can create
      * lists using the handy IntList.of method.
-     *
+     * <p>
      * Make sure to include test cases involving lists of various sizes
      * on both sides of the operation. That includes the empty of, which
      * can be instantiated, for example, with
      * IntList empty = IntList.of().
-     *
+     * <p>
      * Keep in mind that dcatenate(A, B) is NOT required to leave A untouched.
      * Anything can happen to A.
      */
 
     @Test
-    public void testCatenate() {
-        // TODO: Add tests
+    public void testCustomCatenate() {
+        IntList listA = IntList.of(1, 2, 3);
+        IntList listB = IntList.of(4, 5);
+        IntList combinedResult = IntList.catenate(listA, listB);
+
+        assertWithMessage("Expected concatenation result does not match")
+                .that(combinedResult).isEqualTo(IntList.of(1, 2, 3, 4, 5));
+
+        // Verify original lists are untouched
+        assertWithMessage("ListA should remain as it was originally")
+                .that(listA).isEqualTo(IntList.of(1, 2, 3));
+        assertWithMessage("ListB should remain as it was originally")
+                .that(listB).isEqualTo(IntList.of(4, 5));
+
+        IntList emptyList = IntList.of();
+        combinedResult = IntList.catenate(emptyList, listB);
+        assertWithMessage("Concatenation with an empty list (as first parameter) failed")
+                .that(combinedResult).isEqualTo(IntList.of(4, 5));
+
+        combinedResult = IntList.catenate(listA, emptyList);
+        assertWithMessage("Concatenation with an empty list (as second parameter) failed")
+                .that(combinedResult).isEqualTo(IntList.of(1, 2, 3));
     }
 
     @Test
-    public void testDCatenate() {
-        // TODO: Add test
+    public void testCustomDCatenate() {
+        IntList listX = IntList.of(1, 2, 3);
+        IntList listY = IntList.of(4, 5);
+        IntList destructiveResult = IntList.dcatenate(listX, listY);
+
+        assertWithMessage("Expected destructive concatenation result does not match")
+                .that(destructiveResult).isEqualTo(IntList.of(1, 2, 3, 4, 5));
+
+        // Verify listX is modified and listY remains unchanged
+        assertWithMessage("ListX should be modified to include elements from ListY")
+                .that(listX).isEqualTo(IntList.of(1, 2, 3, 4, 5));
+        assertWithMessage("ListY should remain unchanged")
+                .that(listY).isEqualTo(IntList.of(4, 5));
+
+        IntList emptyList = IntList.of();
+        destructiveResult = IntList.dcatenate(emptyList, listY);
+        assertWithMessage("Destructive concatenation with an empty list (as first parameter) failed")
+                .that(destructiveResult).isEqualTo(IntList.of(4, 5));
+
+        destructiveResult = IntList.dcatenate(listX, emptyList);
+        assertWithMessage("Destructive concatenation with an empty list (as second parameter) failed")
+                .that(destructiveResult).isEqualTo(IntList.of(1, 2, 3, 4, 5));
     }
 }
