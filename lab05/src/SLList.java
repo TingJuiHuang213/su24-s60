@@ -145,7 +145,9 @@ public class SLList {
 
     /** Destructively reverses this list. */
     public void reverse() {
-        if (size <= 1) return;
+        if (size <= 1) {
+            return;
+        }
 
         IntListNode prev = sentinel;
         IntListNode curr = sentinel.next;
