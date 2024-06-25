@@ -38,7 +38,6 @@ public class SLList {
         public String toString() {
             return item + "";
         }
-
     }
 
     /* The first item (if it exists) is at sentinel.next. */
@@ -53,10 +52,10 @@ public class SLList {
         size = 0;
     }
 
+    /** Creates an SLList with one integer. */
     public SLList(int x) {
         sentinel = new IntListNode(SENTINEL_VAL, null);
-        sentinel.next = new IntListNode(x, null);
-        sentinel.next.next = sentinel;
+        sentinel.next = new IntListNode(x, sentinel);
         size = 1;
     }
 
@@ -83,29 +82,26 @@ public class SLList {
             l1 = l1.next;
             l2 = l2.next;
         }
-        if (l1 != sentinel || l2 != slList.sentinel) {
-            return false;
-        }
-        return true;
+        return l1 == sentinel && l2 == slList.sentinel;
     }
 
     @Override
     public String toString() {
+        StringBuilder result = new StringBuilder();
         IntListNode l = sentinel.next;
-        String result = "";
 
         while (l != sentinel) {
-            result += l + " ";
+            result.append(l).append(" ");
             l = l.next;
         }
 
-        return result.trim();
+        return result.toString().trim();
     }
 
     /** Returns an SLList consisting of the given values. */
     public static SLList of(int... values) {
         SLList list = new SLList();
-        for (int i = values.length - 1; i >= 0; i -= 1) {
+        for (int i = values.length - 1; i >= 0; i--) {
             list.addFirst(values[i]);
         }
         return list;
@@ -119,26 +115,50 @@ public class SLList {
     /** Adds x to the front of the list. */
     public void addFirst(int x) {
         sentinel.next = new IntListNode(x, sentinel.next);
-        size += 1;
+        size++;
     }
 
     /** Return the value at the given index. */
     public int get(int index) {
+        if (index >= size) {
+            throw new IndexOutOfBoundsException("Index out of bounds");
+        }
         IntListNode p = sentinel.next;
-        while (index > 0) {
+        for (int i = 0; i < index; i++) {
             p = p.next;
-            index -= 1;
         }
         return p.item;
     }
 
     /** Adds x to the list at the specified index. */
     public void add(int index, int x) {
-        // TODO: YOUR CODE HERE
+        if (index > size) {
+            index = size;
+        }
+        IntListNode p = sentinel;
+        for (int i = 0; i < index; i++) {
+            p = p.next;
+        }
+        p.next = new IntListNode(x, p.next);
+        size++;
     }
 
     /** Destructively reverses this list. */
     public void reverse() {
-        // TODO: YOUR CODE HERE
+        if (size <= 1) return;
+
+        IntListNode prev = sentinel;
+        IntListNode curr = sentinel.next;
+        IntListNode next;
+
+        while (curr != sentinel) {
+            next = curr.next;
+            curr.next = prev;
+            prev = curr;
+            curr = next;
+        }
+
+        sentinel.next.next = sentinel;
+        sentinel.next = prev;
     }
 }

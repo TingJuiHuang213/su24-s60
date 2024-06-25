@@ -1,9 +1,9 @@
 import org.junit.Test;
-
 import static com.google.common.truth.Truth.*;
 
 public class SLListTest {
 
+    /** 測試在指定索引處添加元素的功能 */
     @Test
     public void testSLListAdd() {
         SLList test1 = SLList.of(1, 3, 5); /* test1: {1, 3, 5} */
@@ -25,8 +25,19 @@ public class SLListTest {
         assertWithMessage("test1 is incorrect after addition at the front").that(test1.equals(SLList.of(0, 1, 2, 3, 4, 5))).isTrue();
     }
 
+    /** 測試反轉鏈表的功能 */
     @Test
     public void testSLListReverse() {
-        // TODO: Add tests
+        SLList test1 = SLList.of(1, 2, 3, 4, 5); /* test1: {1, 2, 3, 4, 5} */
+        test1.reverse(); /* test1: {5, 4, 3, 2, 1}*/
+        assertWithMessage("test1 is incorrect after reverse").that(test1.equals(SLList.of(5, 4, 3, 2, 1))).isTrue();
+
+        SLList test2 = SLList.of(1); /* test2: {1} */
+        test2.reverse(); /* test2: {1}*/
+        assertWithMessage("test2 is incorrect after reverse").that(test2.equals(SLList.of(1))).isTrue();
+
+        SLList test3 = new SLList(); /* test3: {} */
+        test3.reverse(); /* test3: {}*/
+        assertWithMessage("test3 is incorrect after reverse").that(test3.equals(new SLList())).isTrue();
     }
 }
