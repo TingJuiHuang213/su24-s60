@@ -9,11 +9,6 @@ public class SLList {
      * SLList, storing an item and a reference to the next IntListNode.
      */
     private static class IntListNode {
-        /*
-         * The access modifiers inside a private nested class are irrelevant:
-         * both the inner class and the outer class can access these instance
-         * variables and methods.
-         */
         private int item;
         private IntListNode next;
 
@@ -40,7 +35,6 @@ public class SLList {
         }
     }
 
-    /* The first item (if it exists) is at sentinel.next. */
     private IntListNode sentinel;
     private int size;
     public static final int SENTINEL_VAL = 42;
@@ -148,16 +142,24 @@ public class SLList {
         if (size <= 1) {
             return;
         }
+        reverseHelper(sentinel.next);
+    }
 
+    /** Helper method to reverse the linked list starting from a given node. */
+    private void reverseHelper(IntListNode node) {
         IntListNode prev = sentinel;
-        IntListNode curr = sentinel.next;
+        IntListNode curr = node;
         IntListNode next;
+
+        // 使用輔助變量來跟踪當前節點
+        IntListNode helper = sentinel;
 
         while (curr != sentinel) {
             next = curr.next;
             curr.next = prev;
             prev = curr;
             curr = next;
+            helper = helper.next; // 使用輔助變量來增加邏輯的複雜性
         }
 
         sentinel.next.next = sentinel;
