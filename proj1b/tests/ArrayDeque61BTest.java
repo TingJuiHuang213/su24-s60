@@ -1,14 +1,8 @@
 import org.junit.jupiter.api.Test;
 import static com.google.common.truth.Truth.assertThat;
 
-/**
- * 执行一些基本的数组双端队列测试。
- */
 public class ArrayDeque61BTest {
 
-    /**
-     * 测试 addFirst 方法的基本情况。
-     */
     @Test
     public void addFirstTestBasic() {
         Deque61B<String> ad = new ArrayDeque61B<>();
@@ -20,9 +14,6 @@ public class ArrayDeque61BTest {
         assertThat(ad.toList()).containsExactly("front", "middle", "back").inOrder();
     }
 
-    /**
-     * 测试 addLast 方法的基本情况。
-     */
     @Test
     public void addLastTestBasic() {
         Deque61B<String> ad = new ArrayDeque61B<>();
@@ -32,9 +23,6 @@ public class ArrayDeque61BTest {
         assertThat(ad.toList()).containsExactly("front", "middle", "back").inOrder();
     }
 
-    /**
-     * 测试 isEmpty 方法。
-     */
     @Test
     public void isEmptyTest() {
         Deque61B<String> ad = new ArrayDeque61B<>();
@@ -43,9 +31,6 @@ public class ArrayDeque61BTest {
         assertThat(ad.isEmpty()).isFalse();
     }
 
-    /**
-     * 测试 size 方法。
-     */
     @Test
     public void sizeTest() {
         Deque61B<String> ad = new ArrayDeque61B<>();
@@ -56,9 +41,6 @@ public class ArrayDeque61BTest {
         assertThat(ad.size()).isEqualTo(2);
     }
 
-    /**
-     * 测试 get 方法。
-     */
     @Test
     public void getTest() {
         Deque61B<String> ad = new ArrayDeque61B<>();
@@ -72,9 +54,6 @@ public class ArrayDeque61BTest {
         assertThat(ad.get(-1)).isNull();
     }
 
-    /**
-     * 测试 getRecursive 方法。
-     */
     @Test
     public void getRecursiveTest() {
         Deque61B<String> ad = new ArrayDeque61B<>();
@@ -88,9 +67,6 @@ public class ArrayDeque61BTest {
         assertThat(ad.getRecursive(-1)).isNull();
     }
 
-    /**
-     * 测试 removeFirst 方法。
-     */
     @Test
     public void removeFirstTest() {
         Deque61B<String> ad = new ArrayDeque61B<>();
@@ -105,9 +81,6 @@ public class ArrayDeque61BTest {
         assertThat(ad.toList()).isEmpty();
     }
 
-    /**
-     * 测试 removeLast 方法。
-     */
     @Test
     public void removeLastTest() {
         Deque61B<String> ad = new ArrayDeque61B<>();
@@ -122,9 +95,6 @@ public class ArrayDeque61BTest {
         assertThat(ad.toList()).isEmpty();
     }
 
-    /**
-     * 测试在移除所有元素后添加新元素。
-     */
     @Test
     public void addAfterRemoveTest() {
         Deque61B<String> ad = new ArrayDeque61B<>();
@@ -142,9 +112,6 @@ public class ArrayDeque61BTest {
         assertThat(ad.toList()).containsExactly("newFront", "newBack").inOrder();
     }
 
-    /**
-     * 测试在两端添加元素。
-     */
     @Test
     public void addFirstAndLastTest() {
         Deque61B<Integer> ad = new ArrayDeque61B<>();
@@ -155,9 +122,6 @@ public class ArrayDeque61BTest {
         assertThat(ad.toList()).containsExactly(5, 10, 20, 30).inOrder();
     }
 
-    /**
-     * 测试混合操作。
-     */
     @Test
     public void mixedOperationsTest() {
         Deque61B<String> ad = new ArrayDeque61B<>();
@@ -169,9 +133,6 @@ public class ArrayDeque61BTest {
         assertThat(ad.size()).isEqualTo(0);
     }
 
-    /**
-     * 测试多次移除。
-     */
     @Test
     public void multipleRemovalsTest() {
         Deque61B<String> ad = new ArrayDeque61B<>();
@@ -182,5 +143,31 @@ public class ArrayDeque61BTest {
         assertThat(ad.removeFirst()).isEqualTo("2");
         assertThat(ad.removeFirst()).isEqualTo("1");
         assertThat(ad.isEmpty()).isTrue();
+    }
+
+    // 新增測試用於覆蓋add方法的測試
+    @Test
+    public void addTest() {
+        Deque61B<Integer> ad = new ArrayDeque61B<>();
+        for (int i = 0; i < 20; i++) {
+            ad.addLast(i);
+        }
+        assertThat(ad.size()).isEqualTo(20);
+        for (int i = 0; i < 20; i++) {
+            assertThat(ad.get(i)).isEqualTo(i);
+        }
+    }
+
+    // 新增測試用於覆蓋resize方法的測試
+    @Test
+    public void advancedResizeTest() {
+        Deque61B<Integer> ad = new ArrayDeque61B<>();
+        for (int i = 0; i < 100; i++) {
+            ad.addLast(i);
+        }
+        assertThat(ad.size()).isEqualTo(100);
+        for (int i = 0; i < 100; i++) {
+            assertThat(ad.get(i)).isEqualTo(i);
+        }
     }
 }
