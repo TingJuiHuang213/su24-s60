@@ -214,4 +214,22 @@ public class ArrayDeque61BTest {
         ad.addLast("newBack");
         assertThat(ad.toList()).containsExactly("newFront", "newBack").inOrder();
     }
+
+    // 重新增加测试确保覆盖所有可能的情景
+    @Test
+    public void addAfterRemoveComprehensiveTest() {
+        Deque61B<String> ad = new ArrayDeque61B<>();
+        ad.addLast("first");
+        ad.addLast("second");
+        ad.addLast("third");
+        assertThat(ad.removeFirst()).isEqualTo("first");
+        assertThat(ad.removeFirst()).isEqualTo("second");
+        assertThat(ad.removeFirst()).isEqualTo("third");
+        assertThat(ad.isEmpty()).isTrue();
+
+        ad.addLast("newFirst");
+        assertThat(ad.toList()).containsExactly("newFirst").inOrder();
+        ad.addFirst("newSecond");
+        assertThat(ad.toList()).containsExactly("newSecond", "newFirst").inOrder();
+    }
 }
