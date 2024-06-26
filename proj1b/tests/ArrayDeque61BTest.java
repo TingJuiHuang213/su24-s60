@@ -194,7 +194,24 @@ public class ArrayDeque61BTest {
             assertThat(ad.get(i)).isEqualTo(24 - i);
         }
         for (int i = 25; i < 50; i++) {
-            assertThat(ad.get(i)).isEqualTo(i + 75 - 25);
+            assertThat(ad.get(i)).isEqualTo(i + 50);
         }
+    }
+
+    @Test
+    public void addAfterRemoveToEmptyTest() {
+        Deque61B<String> ad = new ArrayDeque61B<>();
+        ad.addLast("front");
+        ad.addLast("middle");
+        ad.addLast("back");
+        assertThat(ad.removeFirst()).isEqualTo("front");
+        assertThat(ad.removeFirst()).isEqualTo("middle");
+        assertThat(ad.removeFirst()).isEqualTo("back");
+        assertThat(ad.isEmpty()).isTrue();
+
+        ad.addFirst("newFront");
+        assertThat(ad.toList()).containsExactly("newFront").inOrder();
+        ad.addLast("newBack");
+        assertThat(ad.toList()).containsExactly("newFront", "newBack").inOrder();
     }
 }
