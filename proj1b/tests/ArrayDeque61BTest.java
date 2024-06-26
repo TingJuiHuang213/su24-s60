@@ -156,6 +156,16 @@ public class ArrayDeque61BTest {
         for (int i = 0; i < 20; i++) {
             assertThat(ad.get(i)).isEqualTo(i);
         }
+        for (int i = 0; i < 20; i++) {
+            ad.removeFirst();
+        }
+        for (int i = 0; i < 20; i++) {
+            ad.addFirst(i);
+        }
+        assertThat(ad.size()).isEqualTo(20);
+        for (int i = 0; i < 20; i++) {
+            assertThat(ad.get(i)).isEqualTo(19 - i);
+        }
     }
 
     // 新增測試用於覆蓋resize方法的測試
@@ -168,6 +178,23 @@ public class ArrayDeque61BTest {
         assertThat(ad.size()).isEqualTo(100);
         for (int i = 0; i < 100; i++) {
             assertThat(ad.get(i)).isEqualTo(i);
+        }
+        for (int i = 0; i < 75; i++) {
+            ad.removeFirst();
+        }
+        assertThat(ad.size()).isEqualTo(25);
+        for (int i = 0; i < 25; i++) {
+            assertThat(ad.get(i)).isEqualTo(i + 75);
+        }
+        for (int i = 0; i < 25; i++) {
+            ad.addFirst(i);
+        }
+        assertThat(ad.size()).isEqualTo(50);
+        for (int i = 0; i < 25; i++) {
+            assertThat(ad.get(i)).isEqualTo(24 - i);
+        }
+        for (int i = 25; i < 50; i++) {
+            assertThat(ad.get(i)).isEqualTo(i + 75 - 25);
         }
     }
 }
