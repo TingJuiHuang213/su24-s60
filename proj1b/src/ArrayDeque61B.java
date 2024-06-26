@@ -68,11 +68,14 @@ public class ArrayDeque61B<T> implements Deque61B<T> {
         if (index < 0 || index >= size) {
             return null;
         }
-        return getRecursiveHelper(index);
+        return getRecursiveHelper(front, index);
     }
 
-    private T getRecursiveHelper(int index) {
-        return items[(front + index) % items.length];
+    private T getRecursiveHelper(int currentIndex, int index) {
+        if (index == 0) {
+            return items[currentIndex % items.length];
+        }
+        return getRecursiveHelper((currentIndex + 1) % items.length, index - 1);
     }
 
     @Override
