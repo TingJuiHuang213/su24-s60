@@ -13,42 +13,77 @@ public class BooleanSet implements SimpleSet {
         size = 0;
     }
 
-    /** Adds k to the set. */
+    /**
+     * Adds k to the set if it is not already present.
+     *
+     * @param k the element to add
+     */
     @Override
     public void add(int k) {
-        // TODO: Implement this method.
+        if (!contains[k]) {
+            contains[k] = true;
+            size++;
+        }
     }
 
-    /** Removes k from the set. */
+    /**
+     * Removes k from the set if it is present.
+     *
+     * @param k the element to remove
+     */
     @Override
     public void remove(int k) {
-        // TODO: Implement this method.
+        if (contains[k]) {
+            contains[k] = false;
+            size--;
+        }
     }
 
-    /** Return true if k is in this set, false otherwise. */
+    /**
+     * Returns true if k is in this set, false otherwise.
+     *
+     * @param k the element to check
+     * @return true if k is present, false otherwise
+     */
     @Override
     public boolean contains(int k) {
         return contains[k];
     }
 
-
-    /** Return true if this set is empty, false otherwise. */
+    /**
+     * Returns true if this set is empty, false otherwise.
+     *
+     * @return true if the set is empty, false otherwise
+     */
     @Override
     public boolean isEmpty() {
-        return this.size() == 0;
+        return size == 0;
     }
 
-    /** Returns the number of items in the set. */
+    /**
+     * Returns the number of items in the set.
+     *
+     * @return the size of the set
+     */
     @Override
     public int size() {
-        // TODO: Implement this method.
-        return 0;
+        return size;
     }
 
-    /** Returns an array containing all of the elements in this collection. */
+    /**
+     * Returns an array containing all of the elements in this collection.
+     *
+     * @return an array containing all elements in the set
+     */
     @Override
     public int[] toIntArray() {
-        // TODO: Implement this method.
-        return null;
+        int[] array = new int[size];
+        int index = 0;
+        for (int i = 0; i < contains.length; i++) {
+            if (contains[i]) {
+                array[index++] = i;
+            }
+        }
+        return array;
     }
 }

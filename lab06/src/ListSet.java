@@ -12,45 +12,65 @@ public class ListSet implements SimpleSet {
         elems = new ArrayList<Integer>();
     }
 
-    /** Adds k to the set. */
+    /**
+     * Adds k to the set if it is not already present.
+     * @param k the element to add
+     */
     @Override
     public void add(int k) {
-        // TODO: Implement this method.
+        if (!contains(k)) {
+            elems.add(k);
+        }
     }
 
-    /** Removes k from the set. */
+    /**
+     * Removes k from the set if it is present.
+     * @param k the element to remove
+     */
     @Override
     public void remove(int k) {
         Integer toRemove = k;
-        // TODO - use the above variable with an appropriate List method.
-        // The reason is beyond the scope of this lab, but involves
-        // method resolution.
+        elems.remove(toRemove);
     }
 
-    /** Return true if k is in this set, false otherwise. */
+    /**
+     * Returns true if k is in this set, false otherwise.
+     * @param k the element to check
+     * @return true if k is present, false otherwise
+     */
     @Override
     public boolean contains(int k) {
-        // TODO: Implement this method.
-        return false;
+        return elems.contains(k);
     }
 
-    /** Return true if this set is empty, false otherwise. */
+    /**
+     * Returns true if this set is empty, false otherwise.
+     * @return true if the set is empty, false otherwise
+     */
     @Override
     public boolean isEmpty() {
-      return this.size() == 0;
+        return elems.isEmpty();
     }
 
-    /** Returns the number of items in the set. */
+    /**
+     * Returns the number of items in the set.
+     * @return the size of the set
+     */
     @Override
     public int size() {
-        // TODO: Implement this method.
-        return 0;
+        return elems.size();
     }
 
-    /** Returns an array containing all of the elements in this collection. */
+    /**
+     * Returns an array containing all of the elements in this collection.
+     * @return an array containing all elements in the set
+     */
     @Override
     public int[] toIntArray() {
-        // TODO - use a for loop!
-        return null;
+        int[] array = new int[elems.size()];
+        for (int i = 0; i < elems.size(); i++) {
+            array[i] = elems.get(i);
+        }
+        return array;
     }
 }
