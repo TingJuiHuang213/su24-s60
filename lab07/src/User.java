@@ -14,8 +14,7 @@ public class User implements Comparable<User> {
     private String email;
 
     public User(String name, String email) {
-        this(nextId, name, email);
-        nextId += 1;
+        this(generateNextId(), name, email);
     }
 
     /** Force assign an id to a created user **/
@@ -26,32 +25,44 @@ public class User implements Comparable<User> {
         setAge();
     }
 
-    /** For this assignment, age is just an automatically assigned field. */
-    void setAge() {
-        age = (id % AGE_MODULUS) + AGE_CONSTANT;
+    /** Generate the next user ID **/
+    private static int generateNextId() {
+        int currentId = nextId;
+        nextId += 1;
+        return currentId;
     }
 
-    int getAge() {
+    /** For this assignment, age is just an automatically assigned field. */
+    private void setAge() {
+        this.age = calculateAge(this.id);
+    }
+
+    /** Calculate age based on the user ID */
+    private int calculateAge(int id) {
+        return (id % AGE_MODULUS) + AGE_CONSTANT;
+    }
+
+    public int getAge() {
         return age;
     }
 
-    int getId() {
+    public int getId() {
         return id;
     }
 
-    String getName() {
+    public String getName() {
         return name;
     }
 
-    void setName(String name) {
+    public void setName(String name) {
         this.name = name;
     }
 
-    String getEmail() {
+    public String getEmail() {
         return email;
     }
 
-    void setEmail(String email) {
+    public void setEmail(String email) {
         this.email = email;
     }
 
@@ -65,27 +76,21 @@ public class User implements Comparable<User> {
     public boolean equals(Object o) {
         if (this == o) {
             return true;
-        } else if (o == null || getClass() != o.getClass()) {
+        }
+        if (o == null || getClass() != o.getClass()) {
             return false;
         }
 
         User other = (User) o;
-        if (id != other.id) {
-            return false;
-        } else if (!Objects.equals(name, other.name)) {
-            return false;
-        } else {
-            return Objects.equals(email, other.email);
-        }
+        return id == other.id &&
+                Objects.equals(name, other.name) &&
+                Objects.equals(email, other.email);
     }
 
     @Override
     public int compareTo(User other) {
-        if (this.id != other.id) {
-            return Integer.compare(this.id, other.id);
-        } else {
-            return this.name.compareTo(other.name);
-        }
+        int idComparison = Integer.compare(this.id, other.id);
+        return (idComparison != 0) ? idComparison : this.name.compareTo(other.name);
     }
 
     public static void main(String[] args) {
@@ -97,6 +102,7 @@ public class User implements Comparable<User> {
                 new User(1, "Circle", "")
         };
         Arrays.sort(users);
+        // 调整输出循环的顺序
         for (User user : users) {
             System.out.println(user);
         }

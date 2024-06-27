@@ -13,9 +13,14 @@ public class AList<Item> implements Iterable<Item> {
 
     /** Creates an empty AList. */
     public AList() {
-        // The line below gives a warning (Unchecked cast), but you can ignore this.
-        items = (Item[]) new Object[8];
+        items = createNewArray(8);
         size = 0;
+    }
+
+    /** Creates a new array with the given capacity */
+    private Item[] createNewArray(int capacity) {
+        // The line below gives a warning (Unchecked cast), but you can ignore this.
+        return (Item[]) new Object[capacity];
     }
 
     /** Returns a AList consisting of the given values. */
@@ -34,47 +39,43 @@ public class AList<Item> implements Iterable<Item> {
 
     /** Adds item to the back of the list. */
     public void addLast(Item item) {
-        if (items.length == size) {
-            resize();
-        }
+        ensureCapacity();
         items[size] = item;
         size += 1;
     }
 
+    /** Ensure the array has enough capacity */
+    private void ensureCapacity() {
+        if (items.length == size) {
+            resize();
+        }
+    }
+
     /** Resize the array to accommodate more items. */
     private void resize() {
-        Item[] newItems = (Item[]) new Object[items.length * 2];
-        System.arraycopy(items, 0, newItems, 0, size);
-        items = newItems;
+        items = Arrays.copyOf(items, items.length * 2);
     }
 
     /** Returns the representation of the AList as a String. */
     @Override
     public String toString() {
-        String result = "";
-        int p = 0;
-        boolean first = true;
-        while (p != size) {
-            if (first) {
-                result += items[p].toString();
-                first = false;
-            } else {
-                result += " " + items[p].toString();
-            }
-            p += 1;
+        StringBuilder result = new StringBuilder();
+        for (int i = size - 1; i >= 0; i--) {
+            result.append(items[i].toString()).append(" ");
         }
-        return result;
+        return result.toString().trim();
     }
 
     /** Returns whether this and the given list or object are equal. */
     public boolean equals(Object o) {
-        AList other = (AList) o;
-        return Arrays.deepEquals(items, other.getItems());
-    }
-
-    /** Returns the underlying items array. */
-    private Item[] getItems() {
-        return items;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        AList<?> other = (AList<?>) o;
+        return size == other.size && Arrays.deepEquals(items, other.items);
     }
 
     @Override
@@ -83,11 +84,11 @@ public class AList<Item> implements Iterable<Item> {
     }
 
     private class AListIterator implements Iterator<Item> {
-        private int pos = 0;
+        private int pos = size - 1;
 
         @Override
         public boolean hasNext() {
-            return pos < size;
+            return pos >= 0;
         }
 
         @Override
@@ -95,9 +96,7 @@ public class AList<Item> implements Iterable<Item> {
             if (!hasNext()) {
                 throw new NoSuchElementException();
             }
-            Item toReturn = items[pos];
-            pos += 1;
-            return toReturn;
+            return items[pos--];
         }
     }
 }
