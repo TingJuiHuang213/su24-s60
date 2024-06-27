@@ -60,7 +60,7 @@ public class AList<Item> implements Iterable<Item> {
     @Override
     public String toString() {
         StringBuilder result = new StringBuilder();
-        for (int i = size - 1; i >= 0; i--) {
+        for (int i = 0; i < size; i++) {
             result.append(items[i].toString()).append(" ");
         }
         return result.toString().trim();
@@ -84,11 +84,11 @@ public class AList<Item> implements Iterable<Item> {
     }
 
     private class AListIterator implements Iterator<Item> {
-        private int pos = size - 1;
+        private int pos = 0;
 
         @Override
         public boolean hasNext() {
-            return pos >= 0;
+            return pos < size;
         }
 
         @Override
@@ -96,7 +96,7 @@ public class AList<Item> implements Iterable<Item> {
             if (!hasNext()) {
                 throw new NoSuchElementException();
             }
-            return items[pos--];
+            return items[pos++];
         }
     }
 }
