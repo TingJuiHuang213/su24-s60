@@ -1,5 +1,6 @@
 package deque;
 
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -77,4 +78,7 @@ public interface Deque61B<T> {
      * @return element at {@code index} in the deque
      */
     T getRecursive(int index);
+
+    // 添加 iterator() 方法
+    Iterator<T> iterator();
 }
