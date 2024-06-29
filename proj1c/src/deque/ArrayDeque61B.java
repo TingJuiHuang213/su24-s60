@@ -1,12 +1,10 @@
 package deque;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import deque.Deque61B;
+import java.util.ArrayList;  // 添加這行
+import java.util.Iterator;   // 添加這行
+import java.util.List;       // 添加這行
 
-
-public class ArrayDeque61B<T> implements Deque61B<T> {
+public class ArrayDeque61B<T> implements Deque61B<T>, Iterable<T> {
     private T[] items;
     private int size;
     private int front;
@@ -76,11 +74,6 @@ public class ArrayDeque61B<T> implements Deque61B<T> {
         return getRecursiveHelper(front, index);
     }
 
-    @Override
-    public Iterator<T> iterator() {
-        return null;
-    }
-
     private T getRecursiveHelper(int currentIndex, int index) {
         if (index == 0) {
             return items[currentIndex % items.length];
@@ -116,6 +109,54 @@ public class ArrayDeque61B<T> implements Deque61B<T> {
             resize(items.length / 2);
         }
         return item;
+    }
+
+    @Override
+    public Iterator<T> iterator() {
+        return new Iterator<T>() {
+            private int pos = 0;
+
+            @Override
+            public boolean hasNext() {
+                return pos < size;
+            }
+
+            @Override
+            public T next() {
+                T item = items[(front + pos) % items.length];
+                pos++;
+                return item;
+            }
+        };
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Deque61B)) return false;
+        Deque61B<?> that = (Deque61B<?>) o;
+        if (size != that.size()) return false;
+        Iterator<T> iter1 = this.iterator();
+        Iterator<?> iter2 = that.iterator();
+        while (iter1.hasNext() && iter2.hasNext()) {
+            if (!iter1.next().equals(iter2.next())) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder("[");
+        for (int i = 0; i < size; i++) {
+            sb.append(items[(front + i) % items.length]);
+            if (i < size - 1) {
+                sb.append(", ");
+            }
+        }
+        sb.append("]");
+        return sb.toString();
     }
 
     @SuppressWarnings("unchecked")

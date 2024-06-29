@@ -1,19 +1,19 @@
 package deque;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Iterator;
+import java.util.ArrayList;  // 添加這行
+import java.util.Iterator;   // 添加這行
+import java.util.List;       // 添加這行
 
-public class LinkedListDeque61B<T> implements Deque61B<T> {
+public class LinkedListDeque61B<T> implements Deque61B<T>, Iterable<T> {
     private class Node {
         T item;
-        Node prev;
         Node next;
+        Node prev;
 
-        Node(T item, Node prev, Node next) {
+        Node(T item, Node next, Node prev) {
             this.item = item;
-            this.prev = prev;
             this.next = next;
+            this.prev = prev;
         }
     }
 
@@ -22,14 +22,14 @@ public class LinkedListDeque61B<T> implements Deque61B<T> {
 
     public LinkedListDeque61B() {
         sentinel = new Node(null, null, null);
-        sentinel.prev = sentinel;
         sentinel.next = sentinel;
+        sentinel.prev = sentinel;
         size = 0;
     }
 
     @Override
     public void addFirst(T item) {
-        Node newNode = new Node(item, sentinel, sentinel.next);
+        Node newNode = new Node(item, sentinel.next, sentinel);
         sentinel.next.prev = newNode;
         sentinel.next = newNode;
         size++;
@@ -37,7 +37,7 @@ public class LinkedListDeque61B<T> implements Deque61B<T> {
 
     @Override
     public void addLast(T item) {
-        Node newNode = new Node(item, sentinel.prev, sentinel);
+        Node newNode = new Node(item, sentinel, sentinel.prev);
         sentinel.prev.next = newNode;
         sentinel.prev = newNode;
         size++;
@@ -51,6 +51,44 @@ public class LinkedListDeque61B<T> implements Deque61B<T> {
     @Override
     public int size() {
         return size;
+    }
+
+    @Override
+    public List<T> toList() {
+        List<T> list = new ArrayList<>();
+        Node current = sentinel.next;
+        while (current != sentinel) {
+            list.add(current.item);
+            current = current.next;
+        }
+        return list;
+    }
+
+    @Override
+    public T get(int index) {
+        if (index < 0 || index >= size) {
+            return null;
+        }
+        Node current = sentinel.next;
+        for (int i = 0; i < index; i++) {
+            current = current.next;
+        }
+        return current.item;
+    }
+
+    @Override
+    public T getRecursive(int index) {
+        if (index < 0 || index >= size) {
+            return null;
+        }
+        return getRecursiveHelper(sentinel.next, index);
+    }
+
+    private T getRecursiveHelper(Node current, int index) {
+        if (index == 0) {
+            return current.item;
+        }
+        return getRecursiveHelper(current.next, index - 1);
     }
 
     @Override
@@ -78,45 +116,6 @@ public class LinkedListDeque61B<T> implements Deque61B<T> {
     }
 
     @Override
-    public T get(int index) {
-        if (index < 0 || index >= size) {
-            return null;
-        }
-        Node current = sentinel.next;
-        for (int i = 0; i < index; i++) {
-            current = current.next;
-        }
-        return current.item;
-    }
-
-    @Override
-    public T getRecursive(int index) {
-        if (index < 0 || index >= size) {
-            return null;
-        }
-        return getRecursiveHelper(sentinel.next, index);
-    }
-
-    private T getRecursiveHelper(Node node, int index) {
-        if (index == 0) {
-            return node.item;
-        }
-        return getRecursiveHelper(node.next, index - 1);
-    }
-
-    @Override
-    public List<T> toList() {
-        List<T> list = new ArrayList<>();
-        Node current = sentinel.next;
-        while (current != sentinel) {
-            list.add(current.item);
-            current = current.next;
-        }
-        return list;
-    }
-
-    // 添加 iterator() 方法
-    @Override
     public Iterator<T> iterator() {
         return new Iterator<T>() {
             private Node current = sentinel.next;
@@ -135,40 +134,34 @@ public class LinkedListDeque61B<T> implements Deque61B<T> {
         };
     }
 
-    // 添加 equals() 方法
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof LinkedListDeque61B)) return false;
-        LinkedListDeque61B<?> that = (LinkedListDeque61B<?>) o;
-        if (size != that.size) {
-            return false;
-        }
-        Node current1 = this.sentinel.next;
-        Node current2 = (Node) that.sentinel.next;
-        while (current1 != sentinel) {
-            if (!current1.item.equals(current2.item)) {
+        if (!(o instanceof Deque61B)) return false;
+        Deque61B<?> that = (Deque61B<?>) o;
+        if (size != that.size()) return false;
+        Iterator<T> iter1 = this.iterator();
+        Iterator<?> iter2 = that.iterator();
+        while (iter1.hasNext() && iter2.hasNext()) {
+            if (!iter1.next().equals(iter2.next())) {
                 return false;
             }
-            current1 = current1.next;
-            current2 = current2.next;
         }
         return true;
     }
 
-
-    // 添加 toString() 方法
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder();
+        StringBuilder sb = new StringBuilder("[");
         Node current = sentinel.next;
         while (current != sentinel) {
             sb.append(current.item);
             if (current.next != sentinel) {
-                sb.append(" ");
+                sb.append(", ");
             }
             current = current.next;
         }
+        sb.append("]");
         return sb.toString();
     }
 }
