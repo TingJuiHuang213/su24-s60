@@ -132,10 +132,16 @@ public class ArrayDeque61B<T> implements Deque61B<T>, Iterable<T> {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof Deque61B)) return false;
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof Deque61B)) {
+            return false;
+        }
         Deque61B<?> that = (Deque61B<?>) o;
-        if (size != that.size()) return false;
+        if (size != that.size()) {
+            return false;
+        }
         Iterator<T> iter1 = this.iterator();
         Iterator<?> iter2 = that.iterator();
         while (iter1.hasNext() && iter2.hasNext()) {

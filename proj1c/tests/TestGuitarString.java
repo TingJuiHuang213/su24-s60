@@ -82,4 +82,3 @@ public class TestGuitarString  {
         assertWithMessage(errorMsg).that(s5).isWithin(0.001).of(expected);
     }
 }
-
