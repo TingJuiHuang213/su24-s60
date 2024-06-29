@@ -1,8 +1,8 @@
 package deque;
 
-import java.util.ArrayList;  // 添加這行
-import java.util.Iterator;   // 添加這行
-import java.util.List;       // 添加這行
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 public class LinkedListDeque61B<T> implements Deque61B<T>, Iterable<T> {
     private class Node {
@@ -29,6 +29,7 @@ public class LinkedListDeque61B<T> implements Deque61B<T>, Iterable<T> {
 
     @Override
     public void addFirst(T item) {
+        // 新增結點到鏈表的開頭
         Node newNode = new Node(item, sentinel.next, sentinel);
         sentinel.next.prev = newNode;
         sentinel.next = newNode;
@@ -37,6 +38,7 @@ public class LinkedListDeque61B<T> implements Deque61B<T>, Iterable<T> {
 
     @Override
     public void addLast(T item) {
+        // 新增結點到鏈表的尾部
         Node newNode = new Node(item, sentinel, sentinel.prev);
         sentinel.prev.next = newNode;
         sentinel.prev = newNode;
@@ -45,16 +47,19 @@ public class LinkedListDeque61B<T> implements Deque61B<T>, Iterable<T> {
 
     @Override
     public boolean isEmpty() {
+        // 檢查雙端隊列是否為空
         return size == 0;
     }
 
     @Override
     public int size() {
+        // 返回雙端隊列的大小
         return size;
     }
 
     @Override
     public List<T> toList() {
+        // 將雙端隊列轉換為列表
         List<T> list = new ArrayList<>();
         Node current = sentinel.next;
         while (current != sentinel) {
@@ -66,6 +71,7 @@ public class LinkedListDeque61B<T> implements Deque61B<T>, Iterable<T> {
 
     @Override
     public T get(int index) {
+        // 獲取指定索引處的元素
         if (index < 0 || index >= size) {
             return null;
         }
@@ -78,6 +84,7 @@ public class LinkedListDeque61B<T> implements Deque61B<T>, Iterable<T> {
 
     @Override
     public T getRecursive(int index) {
+        // 遞歸獲取指定索引處的元素
         if (index < 0 || index >= size) {
             return null;
         }
@@ -85,6 +92,7 @@ public class LinkedListDeque61B<T> implements Deque61B<T>, Iterable<T> {
     }
 
     private T getRecursiveHelper(Node current, int index) {
+        // 輔助方法：遞歸獲取指定索引處的元素
         if (index == 0) {
             return current.item;
         }
@@ -93,6 +101,7 @@ public class LinkedListDeque61B<T> implements Deque61B<T>, Iterable<T> {
 
     @Override
     public T removeFirst() {
+        // 移除並返回雙端隊列的第一個元素
         if (isEmpty()) {
             return null;
         }
@@ -105,6 +114,7 @@ public class LinkedListDeque61B<T> implements Deque61B<T>, Iterable<T> {
 
     @Override
     public T removeLast() {
+        // 移除並返回雙端隊列的最後一個元素
         if (isEmpty()) {
             return null;
         }
@@ -117,6 +127,7 @@ public class LinkedListDeque61B<T> implements Deque61B<T>, Iterable<T> {
 
     @Override
     public Iterator<T> iterator() {
+        // 返回一個遍歷雙端隊列的迭代器
         return new Iterator<T>() {
             private Node current = sentinel.next;
 
@@ -136,6 +147,7 @@ public class LinkedListDeque61B<T> implements Deque61B<T>, Iterable<T> {
 
     @Override
     public boolean equals(Object o) {
+        // 檢查雙端隊列是否相等
         if (this == o) {
             return true;
         }
@@ -158,6 +170,7 @@ public class LinkedListDeque61B<T> implements Deque61B<T>, Iterable<T> {
 
     @Override
     public String toString() {
+        // 返回雙端隊列的字符串表示
         StringBuilder sb = new StringBuilder("[");
         Node current = sentinel.next;
         while (current != sentinel) {
