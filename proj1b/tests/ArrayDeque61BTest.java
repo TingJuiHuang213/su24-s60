@@ -3,6 +3,9 @@ import static com.google.common.truth.Truth.assertThat;
 
 public class ArrayDeque61BTest {
 
+    /**
+     * 測試 addFirst 方法的基本功能。
+     */
     @Test
     public void addFirstTestBasic() {
         Deque61B<String> ad = new ArrayDeque61B<>();
@@ -14,6 +17,9 @@ public class ArrayDeque61BTest {
         assertThat(ad.toList()).containsExactly("front", "middle", "back").inOrder();
     }
 
+    /**
+     * 測試 addLast 方法的基本功能。
+     */
     @Test
     public void addLastTestBasic() {
         Deque61B<String> ad = new ArrayDeque61B<>();
@@ -23,6 +29,9 @@ public class ArrayDeque61BTest {
         assertThat(ad.toList()).containsExactly("front", "middle", "back").inOrder();
     }
 
+    /**
+     * 測試 isEmpty 方法。
+     */
     @Test
     public void isEmptyTest() {
         Deque61B<String> ad = new ArrayDeque61B<>();
@@ -31,6 +40,9 @@ public class ArrayDeque61BTest {
         assertThat(ad.isEmpty()).isFalse();
     }
 
+    /**
+     * 測試 size 方法。
+     */
     @Test
     public void sizeTest() {
         Deque61B<String> ad = new ArrayDeque61B<>();
@@ -41,6 +53,9 @@ public class ArrayDeque61BTest {
         assertThat(ad.size()).isEqualTo(2);
     }
 
+    /**
+     * 測試 get 方法。
+     */
     @Test
     public void getTest() {
         Deque61B<String> ad = new ArrayDeque61B<>();
@@ -54,6 +69,9 @@ public class ArrayDeque61BTest {
         assertThat(ad.get(-1)).isNull();
     }
 
+    /**
+     * 測試 getRecursive 方法。
+     */
     @Test
     public void getRecursiveTest() {
         Deque61B<String> ad = new ArrayDeque61B<>();
@@ -67,6 +85,9 @@ public class ArrayDeque61BTest {
         assertThat(ad.getRecursive(-1)).isNull();
     }
 
+    /**
+     * 測試 removeFirst 方法。
+     */
     @Test
     public void removeFirstTest() {
         Deque61B<String> ad = new ArrayDeque61B<>();
@@ -81,6 +102,9 @@ public class ArrayDeque61BTest {
         assertThat(ad.toList()).isEmpty();
     }
 
+    /**
+     * 測試 removeLast 方法。
+     */
     @Test
     public void removeLastTest() {
         Deque61B<String> ad = new ArrayDeque61B<>();
@@ -95,6 +119,9 @@ public class ArrayDeque61BTest {
         assertThat(ad.toList()).isEmpty();
     }
 
+    /**
+     * 測試在移除所有元素後再次添加元素。
+     */
     @Test
     public void addAfterRemoveTest() {
         Deque61B<String> ad = new ArrayDeque61B<>();
@@ -112,6 +139,9 @@ public class ArrayDeque61BTest {
         assertThat(ad.toList()).containsExactly("newFront", "newBack").inOrder();
     }
 
+    /**
+     * 測試 addFirst 和 addLast 方法的混合使用。
+     */
     @Test
     public void addFirstAndLastTest() {
         Deque61B<Integer> ad = new ArrayDeque61B<>();
@@ -122,6 +152,9 @@ public class ArrayDeque61BTest {
         assertThat(ad.toList()).containsExactly(5, 10, 20, 30).inOrder();
     }
 
+    /**
+     * 測試多種操作的組合。
+     */
     @Test
     public void mixedOperationsTest() {
         Deque61B<String> ad = new ArrayDeque61B<>();
@@ -133,6 +166,9 @@ public class ArrayDeque61BTest {
         assertThat(ad.size()).isEqualTo(0);
     }
 
+    /**
+     * 測試多次移除操作。
+     */
     @Test
     public void multipleRemovalsTest() {
         Deque61B<String> ad = new ArrayDeque61B<>();
@@ -145,7 +181,9 @@ public class ArrayDeque61BTest {
         assertThat(ad.isEmpty()).isTrue();
     }
 
-    // 新增測試用於覆蓋add方法的測試
+    /**
+     * 測試添加大量元素和移除操作。
+     */
     @Test
     public void addTest() {
         Deque61B<Integer> ad = new ArrayDeque61B<>();
@@ -168,7 +206,9 @@ public class ArrayDeque61BTest {
         }
     }
 
-    // 新增測試用於覆蓋resize方法的測試
+    /**
+     * 測試陣列擴展和縮小的功能。
+     */
     @Test
     public void advancedResizeTest() {
         Deque61B<Integer> ad = new ArrayDeque61B<>();
@@ -198,6 +238,9 @@ public class ArrayDeque61BTest {
         }
     }
 
+    /**
+     * 測試在移除所有元素後再次添加元素。
+     */
     @Test
     public void addAfterRemoveToEmptyTest() {
         Deque61B<String> ad = new ArrayDeque61B<>();
@@ -215,7 +258,9 @@ public class ArrayDeque61BTest {
         assertThat(ad.toList()).containsExactly("newFront", "newBack").inOrder();
     }
 
-    // 重新增加测试确保覆盖所有可能的情景
+    /**
+     * 測試多種情景的添加和移除操作。
+     */
     @Test
     public void addAfterRemoveComprehensiveTest() {
         Deque61B<String> ad = new ArrayDeque61B<>();
