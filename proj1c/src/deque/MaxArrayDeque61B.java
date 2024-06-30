@@ -3,32 +3,32 @@ package deque;
 import java.util.Comparator;
 
 /**
- * A generic array-based deque implementation with max functionality.
- * @param <T> the type of elements in this deque
+ * 带有最大值功能的基于数组的通用双端队列实现。
+ * @param <T> 双端队列中元素的类型
  */
 public class MaxArrayDeque61B<T> extends ArrayDeque61B<T> {
-    private Comparator<T> comparator;
+    private final Comparator<T> defaultComparator;
 
     /**
-     * Creates a MaxArrayDeque with the given Comparator.
-     * @param c the Comparator to determine the maximum element
+     * 使用给定的比较器创建一个 MaxArrayDeque。
+     * @param c 用于确定最大元素的比较器
      */
     public MaxArrayDeque61B(Comparator<T> c) {
-        comparator = c;
+        defaultComparator = c;
     }
 
     /**
-     * Returns the maximum element in the deque according to the default Comparator.
-     * @return the maximum element, or null if the deque is empty
+     * 根据默认比较器返回双端队列中的最大元素。
+     * @return 最大元素，如果双端队列为空则返回 null
      */
     public T max() {
-        return max(comparator);
+        return max(defaultComparator);
     }
 
     /**
-     * Returns the maximum element in the deque according to the given Comparator.
-     * @param c the Comparator to determine the maximum element
-     * @return the maximum element, or null if the deque is empty
+     * 根据给定的比较器返回双端队列中的最大元素。
+     * @param c 用于确定最大元素的比较器
+     * @return 最大元素，如果双端队列为空则返回 null
      */
     public T max(Comparator<T> c) {
         if (isEmpty()) {

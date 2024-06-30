@@ -7,231 +7,228 @@ public class LinkedListDeque61BTest {
 
     @Test
     public void addFirstTestBasic() {
-        Deque61B<String> lld = new LinkedListDeque61B<>();
-        lld.addFirst("back");
-        assertThat(lld.toList()).containsExactly("back").inOrder();
-        lld.addFirst("middle");
-        assertThat(lld.toList()).containsExactly("middle", "back").inOrder();
-        lld.addFirst("front");
-        assertThat(lld.toList()).containsExactly("front", "middle", "back").inOrder();
+        Deque61B<String> deque = new LinkedListDeque61B<>();
+        deque.addFirst("back");
+        assertThat(deque.toList()).containsExactly("back").inOrder();
+        deque.addFirst("middle");
+        assertThat(deque.toList()).containsExactly("middle", "back").inOrder();
+        deque.addFirst("front");
+        assertThat(deque.toList()).containsExactly("front", "middle", "back").inOrder();
     }
 
     @Test
     public void addLastTestBasic() {
-        Deque61B<String> lld = new LinkedListDeque61B<>();
-        lld.addLast("front");
-        lld.addLast("middle");
-        lld.addLast("back");
-        assertThat(lld.toList()).containsExactly("front", "middle", "back").inOrder();
+        Deque61B<String> deque = new LinkedListDeque61B<>();
+        deque.addLast("front");
+        deque.addLast("middle");
+        deque.addLast("back");
+        assertThat(deque.toList()).containsExactly("front", "middle", "back").inOrder();
     }
 
     @Test
     public void isEmptyTest() {
-        Deque61B<String> lld = new LinkedListDeque61B<>();
-        assertThat(lld.isEmpty()).isTrue();
-        lld.addFirst("front");
-        assertThat(lld.isEmpty()).isFalse();
+        Deque61B<String> deque = new LinkedListDeque61B<>();
+        assertThat(deque.isEmpty()).isTrue();
+        deque.addFirst("front");
+        assertThat(deque.isEmpty()).isFalse();
     }
 
     @Test
     public void sizeTest() {
-        Deque61B<String> lld = new LinkedListDeque61B<>();
-        assertThat(lld.size()).isEqualTo(0);
-        lld.addFirst("front");
-        assertThat(lld.size()).isEqualTo(1);
-        lld.addLast("back");
-        assertThat(lld.size()).isEqualTo(2);
+        Deque61B<String> deque = new LinkedListDeque61B<>();
+        assertThat(deque.size()).isEqualTo(0);
+        deque.addFirst("front");
+        assertThat(deque.size()).isEqualTo(1);
+        deque.addLast("back");
+        assertThat(deque.size()).isEqualTo(2);
     }
 
     @Test
     public void getTest() {
-        Deque61B<String> lld = new LinkedListDeque61B<>();
-        lld.addLast("front");
-        lld.addLast("middle");
-        lld.addLast("back");
-        assertThat(lld.get(0)).isEqualTo("front");
-        assertThat(lld.get(1)).isEqualTo("middle");
-        assertThat(lld.get(2)).isEqualTo("back");
-        assertThat(lld.get(3)).isNull();
-        assertThat(lld.get(-1)).isNull();
+        Deque61B<String> deque = new LinkedListDeque61B<>();
+        deque.addLast("front");
+        deque.addLast("middle");
+        deque.addLast("back");
+        assertThat(deque.get(0)).isEqualTo("front");
+        assertThat(deque.get(1)).isEqualTo("middle");
+        assertThat(deque.get(2)).isEqualTo("back");
+        assertThat(deque.get(3)).isNull();
+        assertThat(deque.get(-1)).isNull();
     }
 
     @Test
     public void getRecursiveTest() {
-        Deque61B<String> lld = new LinkedListDeque61B<>();
-        lld.addLast("front");
-        lld.addLast("middle");
-        lld.addLast("back");
-        assertThat(lld.getRecursive(0)).isEqualTo("front");
-        assertThat(lld.getRecursive(1)).isEqualTo("middle");
-        assertThat(lld.getRecursive(2)).isEqualTo("back");
-        assertThat(lld.getRecursive(3)).isNull();
-        assertThat(lld.getRecursive(-1)).isNull();
+        Deque61B<String> deque = new LinkedListDeque61B<>();
+        deque.addLast("front");
+        deque.addLast("middle");
+        deque.addLast("back");
+        assertThat(deque.getRecursive(0)).isEqualTo("front");
+        assertThat(deque.getRecursive(1)).isEqualTo("middle");
+        assertThat(deque.getRecursive(2)).isEqualTo("back");
+        assertThat(deque.getRecursive(3)).isNull();
+        assertThat(deque.getRecursive(-1)).isNull();
     }
 
     @Test
     public void removeFirstTest() {
-        Deque61B<String> lld = new LinkedListDeque61B<>();
-        lld.addLast("front");
-        lld.addLast("middle");
-        lld.addLast("back");
-        assertThat(lld.removeFirst()).isEqualTo("front");
-        assertThat(lld.toList()).containsExactly("middle", "back").inOrder();
-        assertThat(lld.removeFirst()).isEqualTo("middle");
-        assertThat(lld.toList()).containsExactly("back").inOrder();
-        assertThat(lld.removeFirst()).isEqualTo("back");
-        assertThat(lld.toList()).isEmpty();
+        Deque61B<String> deque = new LinkedListDeque61B<>();
+        deque.addLast("front");
+        deque.addLast("middle");
+        deque.addLast("back");
+        assertThat(deque.removeFirst()).isEqualTo("front");
+        assertThat(deque.toList()).containsExactly("middle", "back").inOrder();
+        assertThat(deque.removeFirst()).isEqualTo("middle");
+        assertThat(deque.toList()).containsExactly("back").inOrder();
+        assertThat(deque.removeFirst()).isEqualTo("back");
+        assertThat(deque.toList()).isEmpty();
     }
 
     @Test
     public void removeLastTest() {
-        Deque61B<String> lld = new LinkedListDeque61B<>();
-        lld.addLast("front");
-        lld.addLast("middle");
-        lld.addLast("back");
-        assertThat(lld.removeLast()).isEqualTo("back");
-        assertThat(lld.toList()).containsExactly("front", "middle").inOrder();
-        assertThat(lld.removeLast()).isEqualTo("middle");
-        assertThat(lld.toList()).containsExactly("front").inOrder();
-        assertThat(lld.removeLast()).isEqualTo("front");
-        assertThat(lld.toList()).isEmpty();
+        Deque61B<String> deque = new LinkedListDeque61B<>();
+        deque.addLast("front");
+        deque.addLast("middle");
+        deque.addLast("back");
+        assertThat(deque.removeLast()).isEqualTo("back");
+        assertThat(deque.toList()).containsExactly("front", "middle").inOrder();
+        assertThat(deque.removeLast()).isEqualTo("middle");
+        assertThat(deque.toList()).containsExactly("front").inOrder();
+        assertThat(deque.removeLast()).isEqualTo("front");
+        assertThat(deque.toList()).isEmpty();
     }
 
     @Test
     public void addAfterRemoveTest() {
-        Deque61B<String> lld = new LinkedListDeque61B<>();
-        lld.addLast("front");
-        lld.addLast("middle");
-        lld.addLast("back");
-        assertThat(lld.removeFirst()).isEqualTo("front");
-        assertThat(lld.removeFirst()).isEqualTo("middle");
-        assertThat(lld.removeFirst()).isEqualTo("back");
-        assertThat(lld.isEmpty()).isTrue();
+        Deque61B<String> deque = new LinkedListDeque61B<>();
+        deque.addLast("front");
+        deque.addLast("middle");
+        deque.addLast("back");
+        assertThat(deque.removeFirst()).isEqualTo("front");
+        assertThat(deque.removeFirst()).isEqualTo("middle");
+        assertThat(deque.removeFirst()).isEqualTo("back");
+        assertThat(deque.isEmpty()).isTrue();
 
-        lld.addFirst("newFront");
-        assertThat(lld.toList()).containsExactly("newFront").inOrder();
-        lld.addLast("newBack");
-        assertThat(lld.toList()).containsExactly("newFront", "newBack").inOrder();
+        deque.addFirst("newFront");
+        assertThat(deque.toList()).containsExactly("newFront").inOrder();
+        deque.addLast("newBack");
+        assertThat(deque.toList()).containsExactly("newFront", "newBack").inOrder();
     }
 
     @Test
     public void addFirstAndLastTest() {
-        Deque61B<Integer> lld = new LinkedListDeque61B<>();
-        lld.addFirst(10);
-        lld.addLast(20);
-        lld.addFirst(5);
-        lld.addLast(30);
-        assertThat(lld.toList()).containsExactly(5, 10, 20, 30).inOrder();
+        Deque61B<Integer> deque = new LinkedListDeque61B<>();
+        deque.addFirst(10);
+        deque.addLast(20);
+        deque.addFirst(5);
+        deque.addLast(30);
+        assertThat(deque.toList()).containsExactly(5, 10, 20, 30).inOrder();
     }
 
     @Test
     public void mixedOperationsTest() {
-        Deque61B<String> lld = new LinkedListDeque61B<>();
-        lld.addFirst("first");
-        lld.addLast("last");
-        assertThat(lld.size()).isEqualTo(2);
-        assertThat(lld.removeFirst()).isEqualTo("first");
-        assertThat(lld.removeLast()).isEqualTo("last");
-        assertThat(lld.size()).isEqualTo(0);
+        Deque61B<String> deque = new LinkedListDeque61B<>();
+        deque.addFirst("first");
+        deque.addLast("last");
+        assertThat(deque.size()).isEqualTo(2);
+        assertThat(deque.removeFirst()).isEqualTo("first");
+        assertThat(deque.removeLast()).isEqualTo("last");
+        assertThat(deque.size()).isEqualTo(0);
     }
 
     @Test
     public void multipleRemovalsTest() {
-        Deque61B<String> lld = new LinkedListDeque61B<>();
-        lld.addFirst("1");
-        lld.addFirst("2");
-        lld.addFirst("3");
-        assertThat(lld.removeFirst()).isEqualTo("3");
-        assertThat(lld.removeFirst()).isEqualTo("2");
-        assertThat(lld.removeFirst()).isEqualTo("1");
-        assertThat(lld.isEmpty()).isTrue();
+        Deque61B<String> deque = new LinkedListDeque61B<>();
+        deque.addFirst("1");
+        deque.addFirst("2");
+        deque.addFirst("3");
+        assertThat(deque.removeFirst()).isEqualTo("3");
+        assertThat(deque.removeFirst()).isEqualTo("2");
+        assertThat(deque.removeFirst()).isEqualTo("1");
+        assertThat(deque.isEmpty()).isTrue();
     }
 
-    // 新增測試用於覆蓋add方法的測試
     @Test
     public void addTest() {
-        Deque61B<Integer> lld = new LinkedListDeque61B<>();
+        Deque61B<Integer> deque = new LinkedListDeque61B<>();
         for (int i = 0; i < 20; i++) {
-            lld.addLast(i);
+            deque.addLast(i);
         }
-        assertThat(lld.size()).isEqualTo(20);
+        assertThat(deque.size()).isEqualTo(20);
         for (int i = 0; i < 20; i++) {
-            assertThat(lld.get(i)).isEqualTo(i);
-        }
-        for (int i = 0; i < 20; i++) {
-            lld.removeFirst();
+            assertThat(deque.get(i)).isEqualTo(i);
         }
         for (int i = 0; i < 20; i++) {
-            lld.addFirst(i);
+            deque.removeFirst();
         }
-        assertThat(lld.size()).isEqualTo(20);
         for (int i = 0; i < 20; i++) {
-            assertThat(lld.get(i)).isEqualTo(19 - i);
+            deque.addFirst(i);
+        }
+        assertThat(deque.size()).isEqualTo(20);
+        for (int i = 0; i < 20; i++) {
+            assertThat(deque.get(i)).isEqualTo(19 - i);
         }
     }
 
-    // 新增測試用於覆蓋resize方法的測試
     @Test
     public void advancedResizeTest() {
-        Deque61B<Integer> lld = new LinkedListDeque61B<>();
+        Deque61B<Integer> deque = new LinkedListDeque61B<>();
         for (int i = 0; i < 100; i++) {
-            lld.addLast(i);
+            deque.addLast(i);
         }
-        assertThat(lld.size()).isEqualTo(100);
+        assertThat(deque.size()).isEqualTo(100);
         for (int i = 0; i < 100; i++) {
-            assertThat(lld.get(i)).isEqualTo(i);
+            assertThat(deque.get(i)).isEqualTo(i);
         }
         for (int i = 0; i < 75; i++) {
-            lld.removeFirst();
+            deque.removeFirst();
         }
-        assertThat(lld.size()).isEqualTo(25);
+        assertThat(deque.size()).isEqualTo(25);
         for (int i = 0; i < 25; i++) {
-            assertThat(lld.get(i)).isEqualTo(i + 75);
+            assertThat(deque.get(i)).isEqualTo(i + 75);
         }
         for (int i = 0; i < 25; i++) {
-            lld.addFirst(i);
+            deque.addFirst(i);
         }
-        assertThat(lld.size()).isEqualTo(50);
+        assertThat(deque.size()).isEqualTo(50);
         for (int i = 0; i < 25; i++) {
-            assertThat(lld.get(i)).isEqualTo(24 - i);
+            assertThat(deque.get(i)).isEqualTo(24 - i);
         }
         for (int i = 25; i < 50; i++) {
-            assertThat(lld.get(i)).isEqualTo(i + 50);
+            assertThat(deque.get(i)).isEqualTo(i + 50);
         }
     }
 
     @Test
     public void addAfterRemoveToEmptyTest() {
-        Deque61B<String> lld = new LinkedListDeque61B<>();
-        lld.addLast("front");
-        lld.addLast("middle");
-        lld.addLast("back");
-        assertThat(lld.removeFirst()).isEqualTo("front");
-        assertThat(lld.removeFirst()).isEqualTo("middle");
-        assertThat(lld.removeFirst()).isEqualTo("back");
-        assertThat(lld.isEmpty()).isTrue();
+        Deque61B<String> deque = new LinkedListDeque61B<>();
+        deque.addLast("front");
+        deque.addLast("middle");
+        deque.addLast("back");
+        assertThat(deque.removeFirst()).isEqualTo("front");
+        assertThat(deque.removeFirst()).isEqualTo("middle");
+        assertThat(deque.removeFirst()).isEqualTo("back");
+        assertThat(deque.isEmpty()).isTrue();
 
-        lld.addFirst("newFront");
-        assertThat(lld.toList()).containsExactly("newFront").inOrder();
-        lld.addLast("newBack");
-        assertThat(lld.toList()).containsExactly("newFront", "newBack").inOrder();
+        deque.addFirst("newFront");
+        assertThat(deque.toList()).containsExactly("newFront").inOrder();
+        deque.addLast("newBack");
+        assertThat(deque.toList()).containsExactly("newFront", "newBack").inOrder();
     }
 
-    // 重新增加测试确保覆盖所有可能的情景
     @Test
     public void addAfterRemoveComprehensiveTest() {
-        Deque61B<String> lld = new LinkedListDeque61B<>();
-        lld.addLast("first");
-        lld.addLast("second");
-        lld.addLast("third");
-        assertThat(lld.removeFirst()).isEqualTo("first");
-        assertThat(lld.removeFirst()).isEqualTo("second");
-        assertThat(lld.removeFirst()).isEqualTo("third");
-        assertThat(lld.isEmpty()).isTrue();
+        Deque61B<String> deque = new LinkedListDeque61B<>();
+        deque.addLast("first");
+        deque.addLast("second");
+        deque.addLast("third");
+        assertThat(deque.removeFirst()).isEqualTo("first");
+        assertThat(deque.removeFirst()).isEqualTo("second");
+        assertThat(deque.removeFirst()).isEqualTo("third");
+        assertThat(deque.isEmpty()).isTrue();
 
-        lld.addLast("newFirst");
-        assertThat(lld.toList()).containsExactly("newFirst").inOrder();
-        lld.addFirst("newSecond");
-        assertThat(lld.toList()).containsExactly("newSecond", "newFirst").inOrder();
+        deque.addLast("newFirst");
+        assertThat(deque.toList()).containsExactly("newFirst").inOrder();
+        deque.addFirst("newSecond");
+        assertThat(deque.toList()).containsExactly("newSecond", "newFirst").inOrder();
     }
 }

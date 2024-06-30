@@ -5,14 +5,14 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
- * A generic array-based deque implementation.
- * @param <T> the type of elements in this deque
+ * 基于数组的通用双端队列实现。
+ * @param <T> 双端队列中元素的类型
  */
 public class ArrayDeque61B<T> implements Deque61B<T>, Iterable<T> {
-    private T[] items;       // The array to store elements
-    private int size;        // Current number of elements
-    private int front;       // Index of the front element
-    private int rear;        // Index of the rear element
+    private T[] items; // 用于存储元素的数组
+    private int size; // 当前元素的数量
+    private int front; // 队首元素的索引
+    private int rear; // 队尾元素的索引
     private static final int INITIAL_CAPACITY = 8;
 
     @SuppressWarnings("unchecked")
@@ -28,7 +28,7 @@ public class ArrayDeque61B<T> implements Deque61B<T>, Iterable<T> {
         if (size == items.length) {
             resize(items.length * 2);
         }
-        front = decrementIndex(front);
+        front = (front - 1 + items.length) % items.length;
         items[front] = item;
         size++;
     }
@@ -39,7 +39,7 @@ public class ArrayDeque61B<T> implements Deque61B<T>, Iterable<T> {
             resize(items.length * 2);
         }
         items[rear] = item;
-        rear = incrementIndex(rear);
+        rear = (rear + 1) % items.length;
         size++;
     }
 
@@ -72,17 +72,18 @@ public class ArrayDeque61B<T> implements Deque61B<T>, Iterable<T> {
 
     @Override
     public T getRecursive(int index) {
-        if (index < 0 || index >= size) {
-            return null;
-        }
         return getRecursiveHelper(front, index);
     }
 
+    // 辅助方法，用于递归获取元素
     private T getRecursiveHelper(int currentIndex, int index) {
-        if (index == 0) {
-            return items[currentIndex % items.length];
+        if (index < 0 || index >= size) {
+            return null;
         }
-        return getRecursiveHelper(incrementIndex(currentIndex), index - 1);
+        if (index == 0) {
+            return items[currentIndex];
+        }
+        return getRecursiveHelper((currentIndex + 1) % items.length, index - 1);
     }
 
     @Override
@@ -91,8 +92,8 @@ public class ArrayDeque61B<T> implements Deque61B<T>, Iterable<T> {
             return null;
         }
         T item = items[front];
-        items[front] = null; // avoid loitering
-        front = incrementIndex(front);
+        items[front] = null; // 避免悬挂引用
+        front = (front + 1) % items.length;
         size--;
         if (size > 0 && size == items.length / 4) {
             resize(items.length / 2);
@@ -105,9 +106,9 @@ public class ArrayDeque61B<T> implements Deque61B<T>, Iterable<T> {
         if (isEmpty()) {
             return null;
         }
-        rear = decrementIndex(rear);
+        rear = (rear - 1 + items.length) % items.length;
         T item = items[rear];
-        items[rear] = null; // avoid loitering
+        items[rear] = null; // 避免悬挂引用
         size--;
         if (size > 0 && size == items.length / 4) {
             resize(items.length / 2);
@@ -117,21 +118,23 @@ public class ArrayDeque61B<T> implements Deque61B<T>, Iterable<T> {
 
     @Override
     public Iterator<T> iterator() {
-        return new Iterator<T>() {
-            private int pos = 0;
+        return new ArrayDequeIterator();
+    }
 
-            @Override
-            public boolean hasNext() {
-                return pos < size;
-            }
+    private class ArrayDequeIterator implements Iterator<T> {
+        private int pos = 0;
 
-            @Override
-            public T next() {
-                T item = items[(front + pos) % items.length];
-                pos++;
-                return item;
-            }
-        };
+        @Override
+        public boolean hasNext() {
+            return pos < size;
+        }
+
+        @Override
+        public T next() {
+            T item = items[(front + pos) % items.length];
+            pos++;
+            return item;
+        }
     }
 
     @Override
@@ -169,10 +172,6 @@ public class ArrayDeque61B<T> implements Deque61B<T>, Iterable<T> {
         return sb.toString();
     }
 
-    /**
-     * Resize the underlying array to the target capacity.
-     * @param capacity the new capacity of the array
-     */
     @SuppressWarnings("unchecked")
     private void resize(int capacity) {
         T[] newArray = (T[]) new Object[capacity];
@@ -182,23 +181,5 @@ public class ArrayDeque61B<T> implements Deque61B<T>, Iterable<T> {
         items = newArray;
         front = 0;
         rear = size;
-    }
-
-    /**
-     * Increment an index, wrapping around the array if necessary.
-     * @param index the index to increment
-     * @return the incremented index
-     */
-    private int incrementIndex(int index) {
-        return (index + 1) % items.length;
-    }
-
-    /**
-     * Decrement an index, wrapping around the array if necessary.
-     * @param index the index to decrement
-     * @return the decremented index
-     */
-    private int decrementIndex(int index) {
-        return (index - 1 + items.length) % items.length;
     }
 }

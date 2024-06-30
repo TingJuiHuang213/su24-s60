@@ -29,17 +29,18 @@ public class LinkedListDeque61B<T> implements Deque61B<T>, Iterable<T> {
 
     @Override
     public void addFirst(T item) {
-        Node newNode = new Node(item, sentinel.next, sentinel);
-        sentinel.next.prev = newNode;
-        sentinel.next = newNode;
-        size++;
+        addBetween(item, sentinel, sentinel.next);
     }
 
     @Override
     public void addLast(T item) {
-        Node newNode = new Node(item, sentinel, sentinel.prev);
-        sentinel.prev.next = newNode;
-        sentinel.prev = newNode;
+        addBetween(item, sentinel.prev, sentinel);
+    }
+
+    private void addBetween(T item, Node predecessor, Node successor) {
+        Node newNode = new Node(item, successor, predecessor);
+        predecessor.next = newNode;
+        successor.prev = newNode;
         size++;
     }
 
@@ -69,11 +70,26 @@ public class LinkedListDeque61B<T> implements Deque61B<T>, Iterable<T> {
         if (index < 0 || index >= size) {
             return null;
         }
-        Node current = sentinel.next;
-        for (int i = 0; i < index; i++) {
-            current = current.next;
+        Node node = getNode(index);
+        return node.item;
+    }
+
+    private Node getNode(int index) {
+        if (index < 0 || index >= size) {
+            return null;
         }
-        return current.item;
+        Node current = sentinel.next;
+        if (index < size / 2) {
+            for (int i = 0; i < index; i++) {
+                current = current.next;
+            }
+        } else {
+            current = sentinel.prev;
+            for (int i = size - 1; i > index; i--) {
+                current = current.prev;
+            }
+        }
+        return current;
     }
 
     @Override
@@ -81,57 +97,57 @@ public class LinkedListDeque61B<T> implements Deque61B<T>, Iterable<T> {
         if (index < 0 || index >= size) {
             return null;
         }
-        return getRecursiveHelper(sentinel.next, index);
+        return getRecursiveHelper(sentinel.next, index).item;
     }
 
-    private T getRecursiveHelper(Node current, int index) {
+    private Node getRecursiveHelper(Node current, int index) {
         if (index == 0) {
-            return current.item;
+            return current;
         }
         return getRecursiveHelper(current.next, index - 1);
     }
 
     @Override
     public T removeFirst() {
-        if (isEmpty()) {
-            return null;
-        }
-        Node first = sentinel.next;
-        sentinel.next = first.next;
-        first.next.prev = sentinel;
-        size--;
-        return first.item;
+        return removeNode(sentinel.next);
     }
 
     @Override
     public T removeLast() {
-        if (isEmpty()) {
+        return removeNode(sentinel.prev);
+    }
+
+    private T removeNode(Node node) {
+        if (node == sentinel) {
             return null;
         }
-        Node last = sentinel.prev;
-        sentinel.prev = last.prev;
-        last.prev.next = sentinel;
+        Node predecessor = node.prev;
+        Node successor = node.next;
+        predecessor.next = successor;
+        successor.prev = predecessor;
         size--;
-        return last.item;
+        return node.item;
     }
 
     @Override
     public Iterator<T> iterator() {
-        return new Iterator<T>() {
-            private Node current = sentinel.next;
+        return new LinkedListIterator();
+    }
 
-            @Override
-            public boolean hasNext() {
-                return current != sentinel;
-            }
+    private class LinkedListIterator implements Iterator<T> {
+        private Node current = sentinel.next;
 
-            @Override
-            public T next() {
-                T item = current.item;
-                current = current.next;
-                return item;
-            }
-        };
+        @Override
+        public boolean hasNext() {
+            return current != sentinel;
+        }
+
+        @Override
+        public T next() {
+            T item = current.item;
+            current = current.next;
+            return item;
+        }
     }
 
     @Override

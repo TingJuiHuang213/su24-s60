@@ -4,19 +4,14 @@ import deque.Deque61B;
 import deque.LinkedListDeque61B;
 
 /**
- * A class that represents a guitar string using the Karplus-Strong algorithm.
+ * 使用 Karplus-Strong 算法表示吉他弦的类。
  */
 public class GuitarString {
-    /** Constants. Do not change. In case you're curious, the keyword final
-     * means the values cannot be changed at runtime. We'll discuss this and
-     * other topics in lecture on Friday. */
-    private static final int SR = 44100;      // Sampling Rate
-    private static final double DECAY = .996; // energy decay factor
+    private static final int SR = 44100; // 采样率
+    private static final double DECAY = .996; // 能量衰减因子
 
-    /* Buffer for storing sound data. */
-    private Deque61B<Double> buffer;
+    private Deque61B<Double> buffer; // 用于存储声音数据的缓冲区
 
-    /* Create a guitar string of the given frequency.  */
     public GuitarString(double frequency) {
         int capacity = (int) Math.round(SR / frequency);
         buffer = new LinkedListDeque61B<>();
@@ -25,25 +20,22 @@ public class GuitarString {
         }
     }
 
-    /* Pluck the guitar string by replacing the buffer with white noise. */
     public void pluck() {
+        Deque61B<Double> newBuffer = new LinkedListDeque61B<>();
         int capacity = buffer.size();
         for (int i = 0; i < capacity; i++) {
-            buffer.removeFirst();
-            buffer.addLast(Math.random() - 0.5);
+            newBuffer.addLast(Math.random() - 0.5);
         }
+        buffer = newBuffer;
     }
 
-    /* Advance the simulation one time step by performing one iteration of
-     * the Karplus-Strong algorithm. */
     public void tic() {
-        double first = buffer.removeFirst();
-        double second = buffer.get(0);
-        double newSample = DECAY * 0.5 * (first + second);
+        double firstSample = buffer.removeFirst();
+        double secondSample = buffer.get(0);
+        double newSample = DECAY * 0.5 * (firstSample + secondSample);
         buffer.addLast(newSample);
     }
 
-    /* Return the double at the front of the buffer. */
     public double sample() {
         return buffer.get(0);
     }

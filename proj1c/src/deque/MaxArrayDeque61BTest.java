@@ -1,58 +1,80 @@
 package deque;
 
-import org.junit.Test;
-import java.util.Comparator;
-import static org.junit.Assert.*;
+import org.junit.jupiter.api.Test;
 
-/**
- * Unit tests for the MaxArrayDeque61B class.
- */
+import java.util.Comparator;
+
+import static com.google.common.truth.Truth.assertThat;
+import static com.google.common.truth.Truth.assertWithMessage;
+
 public class MaxArrayDeque61BTest {
 
-    /**
-     * Tests max() method with the default natural order comparator.
-     */
+    private static final Comparator<Integer> naturalOrderComparator = Integer::compareTo;
+    private static final Comparator<Integer> reverseOrderComparator = (a, b) -> b.compareTo(a);
+
     @Test
-    public void testMaxWithDefaultComparator() {
-        Comparator<Integer> intComparator = Comparator.naturalOrder();
-        MaxArrayDeque61B<Integer> maxDeque = new MaxArrayDeque61B<>(intComparator);
-
-        maxDeque.addLast(1);
-        maxDeque.addLast(3);
-        maxDeque.addLast(2);
-
-        Integer expected = 3;
-        Integer actual = maxDeque.max();
-
-        assertEquals("The max element should be 3.", expected, actual);
+    public void testMaxWithNaturalOrder() {
+        MaxArrayDeque61B<Integer> maxDeque = new MaxArrayDeque61B<>(naturalOrderComparator);
+        for (int i = 0; i < 10; i++) {
+            maxDeque.addLast(i);
+        }
+        assertThat(maxDeque.max()).isEqualTo(9);
     }
 
-    /**
-     * Tests max() method with a custom reverse order comparator.
-     */
+    @Test
+    public void testMaxWithReverseOrder() {
+        MaxArrayDeque61B<Integer> maxDeque = new MaxArrayDeque61B<>(reverseOrderComparator);
+        for (int i = 0;  i < 10; i++) {
+            maxDeque.addLast(i);
+        }
+        assertThat(maxDeque.max()).isEqualTo(0);
+    }
+
     @Test
     public void testMaxWithCustomComparator() {
-        Comparator<Integer> reverseComparator = Comparator.reverseOrder();
-        MaxArrayDeque61B<Integer> maxDeque = new MaxArrayDeque61B<>(reverseComparator);
+        MaxArrayDeque61B<String> maxDeque = new MaxArrayDeque61B<>(Comparator.comparingInt(String::length));
+        maxDeque.addLast("short");
+        maxDeque.addLast("longer");
+        maxDeque.addLast("lengthiest");
+        assertThat(maxDeque.max()).isEqualTo("lengthiest");
 
-        maxDeque.addLast(1);
-        maxDeque.addLast(3);
-        maxDeque.addLast(2);
-
-        Integer expected = 1;
-        Integer actual = maxDeque.max();
-
-        assertEquals("The max element should be 1 with reverse order comparator.", expected, actual);
+        Comparator<String> lexicographicalOrder = String::compareTo;
+        assertThat(maxDeque.max(lexicographicalOrder)).isEqualTo("short");
     }
 
-    /**
-     * Tests max() method on an empty deque.
-     */
     @Test
-    public void testMaxWithEmptyDeque() {
-        Comparator<Integer> intComparator = Comparator.naturalOrder();
-        MaxArrayDeque61B<Integer> maxDeque = new MaxArrayDeque61B<>(intComparator);
+    public void testMaxOnEmptyDeque() {
+        MaxArrayDeque61B<Integer> maxDeque = new MaxArrayDeque61B<>(naturalOrderComparator);
+        assertThat(maxDeque.max()).isNull();
+    }
 
-        assertNull("The max element should be null for an empty deque.", maxDeque.max());
+    @Test
+    public void testMaxAfterRemovals() {
+        MaxArrayDeque61B<Integer> maxDeque = new MaxArrayDeque61B<>(naturalOrderComparator);
+        for (int i = 0; i < 10; i++) {
+            maxDeque.addLast(i);
+        }
+        assertThat(maxDeque.max()).isEqualTo(9);
+        for (int i = 0; i < 9; i++) {
+            maxDeque.removeLast();
+        }
+        assertThat(maxDeque.max()).isEqualTo(0);
+    }
+
+    @Test
+    public void testMaxWithSingleElement() {
+        MaxArrayDeque61B<Integer> maxDeque = new MaxArrayDeque61B<>(naturalOrderComparator);
+        maxDeque.addLast(42);
+        assertThat(maxDeque.max()).isEqualTo(42);
+    }
+
+    @Test
+    public void testMaxWithDuplicateElements() {
+        MaxArrayDeque61B<Integer> maxDeque = new MaxArrayDeque61B<>(naturalOrderComparator);
+        maxDeque.addLast(3);
+        maxDeque.addLast(5);
+        maxDeque.addLast(5);
+        maxDeque.addLast(2);
+        assertThat(maxDeque.max()).isEqualTo(5);
     }
 }

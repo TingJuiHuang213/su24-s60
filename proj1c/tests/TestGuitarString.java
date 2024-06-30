@@ -1,5 +1,3 @@
-/* Imports the required audio library from the
- * edu.princeton.cs.algs4 package. */
 import edu.princeton.cs.algs4.StdAudio;
 import org.junit.jupiter.api.Test;
 import gh2.GuitarString;
@@ -7,17 +5,17 @@ import gh2.GuitarString;
 import static com.google.common.truth.Truth.assertThat;
 import static com.google.common.truth.Truth.assertWithMessage;
 
-/** Tests the GuitarString class.
- *  @author Josh Hug
+/** 测试 GuitarString 类。
+ *  该类提供了各种单元测试，以确保 GuitarString 类使用 Karplus-Strong 算法正确工作。
  */
-public class TestGuitarString  {
+public class TestGuitarString {
 
     @Test
     public void testPluckTheAString() {
-        double CONCERT_A = 440.0;
-        GuitarString aString = new GuitarString(CONCERT_A);
+        double concertA = 440.0;
+        GuitarString aString = new GuitarString(concertA);
         aString.pluck();
-        for (int i = 0; i < 50000; i += 1) {
+        for (int i = 0; i < 50000; i++) {
             StdAudio.play(aString.sample());
             aString.tic();
         }
@@ -25,60 +23,51 @@ public class TestGuitarString  {
 
     @Test
     public void testSample() {
-        GuitarString s = new GuitarString(100);
-        assertThat(s.sample()).isEqualTo(0.0);
-        assertThat(s.sample()).isEqualTo(0.0);
-        assertThat(s.sample()).isEqualTo(0.0);
-        s.pluck();
+        GuitarString string = new GuitarString(100);
+        assertThat(string.sample()).isEqualTo(0.0);
+        string.pluck();
 
-        double sample = s.sample();
-        assertWithMessage("After plucking, your samples should not be 0").that(sample).isNotEqualTo(0);
+        double firstSample = string.sample();
+        assertWithMessage("拨弦后，您的样本不应为0").that(firstSample).isNotEqualTo(0.0);
 
-        String errorMsg = "Sample should not change the state of your string";
-        assertWithMessage(errorMsg).that(s.sample()).isWithin(0.0).of(sample);
-        assertWithMessage(errorMsg).that(s.sample()).isWithin(0.0).of(sample);
+        String errorMsg = "样本不应改变您的字符串状态";
+        double secondSample = string.sample();
+        assertWithMessage(errorMsg).that(secondSample).isWithin(0.0001).of(firstSample);
     }
 
     @Test
     public void testTic() {
-        GuitarString s = new GuitarString(100);
-        assertThat(s.sample()).isEqualTo(0.0);
-        assertThat(s.sample()).isEqualTo(0.0);
-        assertThat(s.sample()).isEqualTo(0.0);
-        s.pluck();
+        GuitarString string = new GuitarString(100);
+        assertThat(string.sample()).isEqualTo(0.0);
+        string.pluck();
 
-        double sample1 = s.sample();
-        assertWithMessage("After plucking, your samples should not be 0").that(sample1).isNotEqualTo(0);
+        double initialSample = string.sample();
+        assertWithMessage("拨弦后，您的样本不应为0").that(initialSample).isNotEqualTo(0.0);
 
-        s.tic();
-        String errorMsg = "After tic(), your samples should not stay the same";
-        assertWithMessage(errorMsg).that(s.sample()).isNotEqualTo(sample1);
+        string.tic();
+        String errorMsg = "tic() 后，您的样本不应保持不变";
+        double newSample = string.sample();
+        assertWithMessage(errorMsg).that(newSample).isNotEqualTo(initialSample);
     }
 
     @Test
     public void testTicCalculations() {
-        // Create a GuitarString of frequency 11025, which
-        // is a Deque61B of length 4.
-        GuitarString s = new GuitarString(11025);
-        s.pluck();
+        GuitarString string = new GuitarString(11025);
+        string.pluck();
 
-        // Record the front four values, ticcing as we go.
-        double s1 = s.sample();
-        s.tic();
-        double s2 = s.sample();
-        s.tic();
-        double s3 = s.sample();
-        s.tic();
-        double s4 = s.sample();
+        double s1 = string.sample();
+        string.tic();
+        double s2 = string.sample();
+        string.tic();
+        double s3 = string.sample();
+        string.tic();
+        double s4 = string.sample();
 
-        // If we tic once more, it should be equal to 0.996*0.5*(s1 + s2)
-        s.tic();
+        string.tic();
+        double expectedSample = 0.996 * 0.5 * (s1 + s2);
+        double actualSample = string.sample();
 
-        double s5 = s.sample();
-        double expected = 0.996 * 0.5 * (s1 + s2);
-
-        // Check that new sample is correct, using tolerance of 0.001.
-        String errorMsg = "Wrong tic value. Try running the testTic method in TestGuitarString.java";
-        assertWithMessage(errorMsg).that(s5).isWithin(0.001).of(expected);
+        String errorMsg = "错误的 tic 值。尝试在 TestGuitarString.java 中运行 testTicCalculations 方法";
+        assertWithMessage(errorMsg).that(actualSample).isWithin(0.001).of(expectedSample);
     }
 }
