@@ -4,7 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="813daae6-8835-4d0b-ae7a-92fd83b8c927" name="Changes" comment="" />
+    <list default="true" id="813daae6-8835-4d0b-ae7a-92fd83b8c927" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.capers/story" beforeDir="false" afterPath="$PROJECT_DIR$/.capers/story" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -40,7 +43,7 @@
     <configuration name="Main" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="capers.Main" />
       <module name="lab8" />
-      <option name="PROGRAM_PARAMETERS" value="dog Fido Labrador 3" />
+      <option name="PROGRAM_PARAMETERS" value="birthday &quot;Fido&quot;" />
       <extension name="coverage">
         <pattern>
           <option name="PATTERN" value="capers.*" />
