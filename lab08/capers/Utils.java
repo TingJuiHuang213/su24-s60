@@ -12,7 +12,6 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.charset.StandardCharsets;
 
-
 /** Assorted utilities.
  *  @author P. N. Hilfinger
  */
@@ -49,10 +48,10 @@ class Utils {
         try {
             if (file.isDirectory()) {
                 throw
-                    new IllegalArgumentException("cannot overwrite directory");
+                        new IllegalArgumentException("cannot overwrite directory");
             }
             BufferedOutputStream str =
-                new BufferedOutputStream(Files.newOutputStream(file.toPath()));
+                    new BufferedOutputStream(Files.newOutputStream(file.toPath()));
             for (Object obj : contents) {
                 if (obj instanceof byte[]) {
                     str.write((byte[]) obj);
@@ -72,7 +71,7 @@ class Utils {
                                                  Class<T> expectedClass) {
         try {
             ObjectInputStream in =
-                new ObjectInputStream(new FileInputStream(file));
+                    new ObjectInputStream(new FileInputStream(file));
             T result = expectedClass.cast(in.readObject());
             in.close();
             return result;
@@ -86,7 +85,6 @@ class Utils {
     static void writeObject(File file, Serializable obj) {
         writeContents(file, serialize(obj));
     }
-
 
     /* OTHER FILE UTILITIES */
 
@@ -104,7 +102,6 @@ class Utils {
         return Paths.get(first.getPath(), others).toFile();
     }
 
-
     /* SERIALIZATION UTILITIES */
 
     /** Returns a byte array containing the serialized contents of OBJ. */
@@ -120,8 +117,6 @@ class Utils {
         }
     }
 
-
-
     /* MESSAGES AND ERROR REPORTING */
 
     /** Return a RuntimeException whose message is composed of MSG and ARGS as
@@ -130,4 +125,17 @@ class Utils {
         return new RuntimeException(String.format(msg, args));
     }
 
+    /* ARGUMENT VALIDATION */
+
+    /** Checks the number of arguments versus the expected number,
+     * throws a RuntimeException if they do not match.
+     * @param cmd Name of command you are validating
+     * @param args Argument array from command line
+     * @param n Number of expected arguments
+     */
+    public static void validateNumArgs(String cmd, String[] args, int n) {
+        if (args.length != n) {
+            throw new RuntimeException(String.format("Invalid number of arguments for: %s.", cmd));
+        }
+    }
 }
