@@ -6,7 +6,7 @@
     <option name="VM_PARAMETERS" value="-ea -Djava.security.manager=allow" />
     <option name="WORKING_DIRECTORY" value="$ProjectFileDir$/testing" />
     <method v="2">
-        <option name="Make" enabled="true" />
+      <option name="Make" enabled="true" />
     </method>
   </configuration>
 </component>

@@ -124,8 +124,8 @@ class Utils {
 
     /* MESSAGES AND ERROR REPORTING */
 
-    /** Return a RuntimeException whose message is composed from MSG and ARGS as
-     *  for the String.format method. */
+    /** Return a RuntimeException whose message is composed of MSG and ARGS as
+     *  for the String. Format method. */
     static RuntimeException error(String msg, Object... args) {
         return new RuntimeException(String.format(msg, args));
     }
