@@ -47,11 +47,9 @@ class Utils {
     static void writeContents(File file, Object... contents) {
         try {
             if (file.isDirectory()) {
-                throw
-                        new IllegalArgumentException("cannot overwrite directory");
+                throw new IllegalArgumentException("cannot overwrite directory");
             }
-            BufferedOutputStream str =
-                    new BufferedOutputStream(Files.newOutputStream(file.toPath()));
+            BufferedOutputStream str = new BufferedOutputStream(Files.newOutputStream(file.toPath()));
             for (Object obj : contents) {
                 if (obj instanceof byte[]) {
                     str.write((byte[]) obj);
@@ -67,16 +65,13 @@ class Utils {
 
     /** Return an object of type T read from FILE, casting it to EXPECTEDCLASS.
      *  Throws IllegalArgumentException in case of problems. */
-    static <T extends Serializable> T readObject(File file,
-                                                 Class<T> expectedClass) {
+    static <T extends Serializable> T readObject(File file, Class<T> expectedClass) {
         try {
-            ObjectInputStream in =
-                    new ObjectInputStream(new FileInputStream(file));
+            ObjectInputStream in = new ObjectInputStream(new FileInputStream(file));
             T result = expectedClass.cast(in.readObject());
             in.close();
             return result;
-        } catch (IOException | ClassCastException
-                 | ClassNotFoundException excp) {
+        } catch (IOException | ClassCastException | ClassNotFoundException excp) {
             throw new IllegalArgumentException(excp.getMessage());
         }
     }
@@ -125,17 +120,10 @@ class Utils {
         return new RuntimeException(String.format(msg, args));
     }
 
-    /* ARGUMENT VALIDATION */
-
-    /** Checks the number of arguments versus the expected number,
-     * throws a RuntimeException if they do not match.
-     * @param cmd Name of command you are validating
-     * @param args Argument array from command line
-     * @param n Number of expected arguments
-     */
-    public static void validateNumArgs(String cmd, String[] args, int n) {
+    /** Validate the number of arguments. */
+    static void validateNumArgs(String cmd, String[] args, int n) {
         if (args.length != n) {
-            throw new RuntimeException(String.format("Invalid number of arguments for: %s.", cmd));
+            throw new IllegalArgumentException(String.format("Invalid number of arguments for command: %s", cmd));
         }
     }
 }

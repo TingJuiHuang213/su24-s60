@@ -49,6 +49,7 @@ public class Main {
      * Sets up the persistence directories.
      */
     public static void setupPersistence() {
+        // 初始化CAPERS_FOLDER和DOG_FOLDER
         if (!CAPERS_FOLDER.exists()) {
             CAPERS_FOLDER.mkdirs();
         }
@@ -66,11 +67,13 @@ public class Main {
         File storyFile = Utils.join(CAPERS_FOLDER, "story.txt");
         String story = args[1] + "\n";
 
+        // 如果文件已經存在，則讀取現有內容並追加新內容
         if (storyFile.exists()) {
             String existingStory = Utils.readContentsAsString(storyFile);
             story = existingStory + story;
         }
 
+        // 將內容寫入文件
         Utils.writeContents(storyFile, story);
         System.out.println(story);
     }
@@ -85,6 +88,7 @@ public class Main {
         String breed = args[2];
         int age = Integer.parseInt(args[3]);
 
+        // 創建新狗對象並保存
         Dog newDog = new Dog(name, breed, age);
         newDog.save();
         System.out.println(newDog);
