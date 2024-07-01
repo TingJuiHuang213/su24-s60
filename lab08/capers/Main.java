@@ -137,8 +137,6 @@ public class Main {
         }
         dog.haveBirthday();
         dog.save();
-        System.out.println("Happy birthday! Woof! Woof!");
-        System.out.println(dog);
     }
 
     /**

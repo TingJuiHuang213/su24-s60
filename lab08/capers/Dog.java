@@ -50,8 +50,8 @@ public class Dog implements Serializable { // 添加 implements Serializable
      */
     public void haveBirthday() {
         age++;
-        System.out.println(this);
         System.out.println("Happy birthday! Woof! Woof!");
+        System.out.println(this);
     }
 
     /**
