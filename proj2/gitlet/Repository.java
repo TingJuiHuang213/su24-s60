@@ -1,29 +1,154 @@
 package gitlet;
 
 import java.io.File;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+
 import static gitlet.Utils.*;
 
-// TODO: any imports you need here
-
 /** Represents a gitlet repository.
- *  TODO: It's a good idea to give a description here of what else this Class
- *  does at a high level.
- *
- *  @author TODO
+ *  This class manages the version control system, handling commands such as init, add, commit, restore, and log.
  */
 public class Repository {
-    /**
-     * TODO: add instance variables here.
-     *
-     * List all instance variables of the Repository class here with a useful
-     * comment above them describing what that variable represents and how that
-     * variable is used. We've provided two examples for you.
-     */
 
     /** The current working directory. */
     public static final File CWD = new File(System.getProperty("user.dir"));
     /** The .gitlet directory. */
     public static final File GITLET_DIR = join(CWD, ".gitlet");
+    /** The staging area for added files. */
+    private static final File STAGING_AREA = join(GITLET_DIR, "staging");
+    /** The commits directory. */
+    private static final File COMMITS_DIR = join(GITLET_DIR, "commits");
 
-    /* TODO: fill in the rest of this class. */
+    // Staging area maps
+    private static Map<String, String> stagingArea = new HashMap<>();
+
+    // Initialize the repository
+    public static void init() {
+        if (GITLET_DIR.exists()) {
+            System.out.println("A Gitlet version-control system already exists in the current directory.");
+            System.exit(0);
+        }
+
+        GITLET_DIR.mkdir();
+        STAGING_AREA.mkdir();
+        COMMITS_DIR.mkdir();
+
+        Commit initialCommit = new Commit("initial commit", null);
+        saveCommit(initialCommit);
+    }
+
+    // Add file to staging area
+    public static void add(String fileName) {
+        File file = join(CWD, fileName);
+        if (!file.exists()) {
+            System.out.println("File does not exist.");
+            System.exit(0);
+        }
+
+        byte[] fileContent = readContents(file);
+        String fileHash = sha1(fileContent);
+
+        // Save the file content as a blob
+        File blob = join(STAGING_AREA, fileHash);
+        if (!blob.exists()) {
+            writeContents(blob, fileContent);
+        }
+
+        // Add to staging area
+        stagingArea.put(fileName, fileHash);
+    }
+
+    // Commit the staged files
+    public static void commit(String message) {
+        if (message.isEmpty()) {
+            System.out.println("Please enter a commit message.");
+            System.exit(0);
+        }
+
+        Commit currentCommit = loadCurrentCommit();
+        Commit newCommit = new Commit(message, currentCommit.getId());
+
+        // Transfer blobs from staging area to commit
+        for (Map.Entry<String, String> entry : stagingArea.entrySet()) {
+            newCommit.getBlobs().put(entry.getKey(), entry.getValue());
+        }
+
+        // Save the new commit
+        saveCommit(newCommit);
+        clearStagingArea();
+    }
+
+    // Restore file from the latest commit
+    public static void restore(String fileName) {
+        Commit currentCommit = loadCurrentCommit();
+        String fileHash = currentCommit.getBlobs().get(fileName);
+        if (fileHash == null) {
+            System.out.println("File does not exist in that commit.");
+            System.exit(0);
+        }
+
+        File blob = join(STAGING_AREA, fileHash);
+        byte[] fileContent = readContents(blob);
+        writeContents(join(CWD, fileName), fileContent);
+    }
+
+    // Restore file from a specific commit
+    public static void restore(String commitId, String fileName) {
+        File commitFile = join(COMMITS_DIR, commitId);
+        if (!commitFile.exists()) {
+            System.out.println("No commit with that id exists.");
+            System.exit(0);
+        }
+
+        Commit commit = readObject(commitFile, Commit.class);
+        String fileHash = commit.getBlobs().get(fileName);
+        if (fileHash == null) {
+            System.out.println("File does not exist in that commit.");
+            System.exit(0);
+        }
+
+        File blob = join(STAGING_AREA, fileHash);
+        byte[] fileContent = readContents(blob);
+        writeContents(join(CWD, fileName), fileContent);
+    }
+
+    // Display the commit history
+    public static void log() {
+        Commit currentCommit = loadCurrentCommit();
+        while (currentCommit != null) {
+            System.out.println("===");
+            System.out.println("Commit " + currentCommit.getId());
+            System.out.println(currentCommit.getTimestamp());
+            System.out.println(currentCommit.getMessage());
+            System.out.println();
+
+            String parentId = currentCommit.getParent();
+            if (parentId == null) {
+                break;
+            }
+            currentCommit = readObject(join(COMMITS_DIR, parentId), Commit.class);
+        }
+    }
+
+    // Helper method to save a commit
+    private static void saveCommit(Commit commit) {
+        File commitFile = join(COMMITS_DIR, commit.getId());
+        writeObject(commitFile, commit);
+        writeObject(join(GITLET_DIR, "HEAD"), commit);
+    }
+
+    // Helper method to load the current commit
+    private static Commit loadCurrentCommit() {
+        return readObject(join(GITLET_DIR, "HEAD"), Commit.class);
+    }
+
+    // Helper method to clear the staging area
+    private static void clearStagingArea() {
+        stagingArea.clear();
+        for (File file : STAGING_AREA.listFiles()) {
+            restrictedDelete(file);
+        }
+    }
 }
