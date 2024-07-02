@@ -32,31 +32,43 @@ public class Repository {
         }
 
         GITLET_DIR.mkdir();
+        System.out.println("Created .gitlet directory.");
+
         STAGING_AREA.mkdir();
+        System.out.println("Created staging area directory.");
+
         COMMITS_DIR.mkdir();
+        System.out.println("Created commits directory.");
 
         Commit initialCommit = new Commit("initial commit", null);
         saveCommit(initialCommit);
+        System.out.println("Initial commit created and saved.");
+
+        // Create and save HEAD
+        File head = join(GITLET_DIR, "HEAD");
+        writeObject(head, initialCommit);
+        System.out.println("HEAD created and saved.");
     }
+
 
     // Add file to staging area
     public static void add(String fileName) {
-        File file = join(CWD, fileName);
+        File file = Utils.join(CWD, fileName);
         if (!file.exists()) {
             System.out.println("File does not exist.");
             System.exit(0);
         }
 
-        byte[] fileContent = readContents(file);
-        String fileHash = sha1(fileContent);
+        byte[] fileContent = Utils.readContents(file);
+        String fileHash = Utils.sha1(fileContent);
 
-        // Save the file content as a blob
-        File blob = join(STAGING_AREA, fileHash);
+        // 保存文件内容到暂存区
+        File blob = Utils.join(STAGING_AREA, fileHash);
         if (!blob.exists()) {
-            writeContents(blob, fileContent);
+            Utils.writeContents(blob, fileContent);
         }
 
-        // Add to staging area
+        // 添加到暂存区映射
         stagingArea.put(fileName, fileHash);
     }
 
@@ -148,7 +160,9 @@ public class Repository {
     private static void clearStagingArea() {
         stagingArea.clear();
         for (File file : STAGING_AREA.listFiles()) {
-            restrictedDelete(file);
+            if (!file.isDirectory()) {
+                restrictedDelete(file);
+            }
         }
     }
 }
