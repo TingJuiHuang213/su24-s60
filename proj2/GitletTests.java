@@ -1295,7 +1295,7 @@ public class GitletTests {
                 ${COMMIT_HEAD}
                 initial commit
                 """.replace("${COMMIT_HEAD}", COMMIT_HEAD));
-        gitletCommand(new String[]{"checkout", "other"}, "");
+        gitletCommand(new String[]{"switch", "other"}, "");
         gitletCommandP(new String[]{"log"}, """
                 ===
                 ${COMMIT_HEAD}
