@@ -1,6 +1,6 @@
 /**
- *  A class used to analyze the runtime of sorting algorithms*/
-
+ *  A class used to analyze the runtime of sorting algorithms
+ */
 
 public class Sorter {
 
