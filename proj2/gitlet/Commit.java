@@ -30,7 +30,7 @@ public class Commit implements Serializable {
 
     // Generate the commit ID
     private String generateId() {
-        return Utils.sha1(message, timestamp, parent, blobs.toString());
+        return Utils.sha1(message, timestamp, parent == null ? "" : parent, blobs.toString());
     }
 
     // Generate the timestamp

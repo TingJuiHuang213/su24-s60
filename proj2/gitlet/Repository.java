@@ -1,15 +1,11 @@
 package gitlet;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
 import static gitlet.Utils.*;
 
-/** Represents a gitlet repository.
- *  This class manages the version control system, handling commands such as init, add, commit, restore, and log.
- */
 public class Repository {
 
     /** The current working directory. */
@@ -53,11 +49,13 @@ public class Repository {
         byte[] fileContent = Utils.readContents(file);
         String fileHash = Utils.sha1(fileContent);
 
+        // Save file content to staging area
         File blob = Utils.join(STAGING_AREA, fileHash);
         if (!blob.exists()) {
             Utils.writeContents(blob, fileContent);
         }
 
+        // Add to staging area map
         stagingArea.put(fileName, fileHash);
     }
 
@@ -71,46 +69,48 @@ public class Repository {
         Commit currentCommit = loadCurrentCommit();
         Commit newCommit = new Commit(message, currentCommit.getId());
 
+        // Transfer blobs from staging area to commit
         for (Map.Entry<String, String> entry : stagingArea.entrySet()) {
             newCommit.getBlobs().put(entry.getKey(), entry.getValue());
         }
 
+        // Save the new commit
         saveCommit(newCommit);
         clearStagingArea();
     }
 
     // Restore file from the latest commit
-    public static void checkout(String fileName) {
-        restore(fileName);
+    public static void restore(String fileName) {
+        Commit currentCommit = loadCurrentCommit();
+        String fileHash = currentCommit.getBlobs().get(fileName);
+        if (fileHash == null) {
+            System.out.println("File does not exist in that commit.");
+            System.exit(0);
+        }
+
+        File blob = join(STAGING_AREA, fileHash);
+        byte[] fileContent = readContents(blob);
+        writeContents(join(CWD, fileName), fileContent);
     }
 
     // Restore file from a specific commit
-    public static void checkout(String commitId, String fileName) {
-        restore(commitId, fileName);
-    }
-
-    // Remove a file
-    public static void rm(String fileName) {
-        stagingArea.remove(fileName);
-        File file = join(CWD, fileName);
-        if (file.exists()) {
-            restrictedDelete(file);
+    public static void restore(String commitId, String fileName) {
+        File commitFile = join(COMMITS_DIR, commitId);
+        if (!commitFile.exists()) {
+            System.out.println("No commit with that id exists.");
+            System.exit(0);
         }
-    }
 
-    // Create a new branch
-    public static void branch(String branchName) {
-        // Branch implementation
-    }
+        Commit commit = readObject(commitFile, Commit.class);
+        String fileHash = commit.getBlobs().get(fileName);
+        if (fileHash == null) {
+            System.out.println("File does not exist in that commit.");
+            System.exit(0);
+        }
 
-    // Checkout a branch
-    public static void checkoutBranch(String branchName) {
-        // Checkout branch implementation
-    }
-
-    // Merge two branches
-    public static void merge(String branchName) {
-        // Merge implementation
+        File blob = join(STAGING_AREA, fileHash);
+        byte[] fileContent = readContents(blob);
+        writeContents(join(CWD, fileName), fileContent);
     }
 
     // Display the commit history
@@ -151,38 +151,5 @@ public class Repository {
                 restrictedDelete(file);
             }
         }
-    }
-
-    // Helper method to restore a file
-    static void restore(String fileName) {
-        Commit currentCommit = loadCurrentCommit();
-        String fileHash = currentCommit.getBlobs().get(fileName);
-        if (fileHash == null) {
-            System.out.println("File does not exist in that commit.");
-            System.exit(0);
-        }
-
-        File blob = join(STAGING_AREA, fileHash);
-        byte[] fileContent = readContents(blob);
-        writeContents(join(CWD, fileName), fileContent);
-    }
-
-    static void restore(String commitId, String fileName) {
-        File commitFile = join(COMMITS_DIR, commitId);
-        if (!commitFile.exists()) {
-            System.out.println("No commit with that id exists.");
-            System.exit(0);
-        }
-
-        Commit commit = readObject(commitFile, Commit.class);
-        String fileHash = commit.getBlobs().get(fileName);
-        if (fileHash == null) {
-            System.out.println("File does not exist in that commit.");
-            System.exit(0);
-        }
-
-        File blob = join(STAGING_AREA, fileHash);
-        byte[] fileContent = readContents(blob);
-        writeContents(join(CWD, fileName), fileContent);
     }
 }

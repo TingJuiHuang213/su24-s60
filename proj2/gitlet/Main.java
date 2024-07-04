@@ -43,16 +43,6 @@ public class Main {
                 }
                 Repository.log();
                 break;
-            case "checkout":
-                if (args.length == 3 && args[1].equals("--")) {
-                    Repository.checkout(args[2]);
-                } else if (args.length == 4 && args[2].equals("--")) {
-                    Repository.checkout(args[1], args[3]);
-                } else {
-                    System.out.println("Incorrect operands.");
-                    System.exit(0);
-                }
-                break;
             case "restore":
                 if (args.length == 3 && args[1].equals("--")) {
                     Repository.restore(args[2]);
