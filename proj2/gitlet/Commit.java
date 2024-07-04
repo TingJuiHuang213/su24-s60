@@ -1,53 +1,51 @@
 package gitlet;
 
 import java.io.Serializable;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.TimeZone;
 
 /** Represents a gitlet commit object.
- *  This class encapsulates the properties of a commit in a version control system.
- *  Each commit has a message, a timestamp, a reference to its parent commit,
- *  and a map of file blobs representing the state of files at the time of the commit.
+ *  This class manages the commit object, storing information such as the commit message, timestamp, parent commit ID, and a map of file blobs.
  */
 public class Commit implements Serializable {
-    /** The message of this Commit. */
+
+    private static final long serialVersionUID = 1L;
     private String message;
-
-    /** The timestamp of this Commit. */
-    private Date timestamp;
-
-    /** The parent commit's SHA-1 ID. */
+    private String timestamp;
     private String parent;
-
-    /** The map of file blobs in this Commit. */
+    private String id;
     private Map<String, String> blobs;
 
-    /** Constructs a new Commit object.
-     * @param message The commit message.
-     * @param parent The SHA-1 ID of the parent commit.
-     */
+    // Constructor for initial commit
     public Commit(String message, String parent) {
         this.message = message;
-        this.timestamp = new Date();  // Current time for new commits
         this.parent = parent;
+        this.timestamp = generateTimestamp();
         this.blobs = new HashMap<>();
+        this.id = generateId();
     }
 
-    /** Returns the SHA-1 ID of this Commit.
-     * @return The SHA-1 ID.
-     */
-    public String getId() {
-        // Using SHA-1 hash to generate a unique ID based on the commit's properties
-        return Utils.sha1(message, timestamp.toString(), parent == null ? "" : parent, blobs.toString());
+    // Generate the commit ID
+    private String generateId() {
+        return Utils.sha1(message, timestamp, parent, blobs.toString());
     }
 
-    // Getter and setter methods for instance variables if needed
+    // Generate the timestamp
+    private String generateTimestamp() {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("EEE MMM d HH:mm:ss yyyy");
+        dateFormat.setTimeZone(TimeZone.getTimeZone("PST"));
+        return dateFormat.format(new Date());
+    }
+
+    // Getters
     public String getMessage() {
         return message;
     }
 
-    public Date getTimestamp() {
+    public String getTimestamp() {
         return timestamp;
     }
 
@@ -55,11 +53,11 @@ public class Commit implements Serializable {
         return parent;
     }
 
-    public Map<String, String> getBlobs() {
-        return blobs;
+    public String getId() {
+        return id;
     }
 
-    public void setBlobs(Map<String, String> blobs) {
-        this.blobs = blobs;
+    public Map<String, String> getBlobs() {
+        return blobs;
     }
 }
