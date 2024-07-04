@@ -107,7 +107,13 @@ public class MainTest {
         Main.main(new String[]{"commit", "Initial commit"});
 
         // 执行 log 命令
+        ByteArrayOutputStream outContent = new ByteArrayOutputStream();
+        System.setOut(new PrintStream(outContent));
         Main.main(new String[]{"log"});
+        System.setOut(null);
+
+        String output = outContent.toString();
+        assertTrue(output.contains("Initial commit"));
 
         // 清理
         testFile.delete();
@@ -219,6 +225,7 @@ public class MainTest {
         ByteArrayOutputStream outContent = new ByteArrayOutputStream();
         System.setOut(new PrintStream(outContent));
         Main.main(new String[]{"global-log"});
+        System.setOut(null);
 
         // 验证输出是否包含所有提交的信息
         String output = outContent.toString();
@@ -257,6 +264,7 @@ public class MainTest {
         ByteArrayOutputStream outContent = new ByteArrayOutputStream();
         System.setOut(new PrintStream(outContent));
         Main.main(new String[]{"find", "First commit"});
+        System.setOut(null);
 
         // 验证输出是否包含提交的ID
         String output = outContent.toString().trim();
@@ -294,6 +302,7 @@ public class MainTest {
         ByteArrayOutputStream outContent = new ByteArrayOutputStream();
         System.setOut(new PrintStream(outContent));
         Main.main(new String[]{"status"});
+        System.setOut(null);
 
         // 验证输出是否包含暂存文件
         String output = outContent.toString();

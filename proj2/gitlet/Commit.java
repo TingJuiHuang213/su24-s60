@@ -1,28 +1,36 @@
 package gitlet;
 
-import java.util.Date; // TODO: You'll likely use this in this class
+import java.io.Serializable;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
-/** Represents a gitlet commit object.
- *  TODO: It's a good idea to give a description here of what else this Class
- *  does at a high level.
- *
- *  @author TODO
- */
-public class Commit {
-    /** The message of this Commit. */
+public class Commit implements Serializable {
     private String message;
+    private String parent;
     private Date timestamp;
+    private Map<String, String> blobs;
 
-    public Commit(String message) {
+    public Commit(String message, String parent) {
         this.message = message;
+        this.parent = parent;
         this.timestamp = new Date();
+        this.blobs = new HashMap<>();
     }
 
-    @Override
-    public String toString() {
-        return "===\n" +
-                "Commit " + this.hashCode() + "\n" +
-                "Date: " + timestamp + "\n" +
-                message + "\n";
+    public String getMessage() {
+        return message;
+    }
+
+    public String getParent() {
+        return parent;
+    }
+
+    public Date getTimestamp() {
+        return timestamp;
+    }
+
+    public Map<String, String> getBlobs() {
+        return blobs;
     }
 }
