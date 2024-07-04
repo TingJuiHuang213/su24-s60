@@ -33,4 +33,8 @@ public class Commit implements Serializable {
     public Map<String, String> getBlobs() {
         return blobs;
     }
+
+    public String getId() {
+        return null;
+    }
 }

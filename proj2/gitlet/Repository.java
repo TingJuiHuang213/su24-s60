@@ -172,13 +172,14 @@ public class Repository {
         }
     }
 
-    private static String getCurrentCommitId() {
-        String currentBranch = getCurrentBranch();
-        return readContentsAsString(join(BRANCHES_DIR, currentBranch));
+    private static String getCurrentBranch() {
+        return Utils.readContentsAsString(new File(".gitlet/HEAD")).trim();
     }
 
-    private static String getCurrentBranch() {
-        return "master"; // 默认为 master 分支，这里可以改成读取实际的当前分支
+    // 获取当前HEAD提交的ID
+    public static String getHeadCommitId() {
+        String currentBranch = getCurrentBranch();
+        return Utils.readContentsAsString(new File(".gitlet/refs/heads/" + currentBranch)).trim();
     }
 
     public static void status() {
@@ -244,6 +245,10 @@ public class Repository {
         String currentCommitId = getCurrentCommitId();
         writeContents(join(BRANCHES_DIR, branchName), currentCommitId);
         System.out.println("Created branch " + branchName + " at commit " + currentCommitId);
+    }
+
+    private static String getCurrentCommitId() {
+        return null;
     }
 
     public static void reset(String commitId) {
