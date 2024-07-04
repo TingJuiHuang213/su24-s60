@@ -1,6 +1,7 @@
 package gitlet;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
@@ -87,5 +88,9 @@ public class Utils {
             throw new IllegalArgumentException("Failed to delete file: " + file);
         }
         return true;
+    }
+
+    public static String readContentsAsString(File file) {
+        return new String(readContents(file), StandardCharsets.UTF_8);
     }
 }

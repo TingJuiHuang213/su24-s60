@@ -57,9 +57,9 @@ public class Repository {
 
         // Add to staging area map
         stagingArea.put(fileName, fileHash);
+        System.out.println("Added to staging area: " + fileName + " -> " + fileHash);
     }
 
-    // Commit the staged files
     public static void commit(String message) {
         if (message.isEmpty()) {
             System.out.println("Please enter a commit message.");
@@ -72,6 +72,7 @@ public class Repository {
         // Transfer blobs from staging area to commit
         for (Map.Entry<String, String> entry : stagingArea.entrySet()) {
             newCommit.getBlobs().put(entry.getKey(), entry.getValue());
+            System.out.println("Committed: " + entry.getKey() + " -> " + entry.getValue());
         }
 
         // Save the new commit
@@ -89,6 +90,11 @@ public class Repository {
         }
 
         File blob = join(STAGING_AREA, fileHash);
+        if (!blob.exists()) {
+            System.out.println("Blob does not exist: " + blob.getPath());
+            System.exit(0);
+        }
+
         byte[] fileContent = readContents(blob);
         writeContents(join(CWD, fileName), fileContent);
     }
@@ -109,6 +115,11 @@ public class Repository {
         }
 
         File blob = join(STAGING_AREA, fileHash);
+        if (!blob.exists()) {
+            System.out.println("Blob does not exist: " + blob.getPath());
+            System.exit(0);
+        }
+
         byte[] fileContent = readContents(blob);
         writeContents(join(CWD, fileName), fileContent);
     }
