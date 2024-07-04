@@ -39,6 +39,7 @@ public class Repository {
     }
 
     // Add file to staging area
+    // Add file to staging area
     public static void add(String fileName) {
         File file = Utils.join(CWD, fileName);
         if (!file.exists()) {
@@ -57,6 +58,9 @@ public class Repository {
 
         // Add to staging area map
         stagingArea.put(fileName, fileHash);
+        // 移除調試輸出
+        // System.out.println("Added to staging area: " + fileName + " -> " + fileHash);
+        // System.out.println("Blob path: " + blob.getPath());
     }
 
     public static void commit(String message) {

@@ -47,7 +47,7 @@ public class Main {
                 break;
             case "restore":
                 if (args.length == 3 && args[1].equals("--")) {
-                    Repository.restore(loadCurrentCommit().getId(), args[2]); // 加载当前提交的ID
+                    Repository.restore(args[2]);
                 } else if (args.length == 4 && args[2].equals("--")) {
                     Repository.restore(args[1], args[3]);
                 } else {
