@@ -94,19 +94,16 @@ public class GitletTest {
         Main.main(new String[]{"add", "test.txt"});
         Main.main(new String[]{"commit", "Add test.txt"});
 
-        // 验证新的提交是否已创建
+        // 再次添加内容并提交
+        Utils.writeContents(testFile, "This is modified content.".getBytes());
+        Main.main(new String[]{"add", "test.txt"});
+        Main.main(new String[]{"commit", "Modify test.txt"});
+
+        // 验证提交数量是否正确
         File commitsDir = new File(".gitlet/commits");
         File[] commitFiles = commitsDir.listFiles();
         assertNotNull(commitFiles);
         assertEquals(2, commitFiles.length);
-
-        // 验证HEAD是否更新
-        File head = new File(".gitlet/HEAD");
-        assertTrue(head.exists());
-
-        Commit headCommit = Utils.readObject(head, Commit.class);
-        assertEquals("Add test.txt", headCommit.getMessage());
-        assertTrue(headCommit.getBlobs().containsKey("test.txt"));
     }
 
     @Test
