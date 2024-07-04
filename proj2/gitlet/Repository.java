@@ -26,10 +26,6 @@ public class Repository {
 
         // 进一步初始化设置
         String initialCommitId = generateCommitId("initial commit");
-        File initialCommitDir = join(COMMITS_DIR, initialCommitId);
-        initialCommitDir.mkdir();
-        writeContents(join(initialCommitDir, "message.txt"), "initial commit");
-        writeContents(join(initialCommitDir, "timestamp.txt"), new Date().toString());
         writeContents(join(BRANCHES_DIR, "master"), initialCommitId);
     }
 
@@ -74,19 +70,21 @@ public class Repository {
     }
 
     public static void log() {
-        String commitId = getCurrentCommitId();
-        while (commitId != null) {
-            File commitDir = join(COMMITS_DIR, commitId);
-            String message = readContentsAsString(join(commitDir, "message.txt"));
-            String timestamp = readContentsAsString(join(commitDir, "timestamp.txt"));
+        File[] commits = COMMITS_DIR.listFiles();
+        if (commits == null || commits.length == 0) {
+            System.out.println("No commits yet.");
+            return;
+        }
+
+        for (File commit : commits) {
+            String commitId = commit.getName();
+            String message = readContentsAsString(join(commit, "message.txt"));
+            String timestamp = readContentsAsString(join(commit, "timestamp.txt"));
             System.out.println("===");
             System.out.println("Commit " + commitId);
             System.out.println(timestamp);
             System.out.println(message);
             System.out.println();
-
-            // 获取父提交ID
-            commitId = null;
         }
     }
 
@@ -174,13 +172,13 @@ public class Repository {
         }
     }
 
-    static String getCurrentCommitId() {
+    private static String getCurrentCommitId() {
         String currentBranch = getCurrentBranch();
         return readContentsAsString(join(BRANCHES_DIR, currentBranch));
     }
 
     private static String getCurrentBranch() {
-        return "master"; // 默認為 master 分支，這裡可以改成讀取實際的當前分支
+        return "master"; // 默认为 master 分支，这里可以改成读取实际的当前分支
     }
 
     public static void status() {

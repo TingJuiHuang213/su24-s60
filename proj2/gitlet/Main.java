@@ -58,15 +58,11 @@ public class Main {
                 Repository.status();
                 break;
             case "restore":
-                if (args.length < 2) {
+                if (args.length < 3) {
                     System.out.println("Incorrect operands.");
                     return;
                 }
-                if (args.length == 2) {
-                    Repository.restore(args[1], Repository.getCurrentCommitId());
-                } else if (args.length == 3) {
-                    Repository.restore(args[1], args[2]);
-                }
+                Repository.restore(args[1], args[2]);
                 break;
             case "branch":
                 if (args.length < 2) {
