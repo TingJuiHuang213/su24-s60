@@ -91,29 +91,10 @@ public class Repository {
     }
 
     // Restore file from the latest commit
-    public static void restore(String fileName) {
-        Commit currentCommit = loadCurrentCommit();
-        String fileHash = currentCommit.getBlobs().get(fileName);
-        if (fileHash == null) {
-            System.out.println("File does not exist in that commit.");
-            System.exit(0);
-        }
-
-        File blob = join(STAGING_AREA, fileHash);
-        if (!blob.exists()) {
-            System.out.println("Blob does not exist: " + blob.getPath());
-            System.exit(0);
-        }
-
-        byte[] fileContent = readContents(blob);
-        writeContents(join(CWD, fileName), fileContent);
-    }
-
-    // Restore file from a specific commit
     public static void restore(String commitId, String fileName) {
         File commitFile = join(COMMITS_DIR, commitId);
         if (!commitFile.exists()) {
-            System.out.println("No commit with that id exists.");
+            System.out.println("Commit does not exist.");
             System.exit(0);
         }
 
@@ -124,9 +105,27 @@ public class Repository {
             System.exit(0);
         }
 
-        File blob = join(STAGING_AREA, fileHash);
+        File blob = join(COMMITS_DIR, fileHash);
         if (!blob.exists()) {
-            System.out.println("Blob does not exist: " + blob.getPath());
+            System.out.println("Blob does not exist.");
+            System.exit(0);
+        }
+
+        byte[] fileContent = readContents(blob);
+        writeContents(join(CWD, fileName), fileContent);
+    }
+
+    public static void restore(String fileName) {
+        Commit currentCommit = loadCurrentCommit();
+        String fileHash = currentCommit.getBlobs().get(fileName);
+        if (fileHash == null) {
+            System.out.println("File does not exist in that commit.");
+            System.exit(0);
+        }
+
+        File blob = join(COMMITS_DIR, fileHash);
+        if (!blob.exists()) {
+            System.out.println("Blob does not exist.");
             System.exit(0);
         }
 
