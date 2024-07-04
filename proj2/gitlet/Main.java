@@ -4,27 +4,33 @@ public class Main {
     public static void main(String[] args) {
         if (args.length == 0) {
             System.out.println("Please enter a command.");
-            return;
+            System.exit(0);
         }
 
-        String command = args[0];
-        switch (command) {
+        switch (args[0]) {
             case "init":
+                if (args.length != 1) {
+                    System.out.println("Incorrect operands.");
+                    System.exit(0);
+                }
+
                 Repository.init();
                 break;
             case "add":
-                if (args.length < 2) {
-                    System.out.println("Please enter a file name.");
-                } else {
-                    Repository.add(args[1]);
+                if (args.length != 2) {
+                    System.out.println("Incorrect operands.");
+                    System.exit(0);
                 }
+
+                Repository.add(args[1]);
                 break;
             case "commit":
-                if (args.length < 2) {
-                    System.out.println("Please enter a commit message.");
-                } else {
-                    Repository.commit(args[1]);
+                if (args.length != 2) {
+                    System.out.println("Incorrect operands.");
+                    System.exit(0);
                 }
+
+                Repository.commit(args[1]);
                 break;
             case "restore":
                 if (args.length == 3 && args[1].equals("--")) {
@@ -33,14 +39,20 @@ public class Main {
                     Repository.restore(args[1], args[3]);
                 } else {
                     System.out.println("Incorrect operands.");
+                    System.exit(0);
                 }
                 break;
             case "log":
+                if (args.length != 1) {
+                    System.out.println("Incorrect operands.");
+                    System.exit(0);
+                }
+
                 Repository.log();
                 break;
-            // 添加更多命令的处理逻辑
             default:
                 System.out.println("No command with that name exists.");
+                System.exit(0);
         }
     }
 }

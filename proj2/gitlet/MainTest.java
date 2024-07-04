@@ -9,7 +9,7 @@ import java.io.PrintStream;
 
 public class MainTest {
     @Test
-    public void test01_init() throws IOException {
+    public void testInit() throws IOException {
         // 初始化Gitlet
         Main.main(new String[]{"init"});
         File gitletDir = new File(".gitlet");
@@ -17,7 +17,7 @@ public class MainTest {
     }
 
     @Test
-    public void test02_basicRestore() throws IOException {
+    public void testBasicRestore() throws IOException {
         // 初始化Gitlet并提交文件
         Main.main(new String[]{"init"});
         File testFile = new File("wug.txt");
@@ -36,7 +36,7 @@ public class MainTest {
     }
 
     @Test
-    public void test03_basicLog() throws IOException {
+    public void testBasicLog() throws IOException {
         // 初始化Gitlet并提交文件
         Main.main(new String[]{"init"});
         File testFile = new File("wug.txt");
@@ -49,10 +49,19 @@ public class MainTest {
         ByteArrayOutputStream outContent = new ByteArrayOutputStream();
         System.setOut(new PrintStream(outContent));
         Main.main(new String[]{"log"});
-        String expectedOutput = "===\n" +
-                "Commit " + Utils.sha1(Utils.readObject(new File(".gitlet/commits/" + Repository.getHeadCommitId() + "/commit"), Commit.class)) + "\n" +
-                Utils.readObject(new File(".gitlet/commits/" + Repository.getHeadCommitId() + "/commit"), Commit.class).getTimestamp() + "\n" +
-                "added wug\n\n";
+        String expectedOutput = "===\n"
+                + "Commit "
+                + Utils.sha1(Utils.readObject(
+                new File(".gitlet/commits/"
+                        + Repository.getHeadCommitId()
+                        + "/commit"), Commit.class))
+                + "\n"
+                + Utils.readObject(
+                new File(".gitlet/commits/"
+                        + Repository.getHeadCommitId()
+                        + "/commit"), Commit.class).getTimestamp()
+                + "\n"
+                + "added wug\n\n";
         assertTrue(outContent.toString().contains("added wug"));
 
         // 清理
@@ -60,7 +69,7 @@ public class MainTest {
     }
 
     @Test
-    public void test04_prevRestore() throws IOException {
+    public void testPrevRestore() throws IOException {
         // 初始化Gitlet并提交文件版本1
         Main.main(new String[]{"init"});
         File testFile = new File("wug.txt");

@@ -27,6 +27,7 @@ public class Repository {
         // 进一步初始化设置
         String initialCommitId = generateCommitId("initial commit");
         writeContents(join(BRANCHES_DIR, "master"), initialCommitId);
+        writeContents(join(GITLET_DIR, "HEAD"), "master");
     }
 
     public static void add(String fileName) {
@@ -172,6 +173,11 @@ public class Repository {
         }
     }
 
+    private static String getCurrentCommitId() {
+        String currentBranch = getCurrentBranch();
+        return Utils.readContentsAsString(new File(".gitlet/branches/" + currentBranch)).trim();
+    }
+
     private static String getCurrentBranch() {
         return Utils.readContentsAsString(new File(".gitlet/HEAD")).trim();
     }
@@ -179,7 +185,7 @@ public class Repository {
     // 获取当前HEAD提交的ID
     public static String getHeadCommitId() {
         String currentBranch = getCurrentBranch();
-        return Utils.readContentsAsString(new File(".gitlet/refs/heads/" + currentBranch)).trim();
+        return Utils.readContentsAsString(new File(".gitlet/branches/" + currentBranch)).trim();
     }
 
     public static void status() {
@@ -221,6 +227,13 @@ public class Repository {
         // 你可以根据实际需求实现
     }
 
+    // 单参数版本的 restore 方法
+    public static void restore(String fileName) {
+        String headCommitId = getHeadCommitId();
+        restore(headCommitId, fileName);
+    }
+
+    // 双参数版本的 restore 方法
     public static void restore(String commitId, String fileName) {
         File commitDir = join(COMMITS_DIR, commitId);
         if (!commitDir.exists()) {
@@ -242,13 +255,9 @@ public class Repository {
     }
 
     public static void branch(String branchName) {
-        String currentCommitId = getCurrentCommitId();
+        String currentCommitId = getHeadCommitId();
         writeContents(join(BRANCHES_DIR, branchName), currentCommitId);
         System.out.println("Created branch " + branchName + " at commit " + currentCommitId);
-    }
-
-    private static String getCurrentCommitId() {
-        return null;
     }
 
     public static void reset(String commitId) {
@@ -279,7 +288,7 @@ public class Repository {
     public static void merge(String branchName) {
         // 获取当前分支和目标分支的最新提交ID
         String currentBranch = getCurrentBranch();
-        String currentCommitId = getCurrentCommitId();
+        String currentCommitId = getHeadCommitId();
         String targetCommitId = readContentsAsString(join(BRANCHES_DIR, branchName));
 
         // 获取所有提交文件
