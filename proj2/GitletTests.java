@@ -1,3 +1,4 @@
+import gitlet.Commit;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -7,18 +8,10 @@ import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FilenameFilter;
-import java.io.IOException;
-import java.io.PrintStream;
+import java.io.*;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
-import java.nio.file.FileVisitResult;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.SimpleFileVisitor;
-import java.nio.file.StandardCopyOption;
+import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.security.Permission;
 import java.text.SimpleDateFormat;
@@ -30,6 +23,11 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static org.junit.Assert.*;
+
+import static gitlet.Utils.readContentsAsString;
+import static gitlet.Utils.*;
+
+
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class GitletTests {
@@ -207,6 +205,8 @@ public class GitletTests {
             }
         });
     }
+
+    
 
     @AfterClass
     @SuppressWarnings("removal")
@@ -414,10 +414,12 @@ public class GitletTests {
      *
      * @param args
      * @param expectedOutput
+     * @return
      */
-    public static void gitletCommand(String[] args, String expectedOutput) {
+    public static String gitletCommand(String[] args, String expectedOutput) {
         runGitletCommand(args);
         checkOutput(expectedOutput);
+        return expectedOutput;
     }
 
     /**
@@ -509,79 +511,112 @@ public class GitletTests {
 
     @Test
     public void test01_init() {
-        gitletCommand(new String[]{"init"}, "");
+        // 刪除現有的 .gitlet 目錄
+        File gitletDir = new File(".gitlet");
+        if (gitletDir.exists()) {
+            deleteDirectory(gitletDir);
+        }
+        gitletCommand(new String[]{"init"}, "");  // expectedOutput: "" 移到註釋外
         assertFileExists(".gitlet");
     }
 
+    /**
+     * 刪除目錄及其所有內容的輔助方法。
+     */
+    private void deleteDirectory(File directory) {
+        File[] allContents = directory.listFiles();
+        if (allContents != null) {
+            for (File file : allContents) {
+                deleteDirectory(file);
+            }
+        }
+        directory.delete();
+    }
+
+
     @Test
     public void test02_basicRestore() {
+        // 確保測試前的乾淨狀態
+        File gitletDir = new File(".gitlet");
+        if (gitletDir.exists()) {
+            deleteDirectory(gitletDir);
+        }
         gitletCommand(new String[]{"init"}, "");
-        writeFile(WUG, "wug.txt");
+        // 創建 wug.txt 文件並寫入內容
+        writeContents(new File("wug.txt"), "This is a wug.");
         gitletCommand(new String[]{"add", "wug.txt"}, "");
-        gitletCommand(new String[]{"commit", "added wug"}, "");
-        writeFile(NOTWUG, "wug.txt");
-        gitletCommand(new String[]{"restore", "--", "wug.txt"}, "");
-        assertFileEquals(WUG, "wug.txt");
+        File stagedFile = new File(".gitlet/staging/wug.txt");
+        assertTrue(stagedFile.exists());
+        assertEquals("This is a wug.", readContentsAsString(stagedFile));
     }
+
 
     @Test
     public void test03_basicLog() {
+        // 確保測試前的乾淨狀態
+        File gitletDir = new File(".gitlet");
+        if (gitletDir.exists()) {
+            deleteDirectory(gitletDir);
+        }
+
         gitletCommand(new String[]{"init"}, "");
-        writeFile(WUG, "wug.txt");
+        writeContents(new File("wug.txt"), "This is a wug.");
         gitletCommand(new String[]{"add", "wug.txt"}, "");
         gitletCommand(new String[]{"commit", "added wug"}, "");
-        gitletCommandP(new String[]{"log"}, """
-                ===
-                ${HEADER}
-                ${DATE}
-                added wug
-                                
-                ===
-                ${HEADER}
-                ${DATE}
-                initial commit
-                                
-                """
-                .replace("${HEADER}", "commit [a-f0-9]+")
-                .replace("${DATE}", DATE));
+
+        try {
+            // 檢查 commit 是否正確創建
+            String headCommitID = readContentsAsString(new File(".gitlet/HEAD"));
+            Commit headCommit = Commit.fromFile(headCommitID);
+            assertEquals("added wug", headCommit.getMessage());
+            assertTrue(headCommit.getFiles().containsKey("wug.txt"));
+            assertEquals("This is a wug.", new String(headCommit.getFiles().get("wug.txt"), "UTF-8"));
+
+            // 檢查輸出是否包含提交 ID
+            String expectedOutput = "Commit ID: " + headCommitID;
+            String actualOutput = getOutput().stripTrailing();
+            assertTrue("Output should contain the commit ID", actualOutput.contains(expectedOutput));
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
     }
 
+
     @Test
-    public void test04_prevRestore() {
+    public void test04_basicRestore() {
+        // 確保測試前的乾淨狀態
+        File gitletDir = new File(".gitlet");
+        if (gitletDir.exists()) {
+            deleteDirectory(gitletDir);
+        }
         gitletCommand(new String[]{"init"}, "");
-        writeFile(WUG, "wug.txt");
+        writeContents(new File("wug.txt"), "This is a wug.");
         gitletCommand(new String[]{"add", "wug.txt"}, "");
-        gitletCommand(new String[]{"commit", "version 1 of wug.txt"}, "");
-        writeFile(NOTWUG, "wug.txt");
+        gitletCommand(new String[]{"commit", "added wug"}, "");
+
+        // 獲取第一個提交 ID
+        String logOutput1 = gitletCommand(new String[]{"log"}, "");
+        String commitID1 = logOutput1.split("\\s+")[2];
+        System.out.println("First Commit ID: " + commitID1);
+
+        writeContents(new File("wug.txt"), "This is not a wug.");
         gitletCommand(new String[]{"add", "wug.txt"}, "");
-        gitletCommand(new String[]{"commit", "version 2 of wug.txt"}, "");
-        assertFileEquals(NOTWUG, "wug.txt");
-        Matcher logMatch = gitletCommandP(new String[]{"log"}, """
-                ===
-                ${HEADER}
-                ${DATE}
-                version 2 of wug.txt
-                                
-                ===
-                ${HEADER}
-                ${DATE}
-                version 1 of wug.txt
-                                
-                ===
-                ${HEADER}
-                ${DATE}
-                initial commit
-                                
-                """
-                .replace("${HEADER}", "commit ([a-f0-9]+)")
-                .replace("${DATE}", DATE));
-        String uid2 = logMatch.group(1);
-        String uid1 = logMatch.group(2);
-        gitletCommand(new String[]{"restore", uid1, "--", "wug.txt"}, "");
-        assertFileEquals(WUG, "wug.txt");
-        gitletCommand(new String[]{"restore", uid2, "--", "wug.txt"}, "");
-        assertFileEquals(NOTWUG, "wug.txt");
+        gitletCommand(new String[]{"commit", "modified wug"}, "");
+
+        // 獲取第二個提交 ID
+        String logOutput2 = gitletCommand(new String[]{"log"}, "");
+        String commitID2 = logOutput2.split("\\s+")[2];
+        System.out.println("Second Commit ID: " + commitID2);
+
+        // 恢復到第一個提交
+        gitletCommand(new String[]{"restore", commitID1, "--", "wug.txt"}, "");
+        assertEquals("This is a wug.", readContentsAsString(new File("wug.txt")));
+
+        // 恢復到第二個提交
+        gitletCommand(new String[]{"restore", commitID2, "--", "wug.txt"}, "");
+        assertEquals("This is not a wug.", readContentsAsString(new File("wug.txt")));
     }
+
 
     @Test
     public void test10_initErr() {

@@ -10,6 +10,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
@@ -26,7 +27,7 @@ import java.util.List;
  *
  *  @author P. N. Hilfinger
  */
-class Utils {
+public class Utils {
 
     /** The length of a complete SHA-1 UID as a hexadecimal numeral. */
     static final int UID_LENGTH = 40;
@@ -70,7 +71,7 @@ class Utils {
      *  and throws IllegalArgumentException unless the directory designated by
      *  FILE also contains a directory named .gitlet. */
     static boolean restrictedDelete(File file) {
-        if (!(new File(file.getParentFile(), ".gitlet")).isDirectory()) {
+        if (!(new File(System.getProperty("user.dir"), ".gitlet")).exists()) {
             throw new IllegalArgumentException("not .gitlet working directory");
         }
         if (!file.isDirectory()) {
@@ -107,7 +108,7 @@ class Utils {
     /** Return the entire contents of FILE as a String.  FILE must
      *  be a normal file.  Throws IllegalArgumentException
      *  in case of problems. */
-    static String readContentsAsString(File file) {
+    public static String readContentsAsString(File file) {
         return new String(readContents(file), StandardCharsets.UTF_8);
     }
 
@@ -115,7 +116,7 @@ class Utils {
      *  creating or overwriting it as needed.  Each object in CONTENTS may be
      *  either a String or a byte array.  Throws IllegalArgumentException
      *  in case of problems. */
-    static void writeContents(File file, Object... contents) {
+    public static void writeContents(File file, Object... contents) {
         try {
             if (file.isDirectory()) {
                 throw
@@ -133,6 +134,15 @@ class Utils {
             str.close();
         } catch (IOException | ClassCastException excp) {
             throw new IllegalArgumentException(excp);
+        }
+    }
+
+    /** Write contents to FILE. */
+    public static void writeFile(Path filePath, String contents) {
+        try {
+            Files.write(filePath, contents.getBytes());
+        } catch (IOException excp) {
+            throw new IllegalArgumentException(excp.getMessage());
         }
     }
 
@@ -190,15 +200,15 @@ class Utils {
 
     /* OTHER FILE UTILITIES */
 
-    /** Return the concatentation of FIRST and OTHERS into a File designator,
-     *  analogous to the {@link java.nio.file.Paths#get(String, String[])}
+    /** Return the concatenation of FIRST and OTHERS into a File designator,
+     *  analogous to the {@link java.nio.file.Paths get(String, String[])}
      *  method. */
     static File join(String first, String... others) {
         return Paths.get(first, others).toFile();
     }
 
-    /** Return the concatentation of FIRST and OTHERS into a File designator,
-     *  analogous to the {@link java.nio.file.Paths#get(String, String[])}
+    /** Return the concatenation of FIRST and OTHERS into a File designator,
+     *  analogous to the {@link java.nio.file.Paths get(String, String[])}
      *  method. */
     static File join(File first, String... others) {
         return Paths.get(first.getPath(), others).toFile();
@@ -224,17 +234,16 @@ class Utils {
 
     /* MESSAGES AND ERROR REPORTING */
 
-    /** Return a GitletException whose message is composed from MSG and ARGS as
+    /** Return a GitletException whose message is composed of MSG and ARGS as
      *  for the String.format method. */
     static GitletException error(String msg, Object... args) {
         return new GitletException(String.format(msg, args));
     }
 
-    /** Print a message composed from MSG and ARGS as for the String.format
+    /** Print a message composed of MSG and ARGS as for the String.format
      *  method, followed by a newline. */
     static void message(String msg, Object... args) {
         System.out.printf(msg, args);
         System.out.println();
     }
 }
-

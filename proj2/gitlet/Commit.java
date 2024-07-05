@@ -1,40 +1,46 @@
 package gitlet;
 
+import java.io.File;
 import java.io.Serializable;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import static gitlet.Utils.*;
 
+/** Represents a gitlet commit object.
+ *  This class handles commit creation, saving, and retrieval.
+ */
 public class Commit implements Serializable {
     private String message;
     private String parent;
-    private Date timestamp;
-    private Map<String, String> blobs;
+    private Map<String, byte[]> files;
 
     public Commit(String message, String parent) {
         this.message = message;
         this.parent = parent;
-        this.timestamp = new Date();
-        this.blobs = new HashMap<>();
+        this.files = new HashMap<>();
     }
 
     public String getMessage() {
         return message;
     }
 
-    public String getParent() {
-        return parent;
+    public Map<String, byte[]> getFiles() {
+        return files;
     }
 
-    public Date getTimestamp() {
-        return timestamp;
+    public void addFile(String fileName, byte[] fileContent) {
+        files.put(fileName, fileContent);
     }
 
-    public Map<String, String> getBlobs() {
-        return blobs;
+    public String saveCommit() {
+        String commitID = sha1(serialize(this));
+        File commitFile = join(Repository.COMMITS_DIR, commitID);
+        writeObject(commitFile, this);
+        return commitID;
     }
 
-    public String getId() {
-        return null;
+    public static Commit fromFile(String commitID) {
+        File commitFile = join(Repository.COMMITS_DIR, commitID);
+        return readObject(commitFile, Commit.class);
     }
 }
