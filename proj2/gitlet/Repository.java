@@ -100,6 +100,22 @@ public class Repository {
         }
     }
 
+    public void restore(String commitID, String fileName) {
+        Commit commit = Utils.readObject(new File(COMMITS_DIR, commitID), Commit.class);
+        if (!commit.getFileMap().containsKey(fileName)) {
+            System.out.println("File does not exist in that commit.");
+            return;
+        }
+        String fileID = commit.getFileMap().get(fileName);
+        File sourceFile = new File(COMMITS_DIR, fileID);
+        File destFile = new File(CWD, fileName);
+        try {
+            Files.copy(sourceFile.toPath(), destFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     public void log() {
         String commitID = Utils.readContentsAsString(HEAD);
         while (commitID != null && !commitID.isEmpty()) {

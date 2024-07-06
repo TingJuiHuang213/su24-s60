@@ -32,11 +32,14 @@ public class Main {
                 repo.commit(args[1]);
                 break;
             case "restore":
-                if (args.length < 3 || !args[1].equals("--")) {
+                if (args.length == 3 && args[1].equals("--")) {
+                    repo.restore(args[2]);
+                } else if (args.length == 4 && args[2].equals("--")) {
+                    repo.restore(args[1], args[3]);
+                } else {
                     System.out.println("Incorrect operands.");
                     return;
                 }
-                repo.restore(args[2]);
                 break;
             case "log":
                 repo.log();
