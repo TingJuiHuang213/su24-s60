@@ -1,6 +1,5 @@
 package gitlet;
 
-
 public class Main {
     public static void main(String[] args) {
         if (args.length == 0) {
@@ -41,7 +40,9 @@ public class Main {
             case "log":
                 repo.log();
                 break;
-            // 處理其他命令
+            default:
+                System.out.println("Invalid command.");
+                break;
         }
     }
 }
