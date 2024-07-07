@@ -132,6 +132,53 @@ public class Repository {
         }
     }
 
+    public void rm(String fileName) {
+        File fileToRemove = new File(CWD, fileName);
+        File stagedFile = new File(STAGING_DIR, fileName);
+
+        if (!fileToRemove.exists() && !stagedFile.exists()) {
+            System.out.println("File does not exist.");
+            return;
+        }
+
+        if (stagedFile.exists()) {
+            stagedFile.delete();
+        }
+
+        String commitID = Utils.readContentsAsString(HEAD);
+        Commit commit = Utils.readObject(new File(COMMITS_DIR, commitID), Commit.class);
+
+        if (commit.getFileMap().containsKey(fileName)) {
+            Utils.writeContents(new File(STAGING_DIR, "removed_" + fileName), ""); // Mark as removed
+        }
+    }
+
+    public void status() {
+        System.out.println("=== Branches ===");
+        System.out.println("*main");
+        System.out.println();
+        System.out.println("=== Staged Files ===");
+        for (File file : STAGING_DIR.listFiles()) {
+            if (!file.getName().startsWith("removed_")) {
+                System.out.println(file.getName());
+            }
+        }
+        System.out.println();
+        System.out.println("=== Removed Files ===");
+        for (File file : STAGING_DIR.listFiles()) {
+            if (file.getName().startsWith("removed_")) {
+                System.out.println(file.getName().substring(8));
+            }
+        }
+        System.out.println();
+        System.out.println("=== Modifications Not Staged For Commit ===");
+        // 这里可以添加逻辑来检查未暂存的修改文件
+        System.out.println();
+        System.out.println("=== Untracked Files ===");
+        // 这里可以添加逻辑来检查未追踪的文件
+        System.out.println();
+    }
+
     private void printCommit(Commit commit) {
         System.out.println("===");
         System.out.println("Commit " + Utils.sha1(Utils.serialize(commit)));

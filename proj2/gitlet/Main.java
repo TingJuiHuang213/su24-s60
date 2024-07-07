@@ -40,6 +40,16 @@ public class Main {
             case "log":
                 repo.log();
                 break;
+            case "rm":
+                if (args.length < 2) {
+                    System.out.println("Please provide a file name.");
+                    return;
+                }
+                repo.rm(args[1]);
+                break;
+            case "status":
+                repo.status();
+                break;
             default:
                 System.out.println("Invalid command.");
                 break;
