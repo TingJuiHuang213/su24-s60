@@ -150,6 +150,7 @@ public class Repository {
 
         if (commit.getFileMap().containsKey(fileName)) {
             Utils.writeContents(new File(STAGING_DIR, "removed_" + fileName), ""); // Mark as removed
+            fileToRemove.delete();
         }
     }
 
