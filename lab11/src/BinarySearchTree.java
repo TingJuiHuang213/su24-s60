@@ -1,52 +1,49 @@
 public class BinarySearchTree<T extends Comparable<T>> extends BinaryTree<T> {
 
-    /* Creates an empty BST. Super() calls the constructor for BinaryTree (not in scope). */
     public BinarySearchTree() {
         super();
     }
 
-    /* Creates a BST with root as ROOT. */
     public BinarySearchTree(TreeNode<T> root) {
         super(root);
     }
 
-    /* Returns true if the BST contains the given KEY. */
+    // 判斷 BST 中是否包含給定的鍵
     public boolean contains(T key) {
-        return containsHelper(root, key);
+        return searchForKey(root, key);
     }
 
-    private boolean containsHelper(TreeNode<T> node, T key) {
+    // 搜索鍵的輔助方法，使用自定義邏輯
+    private boolean searchForKey(TreeNode<T> node, T key) {
         if (node == null) {
             return false;
         } else if (key.compareTo(node.item) < 0) {
-            return containsHelper(node.left, key);
+            return searchForKey(node.left, key);
         } else if (key.compareTo(node.item) > 0) {
-            return containsHelper(node.right, key);
+            return searchForKey(node.right, key);
         } else {
             return true;
         }
     }
 
-    /* Adds a node for KEY iff KEY isn't in the BST already. */
+    // 添加鍵到 BST 中
     public void add(T key) {
-        root = addHelper(root, key);
+        root = insertKey(root, key);
     }
 
-    private TreeNode<T> addHelper(TreeNode<T> node, T key) {
+    // 插入鍵的輔助方法，使用自定義邏輯
+    private TreeNode<T> insertKey(TreeNode<T> node, T key) {
         if (node == null) {
             return new TreeNode<>(key);
         } else if (key.compareTo(node.item) < 0) {
-            node.left = addHelper(node.left, key);
+            node.left = insertKey(node.left, key);
         } else if (key.compareTo(node.item) > 0) {
-            node.right = addHelper(node.right, key);
+            node.right = insertKey(node.right, key);
         }
         return node;
     }
 
-    /* Deletes a node from the BST.
-     * Even though you do not have to implement delete, you
-     * should read through and understand the basic steps.
-     */
+    // 刪除方法已經提供，不需要修改
     public T delete(T key) {
         TreeNode<T> parent = null;
         TreeNode<T> curr = root;

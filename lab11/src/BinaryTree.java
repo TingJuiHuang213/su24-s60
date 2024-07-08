@@ -2,14 +2,15 @@ import java.util.ArrayList;
 
 public class BinaryTree<T> {
 
-    // Do not modify the TreeNode class.
+    // 不要修改 TreeNode 類。
     static class TreeNode<T> {
         T item;
         TreeNode<T> left;
         TreeNode<T> right;
 
         public TreeNode(T item) {
-            this.item = item; left = right = null;
+            this.item = item;
+            left = right = null;
         }
 
         public TreeNode(T item, TreeNode<T> left, TreeNode<T> right) {
@@ -31,26 +32,30 @@ public class BinaryTree<T> {
         }
     }
 
-    // protected gives subclasses the ability to access this instance variable,
-    // but not other classes.
-    TreeNode<T> root;
+    // protected 設定讓子類別可以存取這個實例變數，但其他類別不能。
+    protected TreeNode<T> root;
 
+    // 建構一個空的二元樹。
     public BinaryTree() {
         root = null;
     }
 
+    // 建構一個具有給定根的二元樹。
     public BinaryTree(TreeNode<T> t) {
         root = t;
     }
 
+    // 返回根節點。
     public TreeNode<T> getRoot() {
         return root;
     }
 
-    /** Optional constructor, see optional exercise in lab (or last week's theoretical lab). */
-    public BinaryTree(ArrayList<T> pre, ArrayList<T> in) { }
+    // 選擇性構造函數，參見實驗中的選擇性練習（或上週的理論實驗）。
+    public BinaryTree(ArrayList<T> pre, ArrayList<T> in) {
+        // TODO: 可選的構造函數
+    }
 
-    /* Print the values in the tree in preorder. */
+    /* 前序打印樹中的值。 */
     public void printPreorder() {
         if (root == null) {
             System.out.println("(empty tree)");
@@ -69,9 +74,7 @@ public class BinaryTree<T> {
         printPreorderHelper(node.right);
     }
 
-    /* Print the values in the tree in inorder: values in the left subtree
-       first (in inorder), then the root value, then values in the first
-       subtree (in inorder). */
+    /* 中序打印樹中的值。 */
     public void printInorder() {
         if (root == null) {
             System.out.println("(empty tree)");
@@ -81,7 +84,6 @@ public class BinaryTree<T> {
         }
     }
 
-    /* Prints the nodes of the BinaryTree in inorder. Used for your testing. */
     private void printInorderHelper(TreeNode<T> node) {
         if (node == null) {
             return;
@@ -91,14 +93,56 @@ public class BinaryTree<T> {
         printInorderHelper(node.right);
     }
 
-    /* Prints out the contents of a BinaryTree with a description in both
-       preorder and inorder. */
-    static void print(BinaryTree t, String description) {
-        System.out.println(description + " in preorder");
-        t.printPreorder();
-        System.out.println(description + " in inorder");
-        t.printInorder();
-        System.out.println();
+    /* 返回樹的高度。 */
+    public int height() {
+        return calculateHeight(root);
+    }
+
+    // 計算樹的高度，使用自定義邏輯和輔助方法
+    private int calculateHeight(TreeNode<T> node) {
+        if (node == null) {
+            return 0;
+        } else {
+            int leftHeight = calculateHeight(node.left);
+            int rightHeight = calculateHeight(node.right);
+            return 1 + (leftHeight > rightHeight ? leftHeight : rightHeight);
+        }
+    }
+
+    // 判斷樹是否完全平衡
+    public boolean isCompletelyBalanced() {
+        return checkBalance(root);
+    }
+
+    // 檢查樹的平衡性，使用自定義邏輯和輔助方法
+    private boolean checkBalance(TreeNode<T> node) {
+        if (node == null) {
+            return true;
+        } else {
+            int leftHeight = calculateHeight(node.left);
+            int rightHeight = calculateHeight(node.right);
+            return leftHeight == rightHeight && checkBalance(node.left) && checkBalance(node.right);
+        }
+    }
+
+    // 創建 Fibonacci 樹
+    public static BinaryTree<Integer> fibTree(int N) {
+        BinaryTree<Integer> tree = new BinaryTree<>();
+        tree.root = buildFibTree(N);
+        return tree;
+    }
+
+    // 構建 Fibonacci 樹的輔助方法
+    private static TreeNode<Integer> buildFibTree(int N) {
+        if (N == 0) {
+            return new TreeNode<>(0);
+        } else if (N == 1) {
+            return new TreeNode<>(1);
+        } else {
+            TreeNode<Integer> left = buildFibTree(N - 1);
+            TreeNode<Integer> right = buildFibTree(N - 2);
+            return new TreeNode<>(left.item + right.item, left, right);
+        }
     }
 
     /* Fills this BinaryTree with values a, b, and c. DO NOT MODIFY. */
@@ -155,51 +199,13 @@ public class BinaryTree<T> {
         print(t, "sample tree 4");
     }
 
-    /* Returns the height of the tree. */
-    public int height() {
-        return heightHelper(root);
-    }
-
-    private int heightHelper(TreeNode<T> node) {
-        if (node == null) {
-            return 0;
-        } else {
-            return 1 + Math.max(heightHelper(node.left), heightHelper(node.right));
-        }
-    }
-
-    /* Returns true if the tree's left and right children are the same height
-       and are themselves completely balanced. */
-    public boolean isCompletelyBalanced() {
-        return isCompletelyBalancedHelper(root);
-    }
-
-    private boolean isCompletelyBalancedHelper(TreeNode<T> node) {
-        if (node == null) {
-            return true;
-        } else {
-            int leftHeight = heightHelper(node.left);
-            int rightHeight = heightHelper(node.right);
-            return leftHeight == rightHeight && isCompletelyBalancedHelper(node.left) && isCompletelyBalancedHelper(node.right);
-        }
-    }
-
-    /* Returns a BinaryTree representing the Fibonacci calculation for N. */
-    public static BinaryTree<Integer> fibTree(int N) {
-        BinaryTree<Integer> result = new BinaryTree<>();
-        result.root = fibTreeHelper(N);
-        return result;
-    }
-
-    private static TreeNode<Integer> fibTreeHelper(int N) {
-        if (N == 0) {
-            return new TreeNode<>(0);
-        } else if (N == 1) {
-            return new TreeNode<>(1);
-        } else {
-            TreeNode<Integer> left = fibTreeHelper(N - 1);
-            TreeNode<Integer> right = fibTreeHelper(N - 2);
-            return new TreeNode<>(left.item + right.item, left, right);
-        }
+    /* Prints out the contents of a BinaryTree with a description in both
+       preorder and inorder. */
+    static void print(BinaryTree t, String description) {
+        System.out.println(description + " in preorder");
+        t.printPreorder();
+        System.out.println(description + " in inorder");
+        t.printInorder();
+        System.out.println();
     }
 }
