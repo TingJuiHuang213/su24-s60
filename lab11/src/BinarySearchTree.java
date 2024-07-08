@@ -6,25 +6,47 @@ public class BinarySearchTree<T extends Comparable<T>> extends BinaryTree<T> {
     }
 
     /* Creates a BST with root as ROOT. */
-    public BinarySearchTree(TreeNode root) {
+    public BinarySearchTree(TreeNode<T> root) {
         super(root);
     }
 
     /* Returns true if the BST contains the given KEY. */
     public boolean contains(T key) {
-        // TODO: YOUR CODE HERE: an extra helper method might be useful
-        return false;
+        return containsHelper(root, key);
+    }
+
+    private boolean containsHelper(TreeNode<T> node, T key) {
+        if (node == null) {
+            return false;
+        } else if (key.compareTo(node.item) < 0) {
+            return containsHelper(node.left, key);
+        } else if (key.compareTo(node.item) > 0) {
+            return containsHelper(node.right, key);
+        } else {
+            return true;
+        }
     }
 
     /* Adds a node for KEY iff KEY isn't in the BST already. */
     public void add(T key) {
-        // TODO: YOUR CODE HERE: an extra helper method might be useful
+        root = addHelper(root, key);
     }
 
-    /* Deletes a node from the BST. 
-     * Even though you do not have to implement delete, you 
+    private TreeNode<T> addHelper(TreeNode<T> node, T key) {
+        if (node == null) {
+            return new TreeNode<>(key);
+        } else if (key.compareTo(node.item) < 0) {
+            node.left = addHelper(node.left, key);
+        } else if (key.compareTo(node.item) > 0) {
+            node.right = addHelper(node.right, key);
+        }
+        return node;
+    }
+
+    /* Deletes a node from the BST.
+     * Even though you do not have to implement delete, you
      * should read through and understand the basic steps.
-    */
+     */
     public T delete(T key) {
         TreeNode<T> parent = null;
         TreeNode<T> curr = root;

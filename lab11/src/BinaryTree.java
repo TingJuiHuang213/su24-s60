@@ -103,41 +103,41 @@ public class BinaryTree<T> {
 
     /* Fills this BinaryTree with values a, b, and c. DO NOT MODIFY. */
     public static BinaryTree<String> sampleTree1() {
-        TreeNode<String> root = new TreeNode("a",
-                new TreeNode("b"),
-                new TreeNode("c"));
+        TreeNode<String> root = new TreeNode<>("a",
+                new TreeNode<>("b"),
+                new TreeNode<>("c"));
         return new BinaryTree<>(root);
     }
 
     /* Fills this BinaryTree with values a, b, and c, d, e, f. DO NOT MODIFY. */
     public static BinaryTree<String> sampleTree2() {
-        TreeNode root = new TreeNode("a",
-                new TreeNode("b",
-                        new TreeNode("d",
-                                new TreeNode("e"),
-                                new TreeNode("f")),
+        TreeNode<String> root = new TreeNode<>("a",
+                new TreeNode<>("b",
+                        new TreeNode<>("d",
+                                new TreeNode<>("e"),
+                                new TreeNode<>("f")),
                         null),
-                new TreeNode("c"));
+                new TreeNode<>("c"));
         return new BinaryTree<>(root);
     }
 
     /* Fills this BinaryTree with the values a, b, c, d, e, f. DO NOT MODIFY. */
     public static BinaryTree<String> sampleTree3() {
-        TreeNode<String> root = new TreeNode("a",
-                new TreeNode("b"),
-                new TreeNode("c",
-                        new TreeNode("d",
-                                new TreeNode("e"),
-                                new TreeNode("f")),
+        TreeNode<String> root = new TreeNode<>("a",
+                new TreeNode<>("b"),
+                new TreeNode<>("c",
+                        new TreeNode<>("d",
+                                new TreeNode<>("e"),
+                                new TreeNode<>("f")),
                         null));
         return new BinaryTree<>(root);
     }
 
     /* Fills this BinaryTree with the same leaf TreeNode. DO NOT MODIFY. */
     public static BinaryTree<String> sampleTree4() {
-        TreeNode<String> leafNode = new TreeNode("c");
-        TreeNode<String> root = new TreeNode("a", new TreeNode("b", leafNode, leafNode),
-                new TreeNode("d", leafNode, leafNode));
+        TreeNode<String> leafNode = new TreeNode<>("c");
+        TreeNode<String> root = new TreeNode<>("a", new TreeNode<>("b", leafNode, leafNode),
+                new TreeNode<>("d", leafNode, leafNode));
         return new BinaryTree<>(root);
     }
 
@@ -157,21 +157,49 @@ public class BinaryTree<T> {
 
     /* Returns the height of the tree. */
     public int height() {
-        // TODO: YOUR CODE HERE
-        return 0;
+        return heightHelper(root);
+    }
+
+    private int heightHelper(TreeNode<T> node) {
+        if (node == null) {
+            return 0;
+        } else {
+            return 1 + Math.max(heightHelper(node.left), heightHelper(node.right));
+        }
     }
 
     /* Returns true if the tree's left and right children are the same height
        and are themselves completely balanced. */
     public boolean isCompletelyBalanced() {
-        // TODO: YOUR CODE HERE
-        return false;
+        return isCompletelyBalancedHelper(root);
+    }
+
+    private boolean isCompletelyBalancedHelper(TreeNode<T> node) {
+        if (node == null) {
+            return true;
+        } else {
+            int leftHeight = heightHelper(node.left);
+            int rightHeight = heightHelper(node.right);
+            return leftHeight == rightHeight && isCompletelyBalancedHelper(node.left) && isCompletelyBalancedHelper(node.right);
+        }
     }
 
     /* Returns a BinaryTree representing the Fibonacci calculation for N. */
     public static BinaryTree<Integer> fibTree(int N) {
-        BinaryTree<Integer> result = new BinaryTree<Integer>();
-        // TODO: YOUR CODE HERE
-        return null;
+        BinaryTree<Integer> result = new BinaryTree<>();
+        result.root = fibTreeHelper(N);
+        return result;
+    }
+
+    private static TreeNode<Integer> fibTreeHelper(int N) {
+        if (N == 0) {
+            return new TreeNode<>(0);
+        } else if (N == 1) {
+            return new TreeNode<>(1);
+        } else {
+            TreeNode<Integer> left = fibTreeHelper(N - 1);
+            TreeNode<Integer> right = fibTreeHelper(N - 2);
+            return new TreeNode<>(left.item + right.item, left, right);
+        }
     }
 }
