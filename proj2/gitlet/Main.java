@@ -41,6 +41,7 @@ public class Main {
             }
         });
         commands.put("log", (String[] arguments) -> repo.log());
+        commands.put("global-log", (String[] arguments) -> repo.globalLog());
         commands.put("rm", (String[] arguments) -> {
             if (arguments.length < 2) {
                 System.out.println("Please provide a file name.");
@@ -49,6 +50,20 @@ public class Main {
             repo.rm(arguments[1]);
         });
         commands.put("status", (String[] arguments) -> repo.status());
+        commands.put("reset", (String[] arguments) -> {
+            if (arguments.length < 2) {
+                System.out.println("Please provide a commit id.");
+                return;
+            }
+            repo.reset(arguments[1]);
+        });
+        commands.put("find", (String[] arguments) -> {
+            if (arguments.length < 2) {
+                System.out.println("Please provide a commit message.");
+                return;
+            }
+            repo.find(arguments[1]);
+        });
 
         // Execute command
         if (commands.containsKey(command)) {
