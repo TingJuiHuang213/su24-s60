@@ -1,5 +1,9 @@
 package gitlet;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.function.Consumer;
+
 public class Main {
     public static void main(String[] args) {
         if (args.length == 0) {
@@ -7,52 +11,50 @@ public class Main {
             return;
         }
 
-        String firstArg = args[0];
+        String command = args[0];
         Repository repo = new Repository();
-        switch (firstArg) {
-            case "init":
-                repo.init();
-                break;
-            case "add":
-                if (args.length < 2) {
-                    System.out.println("Please provide a file name.");
-                    return;
-                }
-                repo.add(args[1]);
-                break;
-            case "commit":
-                if (args.length < 2) {
-                    System.out.println("Please provide a commit message.");
-                    return;
-                }
-                repo.commit(args[1]);
-                break;
-            case "restore":
-                if (args.length == 3 && args[1].equals("--")) {
-                    repo.restore(args[2]);
-                } else if (args.length == 4 && args[2].equals("--")) {
-                    repo.restore(args[1], args[3]);
-                } else {
-                    System.out.println("Incorrect operands.");
-                    return;
-                }
-                break;
-            case "log":
-                repo.log();
-                break;
-            case "rm":
-                if (args.length < 2) {
-                    System.out.println("Please provide a file name.");
-                    return;
-                }
-                repo.rm(args[1]);
-                break;
-            case "status":
-                repo.status();
-                break;
-            default:
-                System.out.println("Invalid command.");
-                break;
+
+        // Command handlers
+        Map<String, Consumer<String[]>> commands = new HashMap<>();
+        commands.put("init", (String[] arguments) -> repo.init());
+        commands.put("add", (String[] arguments) -> {
+            if (arguments.length < 2) {
+                System.out.println("Please provide a file name.");
+                return;
+            }
+            repo.add(arguments[1]);
+        });
+        commands.put("commit", (String[] arguments) -> {
+            if (arguments.length < 2) {
+                System.out.println("Please provide a commit message.");
+                return;
+            }
+            repo.commit(arguments[1]);
+        });
+        commands.put("restore", (String[] arguments) -> {
+            if (arguments.length == 3 && arguments[1].equals("--")) {
+                repo.restore(arguments[2]);
+            } else if (arguments.length == 4 && arguments[2].equals("--")) {
+                repo.restore(arguments[1], arguments[3]);
+            } else {
+                System.out.println("Incorrect operands.");
+            }
+        });
+        commands.put("log", (String[] arguments) -> repo.log());
+        commands.put("rm", (String[] arguments) -> {
+            if (arguments.length < 2) {
+                System.out.println("Please provide a file name.");
+                return;
+            }
+            repo.rm(arguments[1]);
+        });
+        commands.put("status", (String[] arguments) -> repo.status());
+
+        // Execute command
+        if (commands.containsKey(command)) {
+            commands.get(command).accept(args);
+        } else {
+            System.out.println("Invalid command.");
         }
     }
 }

@@ -6,6 +6,8 @@ import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class Repository {
     public static final File CWD = new File(System.getProperty("user.dir"));
@@ -19,16 +21,11 @@ public class Repository {
             System.out.println("A Gitlet version-control system already exists in the current directory.");
             return;
         }
-
-        GITLET_DIR.mkdir();
-        COMMITS_DIR.mkdir();
-        STAGING_DIR.mkdir();
-
+        createDirectories(GITLET_DIR, COMMITS_DIR, STAGING_DIR);
         Commit initialCommit = new Commit("initial commit");
         String initialCommitID = Utils.sha1(Utils.serialize(initialCommit));
         File initialCommitFile = new File(COMMITS_DIR, initialCommitID);
         Utils.writeObject(initialCommitFile, initialCommit);
-
         Utils.writeContents(HEAD, initialCommitID);
     }
 
@@ -38,7 +35,6 @@ public class Repository {
             System.out.println("File does not exist.");
             return;
         }
-
         File stagingFile = new File(STAGING_DIR, fileName);
         try {
             Files.copy(fileToAdd.toPath(), stagingFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
@@ -52,17 +48,23 @@ public class Repository {
             System.out.println("Please enter a commit message.");
             return;
         }
-
         String parentCommitID = Utils.readContentsAsString(HEAD);
         Commit parentCommit = Utils.readObject(new File(COMMITS_DIR, parentCommitID), Commit.class);
-
         Map<String, String> fileMap = new HashMap<>(parentCommit.getFileMap());
+        processStagingArea(fileMap);
+        Commit newCommit = new Commit(message, parentCommitID, fileMap);
+        String newCommitID = Utils.sha1(Utils.serialize(newCommit));
+        File newCommitFile = new File(COMMITS_DIR, newCommitID);
+        Utils.writeObject(newCommitFile, newCommit);
+        Utils.writeContents(HEAD, newCommitID);
+        clearStagingArea();
+    }
 
+    private void processStagingArea(Map<String, String> fileMap) {
         for (File file : STAGING_DIR.listFiles()) {
             String fileName = file.getName();
             String fileID = Utils.sha1(Utils.readContents(file));
             fileMap.put(fileName, fileID);
-
             File commitFile = new File(COMMITS_DIR, fileID);
             try {
                 Files.copy(file.toPath(), commitFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
@@ -70,34 +72,10 @@ public class Repository {
                 throw new RuntimeException(e);
             }
         }
-
-        Commit newCommit = new Commit(message, parentCommitID, fileMap);
-        String newCommitID = Utils.sha1(Utils.serialize(newCommit));
-        File newCommitFile = new File(COMMITS_DIR, newCommitID);
-        Utils.writeObject(newCommitFile, newCommit);
-
-        Utils.writeContents(HEAD, newCommitID);
-
-        for (File file : STAGING_DIR.listFiles()) {
-            file.delete();
-        }
     }
 
     public void restore(String fileName) {
-        String commitID = Utils.readContentsAsString(HEAD);
-        Commit commit = Utils.readObject(new File(COMMITS_DIR, commitID), Commit.class);
-        if (!commit.getFileMap().containsKey(fileName)) {
-            System.out.println("File does not exist in that commit.");
-            return;
-        }
-        String fileID = commit.getFileMap().get(fileName);
-        File sourceFile = new File(COMMITS_DIR, fileID);
-        File destFile = new File(CWD, fileName);
-        try {
-            Files.copy(sourceFile.toPath(), destFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        restore(Utils.readContentsAsString(HEAD), fileName);
     }
 
     public void restore(String commitID, String fileName) {
@@ -121,13 +99,7 @@ public class Repository {
         while (commitID != null && !commitID.isEmpty()) {
             File commitFile = new File(COMMITS_DIR, commitID);
             Commit commit = Utils.readObject(commitFile, Commit.class);
-
-            System.out.println("===");
-            System.out.println("commit " + commitID.toLowerCase());
-            System.out.println("Date: " + commit.getTimestamp());
-            System.out.println(commit.getMessage());
-            System.out.println();
-
+            printCommit(commit, commitID);
             commitID = commit.getParent();
         }
     }
@@ -135,19 +107,15 @@ public class Repository {
     public void rm(String fileName) {
         File fileToRemove = new File(CWD, fileName);
         File stagedFile = new File(STAGING_DIR, fileName);
-
         if (!fileToRemove.exists() && !stagedFile.exists()) {
             System.out.println("File does not exist.");
             return;
         }
-
         if (stagedFile.exists()) {
             stagedFile.delete();
         }
-
         String commitID = Utils.readContentsAsString(HEAD);
         Commit commit = Utils.readObject(new File(COMMITS_DIR, commitID), Commit.class);
-
         if (commit.getFileMap().containsKey(fileName)) {
             Utils.writeContents(new File(STAGING_DIR, "removed_" + fileName), ""); // Mark as removed
             fileToRemove.delete();
@@ -159,18 +127,10 @@ public class Repository {
         System.out.println("*main");
         System.out.println();
         System.out.println("=== Staged Files ===");
-        for (File file : STAGING_DIR.listFiles()) {
-            if (!file.getName().startsWith("removed_")) {
-                System.out.println(file.getName());
-            }
-        }
+        printFilesInDirectory(STAGING_DIR, false);
         System.out.println();
         System.out.println("=== Removed Files ===");
-        for (File file : STAGING_DIR.listFiles()) {
-            if (file.getName().startsWith("removed_")) {
-                System.out.println(file.getName().substring(8));
-            }
-        }
+        printFilesInDirectory(STAGING_DIR, true);
         System.out.println();
         System.out.println("=== Modifications Not Staged For Commit ===");
         // 这里可以添加逻辑来检查未暂存的修改文件
@@ -180,11 +140,33 @@ public class Repository {
         System.out.println();
     }
 
-    private void printCommit(Commit commit) {
+    private void printFilesInDirectory(File directory, boolean removed) {
+        for (File file : directory.listFiles()) {
+            if (removed == file.getName().startsWith("removed_")) {
+                System.out.println(removed ? file.getName().substring(8) : file.getName());
+            }
+        }
+    }
+
+    private void printCommit(Commit commit, String commitID) {
         System.out.println("===");
-        System.out.println("Commit " + Utils.sha1(Utils.serialize(commit)));
-        System.out.println(commit.getTimestamp());
+        System.out.println("commit " + commitID.toLowerCase());
+        System.out.println("Date: " + commit.getTimestamp());
         System.out.println(commit.getMessage());
         System.out.println();
+    }
+
+    private void createDirectories(File... directories) {
+        for (File dir : directories) {
+            if (!dir.exists()) {
+                dir.mkdir();
+            }
+        }
+    }
+
+    private void clearStagingArea() {
+        for (File file : STAGING_DIR.listFiles()) {
+            file.delete();
+        }
     }
 }
