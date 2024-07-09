@@ -41,24 +41,29 @@ public class RedBlackTree<T extends Comparable<T>> {
             return null;
         }
 
-        if (r.getItemCount() == 1) {
-            // 處理2-node的情況
-            T item = r.getItemAt(0);
-            RBTreeNode<T> newNode = new RBTreeNode<>(true, item);
-            newNode.left = buildRedBlackTree(r.getChildAt(0));
-            newNode.right = buildRedBlackTree(r.getChildAt(1));
-            return newNode;
-        } else {
-            // 處理3-node的情況
-            T leftItem = r.getItemAt(0);
-            T rightItem = r.getItemAt(1);
-            RBTreeNode<T> leftNode = new RBTreeNode<>(false, leftItem);
-            RBTreeNode<T> parentNode = new RBTreeNode<>(true, rightItem, leftNode, null);
-            leftNode.left = buildRedBlackTree(r.getChildAt(0));
-            leftNode.right = buildRedBlackTree(r.getChildAt(1));
-            parentNode.right = buildRedBlackTree(r.getChildAt(2));
-            return parentNode;
-        }
+        // 分別處理2-node和3-node的情況
+        return (r.getItemCount() == 1) ? createTwoNode(r) : createThreeNode(r);
+    }
+
+    /** Creates a 2-node RBTreeNode from a given 2-3 tree node. */
+    private RBTreeNode<T> createTwoNode(Node<T> r) {
+        T item = r.getItemAt(0);
+        RBTreeNode<T> newNode = new RBTreeNode<>(true, item);
+        newNode.left = buildRedBlackTree(r.getChildAt(0));
+        newNode.right = buildRedBlackTree(r.getChildAt(1));
+        return newNode;
+    }
+
+    /** Creates a 3-node RBTreeNode from a given 2-3 tree node. */
+    private RBTreeNode<T> createThreeNode(Node<T> r) {
+        T leftItem = r.getItemAt(0);
+        T rightItem = r.getItemAt(1);
+        RBTreeNode<T> leftNode = new RBTreeNode<>(false, leftItem);
+        RBTreeNode<T> parentNode = new RBTreeNode<>(true, rightItem, leftNode, null);
+        leftNode.left = buildRedBlackTree(r.getChildAt(0));
+        leftNode.right = buildRedBlackTree(r.getChildAt(1));
+        parentNode.right = buildRedBlackTree(r.getChildAt(2));
+        return parentNode;
     }
 
     /** Flips the color of NODE and its children. Assume that NODE has both left and right children. */
@@ -103,15 +108,24 @@ public class RedBlackTree<T extends Comparable<T>> {
             return new RBTreeNode<>(false, item);
         }
 
+        // 插入元素並確保紅黑樹的性質
+        node = insertItem(node, item);
+        return fixUp(node);
+    }
+
+    /** Helper method to insert item into the tree */
+    private RBTreeNode<T> insertItem(RBTreeNode<T> node, T item) {
         int comp = item.compareTo(node.item);
         if (comp < 0) {
             node.left = insert(node.left, item);
         } else if (comp > 0) {
             node.right = insert(node.right, item);
-        } else {
-            return node;
         }
+        return node;
+    }
 
+    /** Fixes the Red-Black Tree properties after insertion */
+    private RBTreeNode<T> fixUp(RBTreeNode<T> node) {
         if (isRed(node.right) && !isRed(node.left)) {
             node = rotateLeft(node);
         }
@@ -121,13 +135,11 @@ public class RedBlackTree<T extends Comparable<T>> {
         if (isRed(node.left) && isRed(node.right)) {
             flipColors(node);
         }
-
         return node;
     }
 
-    /** Returns whether the given node NODE is red. Null nodes (children of leaf nodes are automatically considered black. */
+    /** Returns whether the given node NODE is red. Null nodes (children of leaf nodes) are automatically considered black. */
     private boolean isRed(RBTreeNode<T> node) {
         return node != null && !node.isBlack;
     }
-
 }
