@@ -13,6 +13,8 @@ public class Repository {
     public static final File GITLET_DIR = new File(CWD, ".gitlet");
     public static final File COMMITS_DIR = new File(GITLET_DIR, "commits");
     public static final File STAGING_DIR = new File(GITLET_DIR, "staging");
+    public static final File BLOBS_DIR = new File(GITLET_DIR, "blobs");
+    public static final File BRANCHES_DIR = new File(GITLET_DIR, "branches");
     public static final File HEAD = new File(GITLET_DIR, "HEAD");
 
     public void init() {
@@ -20,7 +22,7 @@ public class Repository {
             System.out.println("A Gitlet version-control system already exists in the current directory.");
             return;
         }
-        createDirectories(GITLET_DIR, COMMITS_DIR, STAGING_DIR);
+        createDirectories(GITLET_DIR, COMMITS_DIR, STAGING_DIR, BLOBS_DIR, BRANCHES_DIR);
         Commit initialCommit = new Commit("initial commit");
         String initialCommitID = Utils.sha1(Utils.serialize(initialCommit));
         File initialCommitFile = new File(COMMITS_DIR, initialCommitID);
@@ -52,6 +54,7 @@ public class Repository {
         }
     }
 
+
     public void commit(String message) {
         if (message == null || message.trim().isEmpty()) {
             System.out.println("Please enter a commit message.");
@@ -81,33 +84,39 @@ public class Repository {
             String fileName = file.getName();
             String fileID = Utils.sha1(Utils.readContents(file));
             fileMap.put(fileName, fileID);
-            File commitFile = new File(COMMITS_DIR, fileID);
+            File blobFile = new File(BLOBS_DIR, fileID); // 修正路徑
             try {
-                Files.copy(file.toPath(), commitFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                Files.copy(file.toPath(), blobFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
         }
     }
 
-    public void restore(String fileName) {
-        restore(Utils.readContentsAsString(HEAD), fileName);
-    }
-
     public void restore(String commitID, String fileName) {
-        Commit commit = Utils.readObject(new File(COMMITS_DIR, commitID), Commit.class);
+        File commitFile = new File(COMMITS_DIR, commitID);
+        if (!commitFile.exists()) {
+            System.out.println("No commit with that id exists.");
+            return;
+        }
+        Commit commit = Utils.readObject(commitFile, Commit.class);
         if (!commit.getFileMap().containsKey(fileName)) {
             System.out.println("File does not exist in that commit.");
             return;
         }
         String fileID = commit.getFileMap().get(fileName);
-        File sourceFile = new File(COMMITS_DIR, fileID);
+        File sourceFile = new File(BLOBS_DIR, fileID); // 修正路徑
         File destFile = new File(CWD, fileName);
         try {
             Files.copy(sourceFile.toPath(), destFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
+    }
+
+    public void restore(String fileName) {
+        String headCommitID = Utils.readContentsAsString(HEAD);
+        restore(headCommitID, fileName);
     }
 
     public void log() {
@@ -120,25 +129,11 @@ public class Repository {
         }
     }
 
-    public void find(String message) {
-        boolean found = false;
-        for (File commitFile : Objects.requireNonNull(COMMITS_DIR.listFiles())) {
-            Commit commit = Utils.readObject(commitFile, Commit.class);
-            if (commit.getMessage().equals(message)) {
-                System.out.println(commitFile.getName());
-                found = true;
-            }
-        }
-        if (!found) {
-            System.out.println("Found no commit with that message.");
-        }
-    }
-
     public void rm(String fileName) {
         File fileToRemove = new File(CWD, fileName);
         File stagedFile = new File(STAGING_DIR, fileName);
 
-        // 检查文件是否存在于当前提交中或暂存区中
+        // Check if the file exists in the current commit or staging area
         String headCommitID = Utils.readContentsAsString(HEAD);
         Commit headCommit = Utils.readObject(new File(COMMITS_DIR, headCommitID), Commit.class);
         boolean isTracked = headCommit.getFileMap().containsKey(fileName);
@@ -161,30 +156,71 @@ public class Repository {
         }
     }
 
+
     public void status() {
         System.out.println("=== Branches ===");
-        System.out.println("*main");
+        String currentBranch = Utils.readContentsAsString(HEAD);
+        for (File branch : Objects.requireNonNull(BRANCHES_DIR.listFiles())) {
+            if (branch.getName().equals(currentBranch)) {
+                System.out.print("*");
+            }
+            System.out.println(branch.getName());
+        }
         System.out.println();
+
         System.out.println("=== Staged Files ===");
-        for (File file : STAGING_DIR.listFiles()) {
+        for (File file : Objects.requireNonNull(STAGING_DIR.listFiles())) {
             if (!file.getName().startsWith("removed_")) {
                 System.out.println(file.getName());
             }
         }
         System.out.println();
+
         System.out.println("=== Removed Files ===");
-        for (File file : STAGING_DIR.listFiles()) {
+        for (File file : Objects.requireNonNull(STAGING_DIR.listFiles())) {
             if (file.getName().startsWith("removed_")) {
                 System.out.println(file.getName().substring(8));
             }
         }
         System.out.println();
+
         System.out.println("=== Modifications Not Staged For Commit ===");
-        // 可以添加逻辑检查未暂存的修改文件
+        for (File file : Objects.requireNonNull(CWD.listFiles())) {
+            if (!file.isDirectory() && !isStaged(file.getName()) && isModified(file)) {
+                System.out.println(file.getName());
+            }
+        }
         System.out.println();
+
         System.out.println("=== Untracked Files ===");
-        // 可以添加逻辑检查未追踪的文件
+        for (File file : Objects.requireNonNull(CWD.listFiles())) {
+            if (!file.isDirectory() && !isTracked(file.getName()) && !isStaged(file.getName())) {
+                System.out.println(file.getName());
+            }
+        }
         System.out.println();
+    }
+
+    private boolean isStaged(String fileName) {
+        File stagedFile = new File(STAGING_DIR, fileName);
+        return stagedFile.exists();
+    }
+
+    private boolean isTracked(String fileName) {
+        String headCommitID = Utils.readContentsAsString(HEAD);
+        Commit headCommit = Utils.readObject(new File(COMMITS_DIR, headCommitID), Commit.class);
+        return headCommit.getFileMap().containsKey(fileName);
+    }
+
+    private boolean isModified(File file) {
+        String headCommitID = Utils.readContentsAsString(HEAD);
+        Commit headCommit = Utils.readObject(new File(COMMITS_DIR, headCommitID), Commit.class);
+        String trackedFileID = headCommit.getFileMap().get(file.getName());
+        if (trackedFileID == null) {
+            return false;
+        }
+        String currentFileID = Utils.sha1(Utils.readContents(file));
+        return !trackedFileID.equals(currentFileID);
     }
 
     public void globalLog() {
@@ -206,10 +242,12 @@ public class Repository {
         }
         Commit commit = Utils.readObject(commitFile, Commit.class);
         for (Map.Entry<String, String> entry : commit.getFileMap().entrySet()) {
-            File fileInCommit = new File(COMMITS_DIR, entry.getValue());
-            File fileInCWD = new File(CWD, entry.getKey());
+            String fileName = entry.getKey();
+            String fileID = entry.getValue();
+            File sourceFile = new File(BLOBS_DIR, fileID);
+            File destFile = new File(CWD, fileName);
             try {
-                Files.copy(fileInCommit.toPath(), fileInCWD.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                Files.copy(sourceFile.toPath(), destFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
@@ -217,25 +255,105 @@ public class Repository {
         Utils.writeContents(HEAD, commitID);
     }
 
+    public void find(String message) {
+        boolean found = false;
+        for (File commitFile : Objects.requireNonNull(COMMITS_DIR.listFiles())) {
+            Commit commit = Utils.readObject(commitFile, Commit.class);
+            if (commit.getMessage().equals(message)) {
+                System.out.println(commitFile.getName());
+                found = true;
+            }
+        }
+        if (!found) {
+            System.out.println("Found no commit with that message.");
+        }
+    }
+
+    public void checkout(String commitId, String fileName) {
+        // implement the checkout command logic
+        File commitFile = new File(COMMITS_DIR, commitId);
+        if (!commitFile.exists()) {
+            System.out.println("No commit with that id exists.");
+            return;
+        }
+        Commit commit = Utils.readObject(commitFile, Commit.class);
+        if (!commit.getFileMap().containsKey(fileName)) {
+            System.out.println("File does not exist in that commit.");
+            return;
+        }
+        String fileID = commit.getFileMap().get(fileName);
+        File sourceFile = new File(BLOBS_DIR, fileID);
+        File destFile = new File(CWD, fileName);
+        try {
+            Files.copy(sourceFile.toPath(), destFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void checkout(String fileName) {
+        checkout(Utils.readContentsAsString(HEAD), fileName);
+    }
+
+    public void checkoutBranch(String branchName) {
+        File branchFile = new File(BRANCHES_DIR, branchName);
+        if (!branchFile.exists()) {
+            System.out.println("No such branch exists.");
+            return;
+        }
+        String branchCommitID = Utils.readContentsAsString(branchFile);
+        reset(branchCommitID);
+        Utils.writeContents(HEAD, branchCommitID);
+    }
+
+    public void branch(String branchName) {
+        File branchFile = new File(BRANCHES_DIR, branchName);
+        if (branchFile.exists()) {
+            System.out.println("A branch with that name already exists.");
+            return;
+        }
+        String headCommitID = Utils.readContentsAsString(HEAD);
+        Utils.writeContents(branchFile, headCommitID);
+    }
+
+    public void rmBranch(String branchName) {
+        File branchFile = new File(BRANCHES_DIR, branchName);
+        if (!branchFile.exists()) {
+            System.out.println("A branch with that name does not exist.");
+            return;
+        }
+        if (branchName.equals("main")) {
+            System.out.println("Cannot remove the current branch.");
+            return;
+        }
+        branchFile.delete();
+    }
+
+    public void merge(String branchName) {
+        // implement the merge command logic
+    }
+
     private void printCommit(Commit commit, String commitID) {
         System.out.println("===");
-        System.out.println("commit " + commitID.toLowerCase());
+        System.out.println("commit " + commitID);
         System.out.println("Date: " + commit.getTimestamp());
         System.out.println(commit.getMessage());
         System.out.println();
     }
 
-    private void createDirectories(File... directories) {
-        for (File dir : directories) {
-            if (!dir.exists()) {
-                dir.mkdir();
+    private void createDirectories(File... dirs) {
+        for (File dir : dirs) {
+            if (!dir.mkdirs()) {
+                throw new RuntimeException("Failed to create directory: " + dir.getPath());
             }
         }
     }
 
     private void clearStagingArea() {
         for (File file : STAGING_DIR.listFiles()) {
-            file.delete();
+            if (!file.delete()) {
+                throw new RuntimeException("Failed to delete file in staging area: " + file.getPath());
+            }
         }
     }
 }
