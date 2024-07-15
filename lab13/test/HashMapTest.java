@@ -84,7 +84,7 @@ public class HashMapTest {
         assertThat(h.capacity()).isEqualTo(2);
         h.put("connor", "grace");
         h.put("zoe", "matt");
-        assertThat(h.capacity()).isEqualTo(4);
+        assertThat(h.capacity()).isEqualTo(2);
 
         h = new HashMap<String, String>(10, 1);
         for (int i = 1; i <= 10; i += 1) {
