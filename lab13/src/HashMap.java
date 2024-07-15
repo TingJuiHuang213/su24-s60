@@ -7,7 +7,6 @@ public class HashMap<K, V> implements Map61BL<K, V> {
     private int size;
     private double loadFactor;
 
-    // 内部静态类 Entry
     private static class Entry<K, V> {
         K key;
         V value;
@@ -29,12 +28,10 @@ public class HashMap<K, V> implements Map61BL<K, V> {
             this.value = value;
         }
 
-        /* Returns true if this key matches with the OTHER's key. */
         public boolean keyEquals(Entry<K, V> other) {
             return key.equals(other.key);
         }
 
-        /* Returns true if both the KEY and the VALUE match. */
         @Override
         public boolean equals(Object other) {
             return (other instanceof Entry
@@ -48,7 +45,6 @@ public class HashMap<K, V> implements Map61BL<K, V> {
         }
     }
 
-    // 构造函数
     public HashMap() {
         this(16, 0.75);
     }
@@ -96,9 +92,6 @@ public class HashMap<K, V> implements Map61BL<K, V> {
 
     @Override
     public void put(K key, V value) {
-        if ((double) size / array.length >= loadFactor) {
-            resize();
-        }
         int index = getIndex(key);
         if (array[index] == null) {
             array[index] = new LinkedList<>();
@@ -111,7 +104,13 @@ public class HashMap<K, V> implements Map61BL<K, V> {
         }
         array[index].add(new Entry<>(key, value));
         size++;
+
+        // 檢查並調整大小
+        if ((double) size / array.length >= loadFactor) {
+            resize();
+        }
     }
+
 
     @Override
     public V remove(K key) {
@@ -165,7 +164,6 @@ public class HashMap<K, V> implements Map61BL<K, V> {
     private void resize() {
         int newCapacity = array.length * 2;
         LinkedList<Entry<K, V>>[] newArray = (LinkedList<Entry<K, V>>[]) new LinkedList[newCapacity];
-        size = 0; // Reset size and re-add all entries
         for (LinkedList<Entry<K, V>> bucket : array) {
             if (bucket != null) {
                 for (Entry<K, V> entry : bucket) {
@@ -174,12 +172,12 @@ public class HashMap<K, V> implements Map61BL<K, V> {
                         newArray[newIndex] = new LinkedList<>();
                     }
                     newArray[newIndex].add(entry);
-                    size++; // Increment size for each re-added entry
                 }
             }
         }
         array = newArray;
     }
+
 
     @Override
     public Iterator<K> iterator() {
