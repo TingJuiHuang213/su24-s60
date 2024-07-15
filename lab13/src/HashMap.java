@@ -96,8 +96,6 @@ public class HashMap<K, V> implements Map61BL<K, V> {
 
     @Override
     public void put(K key, V value) {
-        System.out.println("Putting key: " + key + " with value: " + value);
-        System.out.println("Current size: " + size + ", current capacity: " + array.length);
         if ((double) size / array.length >= loadFactor) {
             resize();
         }
@@ -166,8 +164,8 @@ public class HashMap<K, V> implements Map61BL<K, V> {
 
     private void resize() {
         int newCapacity = array.length * 2;
-        System.out.println("Resizing from " + array.length + " to " + newCapacity);
         LinkedList<Entry<K, V>>[] newArray = (LinkedList<Entry<K, V>>[]) new LinkedList[newCapacity];
+        size = 0; // Reset size and re-add all entries
         for (LinkedList<Entry<K, V>> bucket : array) {
             if (bucket != null) {
                 for (Entry<K, V> entry : bucket) {
@@ -176,12 +174,11 @@ public class HashMap<K, V> implements Map61BL<K, V> {
                         newArray[newIndex] = new LinkedList<>();
                     }
                     newArray[newIndex].add(entry);
-                    System.out.println("Moved key: " + entry.getKey() + " to new index: " + newIndex);
+                    size++; // Increment size for each re-added entry
                 }
             }
         }
         array = newArray;
-        System.out.println("Resize complete. New capacity: " + array.length);
     }
 
     @Override
