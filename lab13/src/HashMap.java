@@ -1,23 +1,36 @@
-public class HashMap {
+import java.util.LinkedList;
+import java.util.Iterator;
+import java.util.NoSuchElementException;
 
-    /* TODO: Instance variables here */
+public class HashMap<K, V> implements Map61BL<K, V> {
+    private LinkedList<Entry<K, V>>[] array;
+    private int size;
+    private double loadFactor;
 
-    /* TODO: Constructors here */
+    // 内部静态类 Entry
+    private static class Entry<K, V> {
+        K key;
+        V value;
 
-    /* TODO: Interface methods here */
-
-    private static class Entry {
-
-        private String key;
-        private String value;
-
-        Entry(String key, String value) {
+        Entry(K key, V value) {
             this.key = key;
             this.value = value;
         }
 
+        public K getKey() {
+            return key;
+        }
+
+        public V getValue() {
+            return value;
+        }
+
+        public void setValue(V value) {
+            this.value = value;
+        }
+
         /* Returns true if this key matches with the OTHER's key. */
-        public boolean keyEquals(Entry other) {
+        public boolean keyEquals(Entry<K, V> other) {
             return key.equals(other.key);
         }
 
@@ -25,13 +38,186 @@ public class HashMap {
         @Override
         public boolean equals(Object other) {
             return (other instanceof Entry
-                    && key.equals(((Entry) other).key)
-                    && value.equals(((Entry) other).value));
+                    && key.equals(((Entry<?, ?>) other).key)
+                    && value.equals(((Entry<?, ?>) other).value));
         }
 
         @Override
         public int hashCode() {
-            return super.hashCode();
+            return key.hashCode();
+        }
+    }
+
+    // 构造函数
+    public HashMap() {
+        this(16, 0.75);
+    }
+
+    public HashMap(int initialCapacity) {
+        this(initialCapacity, 0.75);
+    }
+
+    public HashMap(int initialCapacity, double loadFactor) {
+        this.array = (LinkedList<Entry<K, V>>[]) new LinkedList[initialCapacity];
+        this.size = 0;
+        this.loadFactor = loadFactor;
+    }
+
+    @Override
+    public int size() {
+        return size;
+    }
+
+    @Override
+    public boolean containsKey(K key) {
+        int index = getIndex(key);
+        if (array[index] != null) {
+            for (Entry<K, V> entry : array[index]) {
+                if (entry.getKey().equals(key)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    @Override
+    public V get(K key) {
+        int index = getIndex(key);
+        if (array[index] != null) {
+            for (Entry<K, V> entry : array[index]) {
+                if (entry.getKey().equals(key)) {
+                    return entry.getValue();
+                }
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public void put(K key, V value) {
+        System.out.println("Putting key: " + key + " with value: " + value);
+        System.out.println("Current size: " + size + ", current capacity: " + array.length);
+        if ((double) size / array.length >= loadFactor) {
+            resize();
+        }
+        int index = getIndex(key);
+        if (array[index] == null) {
+            array[index] = new LinkedList<>();
+        }
+        for (Entry<K, V> entry : array[index]) {
+            if (entry.getKey().equals(key)) {
+                entry.setValue(value);
+                return;
+            }
+        }
+        array[index].add(new Entry<>(key, value));
+        size++;
+    }
+
+    @Override
+    public V remove(K key) {
+        int index = getIndex(key);
+        if (array[index] != null) {
+            Iterator<Entry<K, V>> iterator = array[index].iterator();
+            while (iterator.hasNext()) {
+                Entry<K, V> entry = iterator.next();
+                if (entry.getKey().equals(key)) {
+                    V value = entry.getValue();
+                    iterator.remove();
+                    size--;
+                    return value;
+                }
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public boolean remove(K key, V value) {
+        int index = getIndex(key);
+        if (array[index] != null) {
+            Iterator<Entry<K, V>> iterator = array[index].iterator();
+            while (iterator.hasNext()) {
+                Entry<K, V> entry = iterator.next();
+                if (entry.getKey().equals(key) && entry.getValue().equals(value)) {
+                    iterator.remove();
+                    size--;
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    @Override
+    public void clear() {
+        array = (LinkedList<Entry<K, V>>[]) new LinkedList[array.length];
+        size = 0;
+    }
+
+    public int capacity() {
+        return array.length;
+    }
+
+    private int getIndex(K key) {
+        return Math.floorMod(key.hashCode(), array.length);
+    }
+
+    private void resize() {
+        int newCapacity = array.length * 2;
+        System.out.println("Resizing from " + array.length + " to " + newCapacity);
+        LinkedList<Entry<K, V>>[] newArray = (LinkedList<Entry<K, V>>[]) new LinkedList[newCapacity];
+        for (LinkedList<Entry<K, V>> bucket : array) {
+            if (bucket != null) {
+                for (Entry<K, V> entry : bucket) {
+                    int newIndex = Math.floorMod(entry.getKey().hashCode(), newCapacity);
+                    if (newArray[newIndex] == null) {
+                        newArray[newIndex] = new LinkedList<>();
+                    }
+                    newArray[newIndex].add(entry);
+                    System.out.println("Moved key: " + entry.getKey() + " to new index: " + newIndex);
+                }
+            }
+        }
+        array = newArray;
+        System.out.println("Resize complete. New capacity: " + array.length);
+    }
+
+    @Override
+    public Iterator<K> iterator() {
+        return new HashMapIterator();
+    }
+
+    private class HashMapIterator implements Iterator<K> {
+        private int currentBucket;
+        private Iterator<Entry<K, V>> bucketIterator;
+
+        HashMapIterator() {
+            currentBucket = 0;
+            bucketIterator = getBucketIterator();
+        }
+
+        private Iterator<Entry<K, V>> getBucketIterator() {
+            while (currentBucket < array.length && (array[currentBucket] == null || array[currentBucket].isEmpty())) {
+                currentBucket++;
+            }
+            return (currentBucket < array.length) ? array[currentBucket].iterator() : null;
+        }
+
+        @Override
+        public boolean hasNext() {
+            if (bucketIterator == null) return false;
+            if (bucketIterator.hasNext()) return true;
+            currentBucket++;
+            bucketIterator = getBucketIterator();
+            return bucketIterator != null && bucketIterator.hasNext();
+        }
+
+        @Override
+        public K next() {
+            if (!hasNext()) throw new NoSuchElementException();
+            return bucketIterator.next().getKey();
         }
     }
 }
