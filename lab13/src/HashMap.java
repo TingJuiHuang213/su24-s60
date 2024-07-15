@@ -28,15 +28,12 @@ public class HashMap<K, V> implements Map61BL<K, V> {
             this.value = value;
         }
 
-        public boolean keyEquals(Entry<K, V> other) {
-            return key.equals(other.key);
-        }
-
         @Override
         public boolean equals(Object other) {
-            return (other instanceof Entry
-                    && key.equals(((Entry<?, ?>) other).key)
-                    && value.equals(((Entry<?, ?>) other).value));
+            if (this == other) return true;
+            if (other == null || getClass() != other.getClass()) return false;
+            Entry<?, ?> entry = (Entry<?, ?>) other;
+            return key.equals(entry.key) && value.equals(entry.value);
         }
 
         @Override
@@ -92,6 +89,9 @@ public class HashMap<K, V> implements Map61BL<K, V> {
 
     @Override
     public void put(K key, V value) {
+        if ((double) size / array.length >= loadFactor) {
+            resize();
+        }
         int index = getIndex(key);
         if (array[index] == null) {
             array[index] = new LinkedList<>();
@@ -104,13 +104,7 @@ public class HashMap<K, V> implements Map61BL<K, V> {
         }
         array[index].add(new Entry<>(key, value));
         size++;
-
-        // 檢查並調整大小
-        if ((double) size / array.length >= loadFactor) {
-            resize();
-        }
     }
-
 
     @Override
     public V remove(K key) {
@@ -177,7 +171,6 @@ public class HashMap<K, V> implements Map61BL<K, V> {
         }
         array = newArray;
     }
-
 
     @Override
     public Iterator<K> iterator() {
