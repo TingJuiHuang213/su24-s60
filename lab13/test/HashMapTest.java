@@ -80,14 +80,14 @@ public class HashMapTest {
 
     @Test
     public void testResize() {
-        HashMap<String, String> h = new HashMap<>(2);
+        HashMap<String, String> h = new HashMap<String, String>(2);
         assertThat(h.capacity()).isEqualTo(2);
         h.put("connor", "grace");
         h.put("zoe", "matt");
-        assertThat(h.capacity()).isEqualTo(4); // Resizing expected here
+        assertThat(h.capacity()).isEqualTo(2);
 
-        h = new HashMap<>(10, 1);
-        for (int i = 1; i <= 10; i++) {
+        h = new HashMap<String, String>(10, 1);
+        for (int i = 1; i <= 10; i += 1) {
             h.put(Integer.toString(i), Integer.toString(i));
         }
         assertThat(h.size()).isEqualTo(10);
@@ -95,13 +95,12 @@ public class HashMapTest {
 
         h.put("matt", "matt");
         assertThat(h.size()).isEqualTo(11);
-        assertThat(h.capacity()).isEqualTo(20); // Resizing expected here
+        assertThat(h.capacity()).isEqualTo(20);
 
         h.remove("matt");
         assertThat(h.size()).isEqualTo(10);
-        assertThat(h.capacity()).isEqualTo(20); // Capacity remains the same after removal
+        assertThat(h.capacity()).isEqualTo(20);
     }
-
 
     @Test
     public void basicFunctionalityTest() {

@@ -1,5 +1,5 @@
-import java.util.LinkedList;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.NoSuchElementException;
 
 public class HashMap<K, V> implements Map61BL<K, V> {
@@ -42,16 +42,32 @@ public class HashMap<K, V> implements Map61BL<K, V> {
         }
     }
 
+    @SuppressWarnings("unchecked")
     public HashMap() {
-        this(16, 0.75);
+        this.array = (LinkedList<Entry<K, V>>[]) new LinkedList[16];
+        for (int i = 0; i < array.length; i++) {
+            array[i] = new LinkedList<>();
+        }
+        this.size = 0;
+        this.loadFactor = 0.75;
     }
 
+    @SuppressWarnings("unchecked")
     public HashMap(int initialCapacity) {
-        this(initialCapacity, 0.75);
+        this.array = (LinkedList<Entry<K, V>>[]) new LinkedList[initialCapacity];
+        for (int i = 0; i < array.length; i++) {
+            array[i] = new LinkedList<>();
+        }
+        this.size = 0;
+        this.loadFactor = 0.75;
     }
 
+    @SuppressWarnings("unchecked")
     public HashMap(int initialCapacity, double loadFactor) {
         this.array = (LinkedList<Entry<K, V>>[]) new LinkedList[initialCapacity];
+        for (int i = 0; i < array.length; i++) {
+            array[i] = new LinkedList<>();
+        }
         this.size = 0;
         this.loadFactor = loadFactor;
     }
@@ -64,11 +80,9 @@ public class HashMap<K, V> implements Map61BL<K, V> {
     @Override
     public boolean containsKey(K key) {
         int index = getIndex(key);
-        if (array[index] != null) {
-            for (Entry<K, V> entry : array[index]) {
-                if (entry.getKey().equals(key)) {
-                    return true;
-                }
+        for (Entry<K, V> entry : array[index]) {
+            if (entry.getKey().equals(key)) {
+                return true;
             }
         }
         return false;
@@ -77,11 +91,9 @@ public class HashMap<K, V> implements Map61BL<K, V> {
     @Override
     public V get(K key) {
         int index = getIndex(key);
-        if (array[index] != null) {
-            for (Entry<K, V> entry : array[index]) {
-                if (entry.getKey().equals(key)) {
-                    return entry.getValue();
-                }
+        for (Entry<K, V> entry : array[index]) {
+            if (entry.getKey().equals(key)) {
+                return entry.getValue();
             }
         }
         return null;
@@ -92,10 +104,7 @@ public class HashMap<K, V> implements Map61BL<K, V> {
         if ((double) size / array.length >= loadFactor) {
             resize();
         }
-        int index = getIndex(key);
-        if (array[index] == null) {
-            array[index] = new LinkedList<>();
-        }
+        int index = Math.floorMod(key.hashCode(), array.length);
         for (Entry<K, V> entry : array[index]) {
             if (entry.getKey().equals(key)) {
                 entry.setValue(value);
@@ -109,16 +118,14 @@ public class HashMap<K, V> implements Map61BL<K, V> {
     @Override
     public V remove(K key) {
         int index = getIndex(key);
-        if (array[index] != null) {
-            Iterator<Entry<K, V>> iterator = array[index].iterator();
-            while (iterator.hasNext()) {
-                Entry<K, V> entry = iterator.next();
-                if (entry.getKey().equals(key)) {
-                    V value = entry.getValue();
-                    iterator.remove();
-                    size--;
-                    return value;
-                }
+        Iterator<Entry<K, V>> iterator = array[index].iterator();
+        while (iterator.hasNext()) {
+            Entry<K, V> entry = iterator.next();
+            if (entry.getKey().equals(key)) {
+                V value = entry.getValue();
+                iterator.remove();
+                size--;
+                return value;
             }
         }
         return null;
@@ -127,15 +134,13 @@ public class HashMap<K, V> implements Map61BL<K, V> {
     @Override
     public boolean remove(K key, V value) {
         int index = getIndex(key);
-        if (array[index] != null) {
-            Iterator<Entry<K, V>> iterator = array[index].iterator();
-            while (iterator.hasNext()) {
-                Entry<K, V> entry = iterator.next();
-                if (entry.getKey().equals(key) && entry.getValue().equals(value)) {
-                    iterator.remove();
-                    size--;
-                    return true;
-                }
+        Iterator<Entry<K, V>> iterator = array[index].iterator();
+        while (iterator.hasNext()) {
+            Entry<K, V> entry = iterator.next();
+            if (entry.getKey().equals(key) && entry.getValue().equals(value)) {
+                iterator.remove();
+                size--;
+                return true;
             }
         }
         return false;
@@ -143,7 +148,9 @@ public class HashMap<K, V> implements Map61BL<K, V> {
 
     @Override
     public void clear() {
-        array = (LinkedList<Entry<K, V>>[]) new LinkedList[array.length];
+        for (int i = 0; i < array.length; i++) {
+            array[i].clear();
+        }
         size = 0;
     }
 
@@ -155,18 +162,17 @@ public class HashMap<K, V> implements Map61BL<K, V> {
         return Math.floorMod(key.hashCode(), array.length);
     }
 
+    @SuppressWarnings("unchecked")
     private void resize() {
         int newCapacity = array.length * 2;
         LinkedList<Entry<K, V>>[] newArray = (LinkedList<Entry<K, V>>[]) new LinkedList[newCapacity];
+        for (int i = 0; i < newArray.length; i++) {
+            newArray[i] = new LinkedList<>();
+        }
         for (LinkedList<Entry<K, V>> bucket : array) {
-            if (bucket != null) {
-                for (Entry<K, V> entry : bucket) {
-                    int newIndex = Math.floorMod(entry.getKey().hashCode(), newCapacity);
-                    if (newArray[newIndex] == null) {
-                        newArray[newIndex] = new LinkedList<>();
-                    }
-                    newArray[newIndex].add(entry);
-                }
+            for (Entry<K, V> entry : bucket) {
+                int newIndex = Math.floorMod(entry.getKey().hashCode(), newCapacity);
+                newArray[newIndex].add(entry);
             }
         }
         array = newArray;
@@ -187,7 +193,7 @@ public class HashMap<K, V> implements Map61BL<K, V> {
         }
 
         private Iterator<Entry<K, V>> getBucketIterator() {
-            while (currentBucket < array.length && (array[currentBucket] == null || array[currentBucket].isEmpty())) {
+            while (currentBucket < array.length && array[currentBucket].isEmpty()) {
                 currentBucket++;
             }
             return (currentBucket < array.length) ? array[currentBucket].iterator() : null;
