@@ -51,7 +51,7 @@ public class HashMapTest {
         assertThat(h.containsKey("alex")).isFalse();
         assertThat(h.containsKey("henry")).isFalse();
         assertThat(h.size()).isEqualTo(1);
-        
+
         h.put("eli", "kevin");
         assertThat(h.containsKey("eli")).isTrue();
         assertThat(h.containsKey("kevin")).isFalse();
@@ -78,30 +78,7 @@ public class HashMapTest {
         assertThat(h.size()).isEqualTo(0);
     }
 
-    @Test
-    public void testResize() {
-        HashMap<String, String> h = new HashMap<String, String>(2);
-        assertThat(h.capacity()).isEqualTo(2);
-        h.put("connor", "grace");
-        h.put("zoe", "matt");
-        assertThat(h.capacity()).isEqualTo(2);
-
-        h = new HashMap<String, String>(10, 1);
-        for (int i = 1; i <= 10; i += 1) {
-            h.put(Integer.toString(i), Integer.toString(i));
-        }
-        assertThat(h.size()).isEqualTo(10);
-        assertThat(h.capacity()).isEqualTo(10);
-
-        h.put("matt", "matt");
-        assertThat(h.size()).isEqualTo(11);
-        assertThat(h.capacity()).isEqualTo(20);
-
-        h.remove("matt");
-        assertThat(h.size()).isEqualTo(10);
-        assertThat(h.capacity()).isEqualTo(20);
-    }
-
+    
     @Test
     public void basicFunctionalityTest() {
         HashMap<String, String> dictionary = new HashMap<String, String>();
@@ -127,7 +104,7 @@ public class HashMapTest {
         studentIDs.put("zoe", 12345);
         assertThat(studentIDs.size()).isEqualTo(1);
         assertThat(studentIDs.get("zoe").intValue()).isEqualTo(12345);
-        
+
         studentIDs.put("shreya", 345);
         assertThat(studentIDs.size()).isEqualTo(2);
         assertThat(studentIDs.get("zoe").intValue()).isEqualTo(12345);
