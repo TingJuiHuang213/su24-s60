@@ -78,7 +78,30 @@ public class HashMapTest {
         assertThat(h.size()).isEqualTo(0);
     }
 
-    
+    @Test
+    public void testResize() {
+        HashMap<String, String> h = new HashMap<String, String>(2);
+        assertThat(h.capacity()).isEqualTo(2);
+        h.put("connor", "grace");
+        h.put("zoe", "matt");
+        assertThat(h.capacity()).isEqualTo(4);
+
+        h = new HashMap<String, String>(10, 1);
+        for (int i = 1; i <= 10; i += 1) {
+            h.put(Integer.toString(i), Integer.toString(i));
+        }
+        assertThat(h.size()).isEqualTo(10);
+        assertThat(h.capacity()).isEqualTo(10);
+
+        h.put("matt", "matt");
+        assertThat(h.size()).isEqualTo(11);
+        assertThat(h.capacity()).isEqualTo(20);
+
+        h.remove("matt");
+        assertThat(h.size()).isEqualTo(10);
+        assertThat(h.capacity()).isEqualTo(20);
+    }
+
     @Test
     public void basicFunctionalityTest() {
         HashMap<String, String> dictionary = new HashMap<String, String>();
