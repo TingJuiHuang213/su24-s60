@@ -1,116 +1,107 @@
 import org.junit.Test;
-import static com.google.common.truth.Truth.assertWithMessage;
+import static org.junit.Assert.*;
 import java.util.NoSuchElementException;
 
+/**
+ * 測試 MinHeap 的各種操作。
+ */
 public class MinHeapTest {
 
     @Test
     public void testInsertAndFindMin() {
         MinHeap<Integer> heap = new MinHeap<>();
-        heap.insert(5);
-        heap.insert(3);
-        heap.insert(8);
+        heap.insert(10);
+        heap.insert(4);
+        heap.insert(15);
         heap.insert(1);
 
-        assertWithMessage("FindMin should return the smallest element")
-                .that(heap.findMin()).isEqualTo(1);
+        assertEquals("FindMin should return the smallest element", (Integer) 1, heap.findMin());
     }
 
     @Test
     public void testRemoveMin() {
         MinHeap<Integer> heap = new MinHeap<>();
+        heap.insert(20);
         heap.insert(5);
+        heap.insert(30);
         heap.insert(3);
-        heap.insert(8);
-        heap.insert(1);
 
-        assertWithMessage("RemoveMin should return the smallest element")
-                .that(heap.removeMin()).isEqualTo(1);
-
-        assertWithMessage("FindMin should now return the next smallest element")
-                .that(heap.findMin()).isEqualTo(3);
+        assertEquals("RemoveMin should return the smallest element", (Integer) 3, heap.removeMin());
+        assertEquals("FindMin should now return the next smallest element", (Integer) 5, heap.findMin());
     }
 
     @Test
     public void testBubbleUp() {
         MinHeap<Integer> heap = new MinHeap<>();
-        heap.insert(5);
-        heap.insert(3);
-        heap.insert(8);
+        heap.insert(50);
+        heap.insert(25);
+        heap.insert(75);
 
-        assertWithMessage("FindMin should return the smallest element")
-                .that(heap.findMin()).isEqualTo(3);
+        assertEquals("FindMin should return the smallest element", (Integer) 25, heap.findMin());
     }
 
     @Test
     public void testBubbleDown() {
         MinHeap<Integer> heap = new MinHeap<>();
-        heap.insert(5);
-        heap.insert(3);
+        heap.insert(12);
         heap.insert(8);
-        heap.insert(1);
+        heap.insert(17);
+        heap.insert(5);
 
         heap.removeMin();
 
-        assertWithMessage("FindMin should now return the next smallest element")
-                .that(heap.findMin()).isEqualTo(3);
+        assertEquals("FindMin should now return the next smallest element", (Integer) 8, heap.findMin());
     }
 
     @Test
     public void testSize() {
         MinHeap<Integer> heap = new MinHeap<>();
-        heap.insert(5);
+        heap.insert(9);
         heap.insert(3);
 
-        assertWithMessage("Size should return the number of elements in the heap")
-                .that(heap.size()).isEqualTo(2);
+        assertEquals("Size should return the number of elements in the heap", 2, heap.size());
     }
 
     @Test
     public void testContains() {
         MinHeap<Integer> heap = new MinHeap<>();
-        heap.insert(5);
-        heap.insert(3);
+        heap.insert(18);
+        heap.insert(14);
 
-        assertWithMessage("Contains should return true for an existing element")
-                .that(heap.contains(3)).isTrue();
-
-        assertWithMessage("Contains should return false for a non-existing element")
-                .that(heap.contains(4)).isFalse();
+        assertTrue("Contains should return true for an existing element", heap.contains(14));
+        assertFalse("Contains should return false for a non-existing element", heap.contains(20));
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testInsertDuplicate() {
         MinHeap<Integer> heap = new MinHeap<>();
-        heap.insert(5);
-        heap.insert(5);  // Should throw an exception
+        heap.insert(6);
+        heap.insert(6);  // 應該拋出異常
     }
 
     @Test(expected = NoSuchElementException.class)
     public void testUpdateNonExistingElement() {
         MinHeap<Integer> heap = new MinHeap<>();
-        Integer oldElement = 5;
-        Integer newElement = 7;
-        heap.update(oldElement, newElement);  // Should throw an exception
+        Integer oldElement = 10;
+        Integer newElement = 20;
+        heap.update(oldElement, newElement);  // 應該拋出異常
     }
-
 
     @Test
     public void testUpdateExistingElement() {
         MinHeap<Integer> heap = new MinHeap<>();
-        heap.insert(5);
-        heap.insert(3);
-        heap.insert(8);
-        heap.insert(1);
+        heap.insert(7);
+        heap.insert(2);
+        heap.insert(9);
+        heap.insert(4);
 
-        // 更新已存在元素的優先級，這裡假設新的元素是 2
-        Integer oldElement = 3;
-        Integer updatedElement = 2;
+        // 更新已存在元素的值
+        Integer oldElement = 2;
+        Integer updatedElement = 1;
 
         // 使用正確的方法來更新元素
         heap.update(oldElement, updatedElement);
 
-        assertWithMessage("FindMin should now return the updated smallest element")
-                .that(heap.findMin()).isEqualTo(1);
+        assertEquals("FindMin should now return the updated smallest element", (Integer) 1, heap.findMin());
     }
 }

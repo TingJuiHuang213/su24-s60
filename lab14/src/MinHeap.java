@@ -12,6 +12,7 @@ public class MinHeap<E extends Comparable<E>> {
         contents = new ArrayList<>();
         contents.add(null);
         indexMap = new HashMap<>();
+        size = 0;
     }
 
     private E getElement(int index) {
@@ -110,7 +111,7 @@ public class MinHeap<E extends Comparable<E>> {
     }
 
     public int size() {
-        return contents.size() - 1;
+        return size;
     }
 
     public void insert(E element) {
@@ -120,17 +121,19 @@ public class MinHeap<E extends Comparable<E>> {
         contents.add(element);
         int index = contents.size() - 1;
         indexMap.put(element, index);
+        size++;
         bubbleUp(index);
     }
 
     public E removeMin() {
-        if (size() == 0) {
+        if (size == 0) {
             return null;
         }
         E min = findMin();
         swap(1, contents.size() - 1);
         contents.remove(contents.size() - 1);
         indexMap.remove(min);
+        size--;
         bubbleDown(1);
         return min;
     }
@@ -149,5 +152,10 @@ public class MinHeap<E extends Comparable<E>> {
 
     public boolean contains(E element) {
         return indexMap.containsKey(element);
+    }
+
+    // 添加新方法，用於返回 contents
+    protected ArrayList<E> getContents() {
+        return contents;
     }
 }

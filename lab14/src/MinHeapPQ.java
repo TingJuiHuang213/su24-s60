@@ -14,10 +14,7 @@ public class MinHeapPQ<T> implements PriorityQueue<T> {
     /* Returns the item with the smallest priority value, but does not remove it
        from the MinHeapPQ. */
     public T peek() {
-        if (heap.size() == 0) {
-            return null;
-        }
-        return heap.findMin().item();
+        return (heap.size() == 0) ? null : heap.findMin().item();
     }
 
     /* Inserts ITEM with the priority value PRIORITYVALUE into the MinHeapPQ. If
@@ -26,7 +23,8 @@ public class MinHeapPQ<T> implements PriorityQueue<T> {
         if (contains(item)) {
             throw new IllegalArgumentException("Item already exists in the MinHeapPQ.");
         }
-        heap.insert(new PriorityItem(item, priorityValue));
+        PriorityItem newItem = new PriorityItem(item, priorityValue);
+        heap.insert(newItem);
     }
 
     /* Returns the item with the highest priority (smallest priority value), and
@@ -42,11 +40,12 @@ public class MinHeapPQ<T> implements PriorityQueue<T> {
        PRIORITYVALUE. Assume the items in the MinHeapPQ are all unique. If ITEM
        is not in the MinHeapPQ, throw a NoSuchElementException. */
     public void changePriority(T item, double priorityValue) {
-        PriorityItem newItem = new PriorityItem(item, priorityValue);
         if (!contains(item)) {
             throw new NoSuchElementException("Item not found in the MinHeapPQ.");
         }
-        heap.update(new PriorityItem(item, 0), newItem);
+        PriorityItem oldItem = findItem(item);
+        PriorityItem newItem = new PriorityItem(item, priorityValue);
+        heap.update(oldItem, newItem);
     }
 
     /* Returns the number of items in the MinHeapPQ. */
@@ -54,10 +53,27 @@ public class MinHeapPQ<T> implements PriorityQueue<T> {
         return heap.size();
     }
 
-    /* Returns true if ITEM is stored in our MinHeapPQ. Note: Any priority value
-       for this dummy PriorityItem would work. */
+    /* Returns true if ITEM is stored in our MinHeapPQ. */
     public boolean contains(T item) {
-        return heap.contains(new PriorityItem(item, 0));
+        return heapContainsItem(item);
+    }
+
+    private boolean heapContainsItem(T item) {
+        for (PriorityItem i : heap.getContents()) {
+            if (i != null && i.item.equals(item)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private PriorityItem findItem(T item) {
+        for (PriorityItem i : heap.getContents()) {
+            if (i != null && i.item.equals(item)) {
+                return i;
+            }
+        }
+        throw new NoSuchElementException("Item not found in the MinHeapPQ.");
     }
 
     @Override
@@ -94,25 +110,19 @@ public class MinHeapPQ<T> implements PriorityQueue<T> {
 
         @Override
         public int compareTo(PriorityItem o) {
-            double diff = this.priorityValue - o.priorityValue;
-            if (diff > 0) {
-                return 1;
-            } else if (diff < 0) {
-                return -1;
-            } else {
-                return 0;
-            }
+            return Double.compare(this.priorityValue, o.priorityValue);
         }
 
         @Override
         public boolean equals(Object o) {
-            if (o == null) {
-                return false;
-            } else if (getClass() == o.getClass()) {
-                PriorityItem p = (PriorityItem) o;
-                return p.item.equals(item);
+            if (this == o) {
+                return true;
             }
-            return false;
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
+            PriorityItem that = (PriorityItem) o;
+            return item.equals(that.item);
         }
 
         @Override
