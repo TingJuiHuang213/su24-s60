@@ -10,19 +10,17 @@ public class MinHeap<E extends Comparable<E>> {
 
     public MinHeap() {
         contents = new ArrayList<>();
-        contents.add(null);
+        contents.add(null); // 占位符，便於計算子節點索引
         indexMap = new HashMap<>();
         size = 0;
     }
 
+    // 獲取元素
     private E getElement(int index) {
-        if (index >= contents.size()) {
-            return null;
-        } else {
-            return contents.get(index);
-        }
+        return (index < contents.size()) ? contents.get(index) : null;
     }
 
+    // 設置元素
     private void setElement(int index, E element) {
         while (index >= contents.size()) {
             contents.add(null);
@@ -31,91 +29,91 @@ public class MinHeap<E extends Comparable<E>> {
         indexMap.put(element, index);
     }
 
-    private void swap(int index1, int index2) {
-        E element1 = getElement(index1);
-        E element2 = getElement(index2);
-        setElement(index2, element1);
-        setElement(index1, element2);
+    // 交換兩個索引處的元素
+    private void swapElements(int index1, int index2) {
+        E temp = contents.get(index1);
+        contents.set(index1, contents.get(index2));
+        contents.set(index2, temp);
+        indexMap.put(contents.get(index1), index1);
+        indexMap.put(contents.get(index2), index2);
     }
 
     @Override
     public String toString() {
-        return toStringHelper(1, "");
+        return buildHeapString(1, "");
     }
 
-    private String toStringHelper(int index, String soFar) {
+    private String buildHeapString(int index, String prefix) {
         if (getElement(index) == null) {
             return "";
-        } else {
-            String toReturn = "";
-            int rightChild = getRightOf(index);
-            toReturn += toStringHelper(rightChild, "        " + soFar);
-            if (getElement(rightChild) != null) {
-                toReturn += soFar + "    /";
-            }
-            toReturn += "\n" + soFar + getElement(index) + "\n";
-            int leftChild = getLeftOf(index);
-            if (getElement(leftChild) != null) {
-                toReturn += soFar + "    \\";
-            }
-            toReturn += toStringHelper(leftChild, "        " + soFar);
-            return toReturn;
         }
+        StringBuilder sb = new StringBuilder();
+        int right = getRightChild(index);
+        sb.append(buildHeapString(right, "        " + prefix));
+        if (getElement(right) != null) {
+            sb.append(prefix).append("    /");
+        }
+        sb.append("\n").append(prefix).append(getElement(index)).append("\n");
+        int left = getLeftChild(index);
+        if (getElement(left) != null) {
+            sb.append(prefix).append("    \\");
+        }
+        sb.append(buildHeapString(left, "        " + prefix));
+        return sb.toString();
     }
 
-    private int getLeftOf(int index) {
+    private int getLeftChild(int index) {
         return 2 * index;
     }
 
-    private int getRightOf(int index) {
+    private int getRightChild(int index) {
         return 2 * index + 1;
     }
 
-    private int getParentOf(int index) {
+    private int getParent(int index) {
         return index / 2;
     }
 
-    private int min(int index1, int index2) {
-        E element1 = getElement(index1);
-        E element2 = getElement(index2);
-        if (element1 == null) return index2;
-        if (element2 == null) return index1;
-        return element1.compareTo(element2) <= 0 ? index1 : index2;
+    private int findSmallerChild(int index1, int index2) {
+        E elem1 = getElement(index1);
+        E elem2 = getElement(index2);
+        if (elem1 == null) return index2;
+        if (elem2 == null) return index1;
+        return elem1.compareTo(elem2) <= 0 ? index1 : index2;
     }
 
     public E findMin() {
         return getElement(1);
     }
 
+    // 上浮操作
     private void bubbleUp(int index) {
-        while (index > 1 && getElement(index).compareTo(getElement(getParentOf(index))) < 0) {
-            swap(index, getParentOf(index));
-            index = getParentOf(index);
+        while (index > 1 && getElement(index).compareTo(getElement(getParent(index))) < 0) {
+            swapElements(index, getParent(index));
+            index = getParent(index);
         }
     }
 
+    // 下沉操作
     private void bubbleDown(int index) {
-        while (getLeftOf(index) < contents.size()) {
-            int left = getLeftOf(index);
-            int right = getRightOf(index);
-            int smallest = left;
-            if (right < contents.size() && getElement(right).compareTo(getElement(left)) < 0) {
-                smallest = right;
-            }
+        while (getLeftChild(index) < contents.size()) {
+            int left = getLeftChild(index);
+            int right = getRightChild(index);
+            int smallest = findSmallerChild(left, right);
             if (getElement(index).compareTo(getElement(smallest)) <= 0) {
                 break;
             }
-            swap(index, smallest);
+            swapElements(index, smallest);
             index = smallest;
         }
     }
 
-    public int size() {
+    public int getSize() {
         return size;
     }
 
-    public void insert(E element) {
-        if (contains(element)) {
+    public void insertElement(E element) {
+        if (elementExists(element)) {
             throw new IllegalArgumentException("Element already exists in the heap.");
         }
         contents.add(element);
@@ -125,21 +123,21 @@ public class MinHeap<E extends Comparable<E>> {
         bubbleUp(index);
     }
 
-    public E removeMin() {
+    public E removeMinElement() {
         if (size == 0) {
             return null;
         }
-        E min = findMin();
-        swap(1, contents.size() - 1);
+        E minElement = findMin();
+        swapElements(1, contents.size() - 1);
         contents.remove(contents.size() - 1);
-        indexMap.remove(min);
+        indexMap.remove(minElement);
         size--;
         bubbleDown(1);
-        return min;
+        return minElement;
     }
 
-    public void update(E oldElement, E newElement) {
-        if (!contains(oldElement)) {
+    public void updateElement(E oldElement, E newElement) {
+        if (!elementExists(oldElement)) {
             throw new NoSuchElementException();
         }
         int index = indexMap.get(oldElement);
@@ -150,12 +148,12 @@ public class MinHeap<E extends Comparable<E>> {
         bubbleDown(index);
     }
 
-    public boolean contains(E element) {
+    public boolean elementExists(E element) {
         return indexMap.containsKey(element);
     }
 
     // 添加新方法，用於返回 contents
-    protected ArrayList<E> getContents() {
+    protected ArrayList<E> getHeapContents() {
         return contents;
     }
 }
