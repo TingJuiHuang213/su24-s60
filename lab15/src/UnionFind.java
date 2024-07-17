@@ -22,11 +22,7 @@ public class UnionFind {
     /* Returns the parent of V. If V is the root of a tree, returns the
        negative size of the tree for which V is the root. */
     public int parent(int v) {
-        if (parent[v] == v) {
-            return -size[v]; // 如果 v 是根節點，返回負的大小
-        } else {
-            return parent[v]; // 否則返回父節點
-        }
+        return parent[v];
     }
 
     /* Returns true if nodes V1 and V2 are connected. */
@@ -64,7 +60,7 @@ public class UnionFind {
                 parent[root2] = root1;
                 size[root1] += size[root2];
             } else {
-                parent[root2] = root1; // 將 root2 接到 root1 上
+                parent[root2] = root1;
                 size[root1] += size[root2];
             }
         }
