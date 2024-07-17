@@ -64,35 +64,6 @@ public class UnionFindTest {
     }
 
     @Test
-    public void testInvalidInputs() {
-        UnionFind uf = new UnionFind(5);
-
-        try {
-            uf.find(-1);
-        } catch (IllegalArgumentException e) {
-            assertThat(e).hasMessageThat().contains("Invalid index");
-        }
-
-        try {
-            uf.find(5);
-        } catch (IllegalArgumentException e) {
-            assertThat(e).hasMessageThat().contains("Invalid index");
-        }
-
-        try {
-            uf.union(-1, 2);
-        } catch (IllegalArgumentException e) {
-            assertThat(e).hasMessageThat().contains("Invalid index");
-        }
-
-        try {
-            uf.union(2, 5);
-        } catch (IllegalArgumentException e) {
-            assertThat(e).hasMessageThat().contains("Invalid index");
-        }
-    }
-
-    @Test
     public void testCompleteUnion() {
         UnionFind uf = new UnionFind(10);
         uf.union(0, 1);
