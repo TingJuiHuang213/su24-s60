@@ -148,6 +148,7 @@ public class MinHeap<E extends Comparable<E>> {
         bubbleDown(index);
     }
 
+<<<<<<< HEAD
     public boolean elementExists(E element) {
         return indexMap.containsKey(element);
     }
@@ -155,5 +156,17 @@ public class MinHeap<E extends Comparable<E>> {
     // 添加新方法，用於返回 contents
     protected ArrayList<E> getHeapContents() {
         return contents;
+=======
+    /* Returns true if ELEMENT is contained in the MinHeap. Item equality should
+       be checked using .equals(), not ==. */
+    public boolean contains(E element) {
+        // OPTIONAL: OPTIMIZE THE SPEED OF THIS TO MAKE IT CONSTANT
+        for (int i = 1; i < contents.size(); i++) {
+            if (element.equals(contents.get(i))) {
+                return true;
+            }
+        }
+        return false;
+>>>>>>> 12b0ea70bf119e42d2c85f563bcef37d7de6de27
     }
 }
