@@ -17,7 +17,7 @@ public class UnionFind {
     }
 
     public int parent(int v) {
-        return parent[v];
+        return parent[v] == v ? -size[v] : parent[v];
     }
 
     public boolean connected(int v1, int v2) {

@@ -10,7 +10,7 @@ public class UnionFindTest {
         for (int i = 0; i < 5; i++) {
             assertThat(uf.connected(i, i)).isTrue();
             assertThat(uf.sizeOf(i)).isEqualTo(1);
-            assertThat(uf.parent(i)).isEqualTo(i);
+            assertThat(uf.parent(i)).isEqualTo(-1);
         }
     }
 
@@ -90,5 +90,39 @@ public class UnionFindTest {
         } catch (IllegalArgumentException e) {
             assertThat(e).hasMessageThat().contains("Invalid index");
         }
+    }
+
+    @Test
+    public void testCompleteUnion() {
+        UnionFind uf = new UnionFind(10);
+        uf.union(0, 1);
+        uf.union(1, 2);
+        uf.union(2, 3);
+        uf.union(3, 4);
+        uf.union(4, 5);
+        uf.union(5, 6);
+        uf.union(6, 7);
+        uf.union(7, 8);
+        uf.union(8, 9);
+        assertThat(uf.connected(0, 9)).isTrue();
+        assertThat(uf.sizeOf(0)).isEqualTo(10);
+        assertThat(uf.find(9)).isEqualTo(uf.find(0));
+    }
+
+    @Test
+    public void testBasicUnion() {
+        UnionFind uf = new UnionFind(10);
+        uf.union(0, 1);
+        uf.union(2, 3);
+        uf.union(4, 5);
+        uf.union(6, 7);
+        uf.union(8, 9);
+        uf.union(0, 2);
+        uf.union(4, 6);
+        uf.union(0, 4);
+        uf.union(8, 0);
+        assertThat(uf.connected(0, 9)).isTrue();
+        assertThat(uf.sizeOf(0)).isEqualTo(10);
+        assertThat(uf.find(9)).isEqualTo(uf.find(0));
     }
 }
