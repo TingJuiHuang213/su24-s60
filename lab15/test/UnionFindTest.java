@@ -7,7 +7,6 @@ public class UnionFindTest {
     public void testInitialState() {
         UnionFind uf = new UnionFind(5);
 
-        // 初始情況下，所有元素都是獨立的
         for (int i = 0; i < 5; i++) {
             assertThat(uf.connected(i, i)).isTrue();
             assertThat(uf.sizeOf(i)).isEqualTo(1);
@@ -45,7 +44,6 @@ public class UnionFindTest {
     public void testFindAndPathCompression() {
         UnionFind uf = new UnionFind(8);
 
-        // Initial unions
         uf.union(0, 1);
         uf.union(2, 3);
         uf.union(4, 5);
@@ -54,14 +52,12 @@ public class UnionFindTest {
         uf.union(5, 7);
         uf.union(7, 3);
 
-        // Test find results
         assertThat(uf.find(0)).isEqualTo(uf.find(3));
         assertThat(uf.find(0)).isEqualTo(uf.find(7));
         assertThat(uf.find(1)).isEqualTo(uf.find(2));
         assertThat(uf.find(4)).isEqualTo(uf.find(6));
         assertThat(uf.find(5)).isEqualTo(uf.find(7));
 
-        // Test sizeOf and parent
         assertThat(uf.sizeOf(0)).isEqualTo(8);
         assertThat(uf.sizeOf(1)).isEqualTo(8);
         assertThat(uf.sizeOf(4)).isEqualTo(8);
@@ -71,7 +67,6 @@ public class UnionFindTest {
     public void testInvalidInputs() {
         UnionFind uf = new UnionFind(5);
 
-        // Test invalid find
         try {
             uf.find(-1);
         } catch (IllegalArgumentException e) {
@@ -84,7 +79,6 @@ public class UnionFindTest {
             assertThat(e).hasMessageThat().contains("Invalid index");
         }
 
-        // Test invalid union
         try {
             uf.union(-1, 2);
         } catch (IllegalArgumentException e) {
