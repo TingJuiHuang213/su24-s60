@@ -31,27 +31,18 @@ public class UnionFind {
      *  If v1 is the root of a tree, returns the negative size of the tree for which v1 is the root.
      */
     public int parent(int v1) {
+        validate(v1);
         return parent[v1];
     }
 
     /** Find the root of v. */
     public int find(int v) {
         validate(v);
-        int r = v;
-        int temp;
-
-        while (parent[r] >= 0) {
-            r = parent[r];
+        if (parent[v] < 0) {
+            return v;
         }
-
-        // Path compression
-        while (parent[v] >= 0) {
-            temp = parent[v];
-            parent[v] = r;
-            v = temp;
-        }
-
-        return r;
+        parent[v] = find(parent[v]); // 路径压缩
+        return parent[v];
     }
 
     /** Returns true if nodes v1 and v2 are connected. */
@@ -66,19 +57,22 @@ public class UnionFind {
      *  but it may alter the internal structure of the data structure.
      */
     public void union(int v1, int v2) {
-        if (!connected(v1, v2)) {
-            int r1 = find(v1);
-            int r2 = find(v2);
-            int size1 = -parent[r1];
-            int size2 = -parent[r2];
+        int root1 = find(v1);
+        int root2 = find(v2);
 
-            if (size1 >= size2) {
-                parent[r2] = r1;
-                parent[r1] = -(size1 + size2);
-            } else {
-                parent[r1] = r2;
-                parent[r2] = -(size1 + size2);
-            }
+        if (root1 == root2) {
+            return;
+        }
+
+        int size1 = -parent[root1];
+        int size2 = -parent[root2];
+
+        if (size1 >= size2) {
+            parent[root2] = root1;
+            parent[root1] = -(size1 + size2);
+        } else {
+            parent[root1] = root2;
+            parent[root2] = -(size1 + size2);
         }
     }
 }
