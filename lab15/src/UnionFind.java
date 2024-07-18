@@ -1,74 +1,83 @@
 public class UnionFind {
 
-    /* Instance variables */
     private int[] parent;
 
-    /* Creates a UnionFind data structure holding N items. Initially, all
-       items are in disjoint sets. */
-    public UnionFind(int N) {
-        if (N < 0) {
-            throw new IllegalArgumentException("Number of elements must be non-negative");
+    /** Creates a UnionFind data structure holding n vertices.
+     * Initially, all vertices are in disjoint sets.
+     */
+    public UnionFind(int n) {
+        if (n <= 0) {
+            throw new IllegalArgumentException("It must be positive!");
         }
-        parent = new int[N];
-        for (int i = 0; i < N; i++) {
-            parent[i] = -1; // 每个元素初始时都是自己的父节点
+        parent = new int[n];
+        for (int i = 0; i < n; i++) {
+            parent[i] = -1;
         }
     }
 
-    /* Returns the size of the set V belongs to. */
-    public int sizeOf(int v) {
-        int root = find(v);
-        return -parent[root]; // 取负值表示集合大小
-    }
-
-    /* Returns the parent of V. If V is the root of a tree, returns the
-       negative size of the tree for which V is the root. */
-    public int parent(int v) {
-        if (v < 0 || v >= parent.length) {
-            throw new IllegalArgumentException("Index out of bounds");
+    /** Throws an exception if v1 is not a valid index. */
+    public void validate(int v1) {
+        if (!(v1 >= 0 && v1 < parent.length)) {
+            throw new RuntimeException(v1 + " is not a valid index.");
         }
-        return parent[v];
     }
 
-    /* Returns true if nodes V1 and V2 are connected. */
+    /** Returns the size of the set v1 belongs to. */
+    public int sizeOf(int v1) {
+        return -parent[find(v1)];
+    }
+
+    /** Returns the parent of v1.
+     *  If v1 is the root of a tree, returns the negative size of the tree for which v1 is the root.
+     */
+    public int parent(int v1) {
+        return parent[v1];
+    }
+
+    /** Find the root of v. */
+    public int find(int v) {
+        validate(v);
+        int r = v;
+        int temp;
+
+        while (parent[r] >= 0) {
+            r = parent[r];
+        }
+
+        // Path compression
+        while (parent[v] >= 0) {
+            temp = parent[v];
+            parent[v] = r;
+            v = temp;
+        }
+
+        return r;
+    }
+
+    /** Returns true if nodes v1 and v2 are connected. */
     public boolean connected(int v1, int v2) {
         return find(v1) == find(v2);
     }
 
-    /* Returns the root of the set V belongs to. Path-compression is employed
-       allowing for fast search-time. If invalid items are passed into this
-       function, throw an IllegalArgumentException. */
-    public int find(int v) {
-        if (v < 0 || v >= parent.length) {
-            throw new IllegalArgumentException("Index out of bounds");
-        }
-        if (parent[v] < 0) {
-            return v;
-        }
-        // 递归路径压缩
-        parent[v] = find(parent[v]);
-        return parent[v];
-    }
-
-    /* Connects two items V1 and V2 together by connecting their respective
-       sets. V1 and V2 can be any element, and a union-by-size heuristic is
-       used. If the sizes of the sets are equal, tie break by connecting V1's
-       root to V2's root. Union-ing a item with itself or items that are
-       already connected should not change the structure. */
+    /** Connects two elements v1 and v2 together.
+     *  v1 and v2 can be any valid elements, and a union-by-size heuristic is used.
+     *  If the sizes of the sets are equal, tie break by connecting v1's root to v2's root.
+     *  Unioning a vertex with itself or vertices that are already connected should not change the sets,
+     *  but it may alter the internal structure of the data structure.
+     */
     public void union(int v1, int v2) {
-        int rootP = find(v1);
-        int rootQ = find(v2);
+        if (!connected(v1, v2)) {
+            int r1 = find(v1);
+            int r2 = find(v2);
+            int size1 = -parent[r1];
+            int size2 = -parent[r2];
 
-        if (rootP != rootQ) {
-            int sizeP = -parent[rootP];
-            int sizeQ = -parent[rootQ];
-
-            if (sizeP < sizeQ) {
-                parent[rootP] = rootQ;
-                parent[rootQ] -= sizeP;
+            if (size1 >= size2) {
+                parent[r2] = r1;
+                parent[r1] = -(size1 + size2);
             } else {
-                parent[rootQ] = rootP;
-                parent[rootP] -= sizeQ;
+                parent[r1] = r2;
+                parent[r2] = -(size1 + size2);
             }
         }
     }
