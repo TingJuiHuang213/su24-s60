@@ -1,58 +1,49 @@
 import org.junit.Test;
-
-import static com.google.common.truth.Truth.assertThat;
-import static com.google.common.truth.Truth.assertWithMessage;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.fail;
 
 public class UnionFindTest {
 
-    /**
-     * Checks that the initial state of the disjoint sets are correct (this will pass with the skeleton
-     * code, but ensure it still passes after all parts are implemented).
-     */
     @Test
     public void initialStateTest() {
         UnionFind uf = new UnionFind(4);
-        assertThat(uf.connected(0, 1)).isFalse();
-        assertThat(uf.connected(0, 2)).isFalse();
-        assertThat(uf.connected(0, 3)).isFalse();
-        assertThat(uf.connected(1, 2)).isFalse();
-        assertThat(uf.connected(1, 3)).isFalse();
-        assertThat(uf.connected(2, 3)).isFalse();
+        assertEquals(1, uf.sizeOf(0));
+        assertEquals(1, uf.sizeOf(1));
+        assertEquals(1, uf.sizeOf(2));
+        assertEquals(1, uf.sizeOf(3));
+        assertFalse(uf.connected(0, 1));
+        assertFalse(uf.connected(1, 2));
+        assertFalse(uf.connected(1, 3));
+        assertFalse(uf.connected(2, 3));
     }
 
-    /**
-     * Checks that invalid inputs are handled correctly.
-     */
     @Test
     public void illegalFindTest() {
         UnionFind uf = new UnionFind(4);
         try {
-            uf.find(10);
-            fail("Cannot find an out of range vertex!");
+            uf.find(10); // 使用 find 方法
+            fail("不能查找範圍外的頂點！");
         } catch (IllegalArgumentException e) {
-            return;
+            // 預期行為
         }
         try {
-            uf.union(1, 10);
-            fail("Cannot union with an out of range vertex!");
+            uf.union(1, 10); // 修改為無效的合併
+            fail("不能合併範圍外的頂點！");
         } catch (IllegalArgumentException e) {
-            return;
+            // 預期行為
         }
     }
 
-    /**
-     * Checks that union is done correctly (including the tie-breaking scheme).
-     */
     @Test
     public void basicUnionTest() {
         UnionFind uf = new UnionFind(10);
         uf.union(0, 1);
-        assertThat(uf.find(0)).isEqualTo(1);
+        assertEquals(1, uf.find(0)); // 使用 find 方法
         uf.union(2, 3);
-        assertThat(uf.find(2)).isEqualTo(3);
+        assertEquals(3, uf.find(2)); // 使用 find 方法
         uf.union(0, 2);
-        assertThat(uf.find(1)).isEqualTo(3);
+        assertEquals(3, uf.find(1)); // 使用 find 方法
 
         uf.union(4, 5);
         uf.union(6, 7);
@@ -60,30 +51,22 @@ public class UnionFindTest {
         uf.union(4, 8);
         uf.union(4, 6);
 
-        assertThat(uf.find(5)).isEqualTo(9);
-        assertThat(uf.find(7)).isEqualTo(9);
-        assertThat(uf.find(8)).isEqualTo(9);
+        assertEquals(9, uf.find(5)); // 使用 find 方法
+        assertEquals(9, uf.find(7)); // 使用 find 方法
+        assertEquals(9, uf.find(8)); // 使用 find 方法
 
         uf.union(9, 2);
-        assertThat(uf.find(3)).isEqualTo(9);
+        assertEquals(9, uf.find(3)); // 使用 find 方法
     }
 
-    /**
-     * Unions the same item with itself. Calls on find and checks that the outputs are correct.
-     */
     @Test
     public void sameUnionTest() {
         UnionFind uf = new UnionFind(4);
         uf.union(1, 1);
-        for (int i = 0; i < 4; i += 1) {
-            assertThat(uf.find(i)).isEqualTo(i);
+        for (int i = 0; i < 4; i++) {
+            assertEquals(i, uf.find(i)); // 使用 find 方法
         }
     }
 
-    /**
-     * Write your own tests below here to verify for correctness. The given tests are not comprehensive.
-     * Specifically, you may want to write a test for path compression and to check for the correctness
-     * of all methods in your implementation.
-     */
-
+    // 在此處添加更多自定義測試以檢查路徑壓縮和所有方法的正確性
 }
