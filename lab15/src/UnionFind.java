@@ -45,8 +45,16 @@ public class UnionFind {
         if (parent[v] < 0) {
             return v;
         }
-        parent[v] = find(parent[v]); // 路径压缩
-        return parent[v];
+        int root = v;
+        while (parent[root] >= 0) {
+            root = parent[root];
+        }
+        while (v != root) {
+            int newParent = parent[v];
+            parent[v] = root;
+            v = newParent;
+        }
+        return root;
     }
 
     /* Connects two items V1 and V2 together by connecting their respective
