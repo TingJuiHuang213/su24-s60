@@ -1,7 +1,6 @@
 package byowTools.TileEngine;
 
 import java.awt.Color;
-import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Random;
 
@@ -22,14 +21,12 @@ import byowTools.RandomUtils;
  * to make your TETile class mutable, if you prefer.
  */
 
-public class TETile implements Serializable {
+public class TETile {
     private final char character; // Do not rename character or the autograder will break.
     private final Color textColor;
     private final Color backgroundColor;
     private final String description;
     private final String filepath;
-
-    private final int id;
 
     /**
      * Full constructor for TETile objects.
@@ -40,13 +37,12 @@ public class TETile implements Serializable {
      * @param filepath Full path to image to be used for this tile. Must be correct size (16x16)
      */
     public TETile(char character, Color textColor, Color backgroundColor, String description,
-                  String filepath, int id) {
+                  String filepath) {
         this.character = character;
         this.textColor = textColor;
         this.backgroundColor = backgroundColor;
         this.description = description;
         this.filepath = filepath;
-        this.id = id;
     }
 
     /**
@@ -57,13 +53,12 @@ public class TETile implements Serializable {
      * @param backgroundColor The color drawn behind the character.
      * @param description The description of the tile, shown in the GUI on hovering over the tile.
      */
-    public TETile(char character, Color textColor, Color backgroundColor, String description, int id) {
+    public TETile(char character, Color textColor, Color backgroundColor, String description) {
         this.character = character;
         this.textColor = textColor;
         this.backgroundColor = backgroundColor;
         this.description = description;
         this.filepath = null;
-        this.id = id;
     }
 
     /**
@@ -72,16 +67,7 @@ public class TETile implements Serializable {
      * @param textColor foreground color for tile copy
      */
     public TETile(TETile t, Color textColor) {
-        this(t.character, textColor, t.backgroundColor, t.description, t.filepath, t.id);
-    }
-
-    /**
-     * Creates a copy of TETile t, except with given character.
-     * @param t tile to copy
-     * @param c character for tile copy
-     */
-    public TETile(TETile t, char c) {
-        this(c, t.textColor, t.backgroundColor, t.description, t.filepath, t.id);
+        this(t.character, textColor, t.backgroundColor, t.description, t.filepath);
     }
 
 
@@ -129,14 +115,6 @@ public class TETile implements Serializable {
     }
 
     /**
-     * ID number of the tile. Used for equality comparisons.
-     * @return id of the tile
-     */
-    public int id() {
-        return id;
-    }
-
-    /**
      * Creates a copy of the given tile with a slightly different text color. The new
      * color will have a red value that is within dr of the current red value,
      * and likewise with dg and db.
@@ -163,19 +141,6 @@ public class TETile implements Serializable {
         // make sure value doesn't fall outside of the range 0 to 255.
         int newValue = Math.min(255, Math.max(0, rawNewValue));
         return newValue;
-    }
-
-    /**
-     * Checks if two tiles are equal by comparing their IDs.
-     * @param o object to compare with
-     * @return boolean representing equality
-     */
-    @Override
-    public boolean equals(Object o) {
-        if (o == this) {
-            return true;
-        }
-        return (o instanceof TETile otherTile && otherTile.id == this.id);
     }
 
     /**

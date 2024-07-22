@@ -33,7 +33,8 @@ public class TERenderer {
         this.xOffset = xOff;
         this.yOffset = yOff;
         StdDraw.setCanvasSize(width * TILE_SIZE, height * TILE_SIZE);
-        resetFont();
+        Font font = new Font("Monaco", Font.BOLD, TILE_SIZE - 2);
+        StdDraw.setFont(font);
         StdDraw.setXscale(0, width);
         StdDraw.setYscale(0, height);
 
@@ -96,31 +97,5 @@ public class TERenderer {
             }
         }
         StdDraw.show();
-    }
-
-    /**
-     * Resets the font to default settings. You should call this method before drawing any tiles
-     * if you changed the pen settings.
-     */
-    public void resetFont() {
-        Font font = new Font("Monaco", Font.BOLD, TILE_SIZE - 2);
-        StdDraw.setFont(font);
-    }
-
-    /**
-     * Like renderFrame, but draws all world tiles without clearing
-     * the canvas or showing the tiles.
-     * @param world the 2D TETile[][] array to render
-     */
-    public void drawTiles(TETile[][] world) {
-        for (int x = 0; x < world.length; x += 1) {
-            for (int y = 0; y < world[x].length; y += 1) {
-                if (world[x][y] == null) {
-                    throw new IllegalArgumentException("Tile at position x=" + x + ", y=" + y
-                            + " is null.");
-                }
-                world[x][y].draw(x + xOffset, y + yOffset);
-            }
-        }
     }
 }

@@ -18,14 +18,15 @@ public class MemoryGame {
     private Random rand;
     /** Whether or not the game is over. */
     private boolean gameOver;
-    /** Whether or not it is the player's turn. */
+    /** Whether or not it is the player's turn. Used in the last section of the
+     * spec, 'Helpful UI'. */
     private boolean playerTurn;
     /** The characters we generate random Strings from. */
     private static final char[] CHARACTERS = "abcdefghijklmnopqrstuvwxyz".toCharArray();
-    /** Encouraging phrases. */
+    /** Encouraging phrases. Used in the last section of the spec, 'Helpful UI'. */
     private static final String[] ENCOURAGEMENT = {"You can do this!", "I believe in you!",
-                                                   "You got this!", "You're a star!", "Go Bears!",
-                                                   "Too easy for you!", "Wow, so impressive!"};
+            "You got this!", "You're a star!", "Go Bears!",
+            "Too easy for you!", "Wow, so impressive!"};
 
     public static void main(String[] args) {
         if (args.length < 1) {
@@ -56,13 +57,16 @@ public class MemoryGame {
     }
 
     public String generateRandomString(int n) {
-        //TODO: Generate random string of letters of length n
-        return null;
+        StringBuilder sb = new StringBuilder(n);
+        for (int i = 0; i < n; i++) {
+            sb.append(CHARACTERS[rand.nextInt(CHARACTERS.length)]);
+        }
+        return sb.toString();
     }
 
     public void drawFrame(String s) {
         /* Take the input string S and display it at the center of the screen,
-        * with the pen settings given below. */
+         * with the pen settings given below. */
         StdDraw.clear(Color.BLACK);
         StdDraw.setPenColor(Color.WHITE);
         Font fontBig = new Font("Monaco", Font.BOLD, 30);
@@ -70,12 +74,12 @@ public class MemoryGame {
         StdDraw.text(this.width / 2, this.height / 2, s);
 
         /* If the game is not over, display encouragement, and let the user know if they
-        * should be typing their answer or watching for the next round. */
+         * should be typing their answer or watching for the next round. */
         if (!gameOver) {
             Font fontSmall = new Font("Monaco", Font.BOLD, 20);
             StdDraw.setFont(fontSmall);
             StdDraw.line(0, this.height - 2, this.width, this.height - 2);
-            StdDraw.textLeft(0, this.height - 1, "Round: "  + this.round);
+            StdDraw.textLeft(0, this.height - 1, "Round: " + this.round);
             if (this.playerTurn) {
                 StdDraw.text(this.width / 2, this.height - 1, "Type!");
             } else {
@@ -88,25 +92,50 @@ public class MemoryGame {
     }
 
     public void flashSequence(String letters) {
-        //TODO: Display each character in letters, making sure to blank the screen between letters
+        for (int i = 0; i < letters.length(); i++) {
+            drawFrame(String.valueOf(letters.charAt(i)));
+            StdDraw.pause(1000);
+            StdDraw.clear(Color.BLACK);
+            StdDraw.pause(500);
+        }
     }
 
     public String solicitNCharsInput(int n) {
-        //TODO: Read n letters of player input
-        return null;
+        StringBuilder sb = new StringBuilder(n);
+        drawFrame("");
+        for (int i = 0; i < n; i++) {
+            while (!StdDraw.hasNextKeyTyped()) {
+                // wait for user to type a key
+            }
+            char c = StdDraw.nextKeyTyped();
+            sb.append(c);
+            drawFrame(sb.toString());
+        }
+        return sb.toString();
     }
 
     public void startGame() {
-        //TODO: Set any relevant variables before the game starts
         this.gameOver = false;
+        this.round = 1;
 
-        //TODO: Establish Engine loop
         while (!gameOver) {
-            drawFrame("You should implement this game!");
-            StdDraw.pause(1000);
+            drawFrame("Round: " + round);
+            StdDraw.pause(1500);
+
+            String roundString = generateRandomString(round);
+            flashSequence(roundString);
+
+            this.playerTurn = true;
+            String playerInput = solicitNCharsInput(round);
+            this.playerTurn = false;
+
+            if (!playerInput.equals(roundString)) {
+                gameOver = true;
+            } else {
+                round += 1;
+            }
         }
 
-        this.drawFrame("Game Over! You made it to round: " + this.round);
+        drawFrame("Game Over! You made it to round: " + this.round);
     }
-
 }
