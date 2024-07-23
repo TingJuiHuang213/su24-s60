@@ -6,8 +6,6 @@ import byowTools.TileEngine.Tileset;
 
 /**
  * Draws a world that contains a plus-shaped structure.
- *
- * This class demonstrates how to draw a plus shape in a 2D world using the TERenderer.
  */
 public class PlusWorld {
     private static final int WIDTH = 60; // Width of the world
@@ -21,8 +19,8 @@ public class PlusWorld {
         // Initialize the world with empty tiles
         TETile[][] world = createEmptyWorld(WIDTH, HEIGHT);
 
-        // Draw a plus shape at position (30, 15) with size 3
-        drawPlus(world, 30, 15, 3, Tileset.WALL);
+        // Draw a plus shape at position (30, 15) with size 5
+        addPlus(world, 30, 15, 5);
 
         // Render the world
         ter.renderFrame(world);
@@ -46,46 +44,45 @@ public class PlusWorld {
     }
 
     /**
-     * Draws a plus shape in the world with the specified size and tile.
+     * Adds a plus shape to the world at the specified position.
      *
-     * @param world The world to be modified.
+     * @param world The world to draw in.
      * @param centerX The x-coordinate of the center of the plus.
      * @param centerY The y-coordinate of the center of the plus.
-     * @param size The size of the plus.
-     * @param tile The tile to draw the plus with.
+     * @param size The size of the plus (length of each arm).
      */
-    private static void drawPlus(TETile[][] world, int centerX, int centerY, int size, TETile tile) {
-        drawHorizontalLine(world, centerX, centerY, size, tile);
-        drawVerticalLine(world, centerX, centerY, size, tile);
-    }
+    public static void addPlus(TETile[][] world, int centerX, int centerY, int size) {
+        TETile tile = Tileset.FLOWER;
 
-    /**
-     * Draws a horizontal line centered at (centerX, centerY) with the specified size and tile.
-     *
-     * @param world The world to be modified.
-     * @param centerX The x-coordinate of the center of the line.
-     * @param centerY The y-coordinate of the center of the line.
-     * @param size The size of the line.
-     * @param tile The tile to draw the line with.
-     */
-    private static void drawHorizontalLine(TETile[][] world, int centerX, int centerY, int size, TETile tile) {
-        for (int x = centerX - size; x <= centerX + size; x++) {
-            world[x][centerY] = tile;
+        // Draw the center part
+        for (int x = centerX - size / 2; x <= centerX + size / 2; x++) {
+            for (int y = centerY - size / 2; y <= centerY + size / 2; y++) {
+                world[x][y] = tile;
+            }
         }
-    }
 
-    /**
-     * Draws a vertical line centered at (centerX, centerY) with the specified size and tile.
-     *
-     * @param world The world to be modified.
-     * @param centerX The x-coordinate of the center of the line.
-     * @param centerY The y-coordinate of the center of the line.
-     * @param size The size of the line.
-     * @param tile The tile to draw the line with.
-     */
-    private static void drawVerticalLine(TETile[][] world, int centerX, int centerY, int size, TETile tile) {
-        for (int y = centerY - size; y <= centerY + size; y++) {
-            world[centerX][y] = tile;
+        // Draw the vertical arms
+        for (int y = centerY - size; y < centerY - size / 2; y++) {
+            for (int x = centerX - size / 2; x <= centerX + size / 2; x++) {
+                world[x][y] = tile;
+            }
+        }
+        for (int y = centerY + size / 2 + 1; y <= centerY + size; y++) {
+            for (int x = centerX - size / 2; x <= centerX + size / 2; x++) {
+                world[x][y] = tile;
+            }
+        }
+
+        // Draw the horizontal arms
+        for (int x = centerX - size; x < centerX - size / 2; x++) {
+            for (int y = centerY - size / 2; y <= centerY + size / 2; y++) {
+                world[x][y] = tile;
+            }
+        }
+        for (int x = centerX + size / 2 + 1; x <= centerX + size; x++) {
+            for (int y = centerY - size / 2; y <= centerY + size / 2; y++) {
+                world[x][y] = tile;
+            }
         }
     }
 }
