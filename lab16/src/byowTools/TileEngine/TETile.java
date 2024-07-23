@@ -3,7 +3,6 @@ package byowTools.TileEngine;
 import java.awt.Color;
 import java.util.Arrays;
 import java.util.Random;
-
 import edu.princeton.cs.algs4.StdDraw;
 import byowTools.RandomUtils;
 
@@ -20,7 +19,6 @@ import byowTools.RandomUtils;
  * The provided TETile is immutable, i.e. none of its instance variables can change. You are welcome
  * to make your TETile class mutable, if you prefer.
  */
-
 public class TETile {
     private final char character; // Do not rename character or the autograder will break.
     private final Color textColor;
@@ -30,6 +28,7 @@ public class TETile {
 
     /**
      * Full constructor for TETile objects.
+     *
      * @param character The character displayed on the screen.
      * @param textColor The color of the character itself.
      * @param backgroundColor The color drawn behind the character.
@@ -48,28 +47,25 @@ public class TETile {
     /**
      * Constructor without filepath. In this case, filepath will be null, so when drawing, we
      * will not even try to draw an image, and will instead use the provided character and colors.
+     *
      * @param character The character displayed on the screen.
      * @param textColor The color of the character itself.
      * @param backgroundColor The color drawn behind the character.
      * @param description The description of the tile, shown in the GUI on hovering over the tile.
      */
     public TETile(char character, Color textColor, Color backgroundColor, String description) {
-        this.character = character;
-        this.textColor = textColor;
-        this.backgroundColor = backgroundColor;
-        this.description = description;
-        this.filepath = null;
+        this(character, textColor, backgroundColor, description, null);
     }
 
     /**
      * Creates a copy of TETile t, except with given textColor.
+     *
      * @param t tile to copy
      * @param textColor foreground color for tile copy
      */
     public TETile(TETile t, Color textColor) {
         this(t.character, textColor, t.backgroundColor, t.description, t.filepath);
     }
-
 
     /**
      * Draws the tile to the screen at location x, y. If a valid filepath is provided,
@@ -78,6 +74,7 @@ public class TETile {
      *
      * Note that the image provided must be of the right size (16x16). It will not be
      * automatically resized or truncated.
+     *
      * @param x x coordinate
      * @param y y coordinate
      */
@@ -98,7 +95,9 @@ public class TETile {
         StdDraw.text(x + 0.5, y + 0.5, Character.toString(character()));
     }
 
-    /** Character representation of the tile. Used for drawing in text mode.
+    /**
+     * Character representation of the tile. Used for drawing in text mode.
+     *
      * @return character representation
      */
     public char character() {
@@ -108,6 +107,7 @@ public class TETile {
     /**
      * Description of the tile. Useful for displaying mouseover text or
      * testing that two tiles represent the same type of thing.
+     *
      * @return description of the tile
      */
     public String description() {
@@ -118,6 +118,7 @@ public class TETile {
      * Creates a copy of the given tile with a slightly different text color. The new
      * color will have a red value that is within dr of the current red value,
      * and likewise with dg and db.
+     *
      * @param t the tile to copy
      * @param dr the maximum difference in red value
      * @param dg the maximum difference in green value
@@ -125,22 +126,38 @@ public class TETile {
      * @param r the random number generator to use
      */
     public static TETile colorVariant(TETile t, int dr, int dg, int db, Random r) {
-        Color oldColor = t.textColor;
+        Color newColor = generateNewColor(t.textColor, dr, dg, db, r);
+        return new TETile(t, newColor);
+    }
+
+    /**
+     * Generates a new color variant based on the given color and variations.
+     *
+     * @param oldColor The original color.
+     * @param dr The maximum difference in red value.
+     * @param dg The maximum difference in green value.
+     * @param db The maximum difference in blue value.
+     * @param r The random number generator to use.
+     * @return The new color variant.
+     */
+    private static Color generateNewColor(Color oldColor, int dr, int dg, int db, Random r) {
         int newRed = newColorValue(oldColor.getRed(), dr, r);
         int newGreen = newColorValue(oldColor.getGreen(), dg, r);
         int newBlue = newColorValue(oldColor.getBlue(), db, r);
-
-        Color c = new Color(newRed, newGreen, newBlue);
-
-        return new TETile(t, c);
+        return new Color(newRed, newGreen, newBlue);
     }
 
+    /**
+     * Calculates a new color value based on the original value and variation.
+     *
+     * @param v The original color value.
+     * @param dv The maximum difference in the color value.
+     * @param r The random number generator to use.
+     * @return The new color value.
+     */
     private static int newColorValue(int v, int dv, Random r) {
         int rawNewValue = v + RandomUtils.uniform(r, -dv, dv + 1);
-
-        // make sure value doesn't fall outside of the range 0 to 255.
-        int newValue = Math.min(255, Math.max(0, rawNewValue));
-        return newValue;
+        return Math.min(255, Math.max(0, rawNewValue));
     }
 
     /**
@@ -149,6 +166,7 @@ public class TETile {
      * drawn using the tile rendering engine, this print method has to
      * print in what might seem like backwards order (so that the 0th
      * row gets printed last).
+     *
      * @param world the 2D world to print
      * @return string representation of the world
      */
@@ -172,21 +190,19 @@ public class TETile {
 
     /**
      * Makes a copy of the given 2D tile array.
+     *
      * @param tiles the 2D array to copy
-     **/
+     * @return a copy of the given 2D tile array
+     */
     public static TETile[][] copyOf(TETile[][] tiles) {
         if (tiles == null) {
             return null;
         }
 
         TETile[][] copy = new TETile[tiles.length][];
-
-        int i = 0;
-        for (TETile[] column : tiles) {
-            copy[i] = Arrays.copyOf(column, column.length);
-            i += 1;
+        for (int i = 0; i < tiles.length; i++) {
+            copy[i] = Arrays.copyOf(tiles[i], tiles[i].length);
         }
-
         return copy;
     }
 }

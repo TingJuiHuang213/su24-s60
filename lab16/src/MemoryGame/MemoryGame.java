@@ -7,23 +7,26 @@ import java.awt.Color;
 import java.awt.Font;
 import java.util.Random;
 
+/**
+ * The MemoryGame class implements a simple memory game where players must remember
+ * and input sequences of characters that are displayed on the screen.
+ */
 public class MemoryGame {
-    /** The width of the window of this game. */
+    // The width of the window of this game.
     private int width;
-    /** The height of the window of this game. */
+    // The height of the window of this game.
     private int height;
-    /** The current round the user is on. */
+    // The current round the user is on.
     private int round;
-    /** The Random object used to randomly generate Strings. */
+    // The Random object used to randomly generate Strings.
     private Random rand;
-    /** Whether or not the game is over. */
+    // Whether or not the game is over.
     private boolean gameOver;
-    /** Whether or not it is the player's turn. Used in the last section of the
-     * spec, 'Helpful UI'. */
+    // Whether or not it is the player's turn. Used in the last section of the spec, 'Helpful UI'.
     private boolean playerTurn;
-    /** The characters we generate random Strings from. */
+    // The characters we generate random Strings from.
     private static final char[] CHARACTERS = "abcdefghijklmnopqrstuvwxyz".toCharArray();
-    /** Encouraging phrases. Used in the last section of the spec, 'Helpful UI'. */
+    // Encouraging phrases. Used in the last section of the spec, 'Helpful UI'.
     private static final String[] ENCOURAGEMENT = {"You can do this!", "I believe in you!",
             "You got this!", "You're a star!", "Go Bears!",
             "Too easy for you!", "Wow, so impressive!"};
@@ -39,10 +42,14 @@ public class MemoryGame {
         game.startGame();
     }
 
+    /**
+     * Initializes the game window and sets up the drawing canvas.
+     *
+     * @param width  The width of the game window.
+     * @param height The height of the game window.
+     * @param seed   The seed for the random number generator.
+     */
     public MemoryGame(int width, int height, long seed) {
-        /* Sets up StdDraw so that it has a width by height grid of 16 by 16 squares as its canvas
-         * Also sets up the scale so the top left is (0,0) and the bottom right is (width, height)
-         */
         this.width = width;
         this.height = height;
         StdDraw.setCanvasSize(this.width * 16, this.height * 16);
@@ -52,10 +59,15 @@ public class MemoryGame {
         StdDraw.setYscale(0, this.height);
         StdDraw.clear(Color.BLACK);
         StdDraw.enableDoubleBuffering();
-
         this.rand = new Random(seed);
     }
 
+    /**
+     * Generates a random string of length n using the characters array.
+     *
+     * @param n The length of the random string.
+     * @return A randomly generated string.
+     */
     public String generateRandomString(int n) {
         StringBuilder sb = new StringBuilder(n);
         for (int i = 0; i < n; i++) {
@@ -64,48 +76,57 @@ public class MemoryGame {
         return sb.toString();
     }
 
+    /**
+     * Draws the given string on the screen.
+     *
+     * @param s The string to be displayed.
+     */
     public void drawFrame(String s) {
-        /* Take the input string S and display it at the center of the screen,
-         * with the pen settings given below. */
         StdDraw.clear(Color.BLACK);
         StdDraw.setPenColor(Color.WHITE);
         Font fontBig = new Font("Monaco", Font.BOLD, 30);
         StdDraw.setFont(fontBig);
         StdDraw.text(this.width / 2, this.height / 2, s);
 
-        /* If the game is not over, display encouragement, and let the user know if they
-         * should be typing their answer or watching for the next round. */
         if (!gameOver) {
             Font fontSmall = new Font("Monaco", Font.BOLD, 20);
             StdDraw.setFont(fontSmall);
             StdDraw.line(0, this.height - 2, this.width, this.height - 2);
             StdDraw.textLeft(0, this.height - 1, "Round: " + this.round);
-            if (this.playerTurn) {
-                StdDraw.text(this.width / 2, this.height - 1, "Type!");
-            } else {
-                StdDraw.text(this.width / 2, this.height - 1, "Watch!");
-            }
-            int randomEncouragement = RandomUtils.uniform(this.rand, ENCOURAGEMENT.length);
-            StdDraw.textRight(this.width, this.height - 1, ENCOURAGEMENT[randomEncouragement]);
+            String playerAction = this.playerTurn ? "Type!" : "Watch!";
+            StdDraw.text(this.width / 2, this.height - 1, playerAction);
+            String encouragement = ENCOURAGEMENT[RandomUtils.uniform(this.rand, ENCOURAGEMENT.length)];
+            StdDraw.textRight(this.width, this.height - 1, encouragement);
         }
         StdDraw.show();
     }
 
+    /**
+     * Displays the sequence of characters to be remembered.
+     *
+     * @param letters The sequence of characters.
+     */
     public void flashSequence(String letters) {
-        for (int i = 0; i < letters.length(); i++) {
-            drawFrame(String.valueOf(letters.charAt(i)));
+        for (char c : letters.toCharArray()) {
+            drawFrame(Character.toString(c));
             StdDraw.pause(1000);
             StdDraw.clear(Color.BLACK);
             StdDraw.pause(500);
         }
     }
 
+    /**
+     * Prompts the player to input a sequence of characters and returns the input.
+     *
+     * @param n The number of characters to be input.
+     * @return The input string.
+     */
     public String solicitNCharsInput(int n) {
         StringBuilder sb = new StringBuilder(n);
         drawFrame("");
         for (int i = 0; i < n; i++) {
             while (!StdDraw.hasNextKeyTyped()) {
-                // wait for user to type a key
+                // Wait for the player to type a key
             }
             char c = StdDraw.nextKeyTyped();
             sb.append(c);
@@ -114,6 +135,9 @@ public class MemoryGame {
         return sb.toString();
     }
 
+    /**
+     * Starts the memory game, controlling the game loop.
+     */
     public void startGame() {
         this.gameOver = false;
         this.round = 1;
