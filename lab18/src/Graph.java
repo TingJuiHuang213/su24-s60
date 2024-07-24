@@ -14,60 +14,117 @@ public class Graph {
         vertexCount = numVertices;
     }
 
-    /* Adds a directed Edge (V1, V2) to the graph. That is, adds an edge
-       in ONE directions, from v1 to v2. */
-    public void addEdge(int v1, int v2) {
-        addEdge(v1, v2, 0);
-    }
-
-    /* Adds an undirected Edge (V1, V2) to the graph. That is, adds an edge
-       in BOTH directions, from v1 to v2 and from v2 to v1. */
-    public void addUndirectedEdge(int v1, int v2) {
-        addUndirectedEdge(v1, v2, 0);
-    }
-
     /* Adds a directed Edge (V1, V2) to the graph with weight WEIGHT. If the
        Edge already exists, replaces the current Edge with a new Edge with
        weight WEIGHT. */
     public void addEdge(int v1, int v2, int weight) {
-        // TODO: YOUR CODE HERE
+        for (Edge e : adjLists[v1]) {
+            if (e.to == v2) {
+                e.weight = weight;
+                return;
+            }
+        }
+        adjLists[v1].add(new Edge(v1, v2, weight));
     }
 
     /* Adds an undirected Edge (V1, V2) to the graph with weight WEIGHT. If the
        Edge already exists, replaces the current Edge with a new Edge with
        weight WEIGHT. */
     public void addUndirectedEdge(int v1, int v2, int weight) {
-        // TODO: YOUR CODE HERE
+        addEdge(v1, v2, weight);
+        addEdge(v2, v1, weight);
     }
 
     /* Returns true if there exists an Edge from vertex FROM to vertex TO.
        Returns false otherwise. */
     public boolean isAdjacent(int from, int to) {
-        // TODO: YOUR CODE HERE
+        for (Edge e : adjLists[from]) {
+            if (e.to == to) {
+                return true;
+            }
+        }
         return false;
     }
 
     /* Returns a list of all the vertices u such that the Edge (V, u)
        exists in the graph. */
     public List<Integer> neighbors(int v) {
-        // TODO: YOUR CODE HERE
-        return null;
-    }
-    /* Returns the number of incoming Edges for vertex V. */
-    public int inDegree(int v) {
-        // TODO: YOUR CODE HERE
-        return 0;
+        List<Integer> result = new ArrayList<>();
+        for (Edge e : adjLists[v]) {
+            result.add(e.to);
+        }
+        return result;
     }
 
-    /* Returns a list of the vertices that lie on the shortest path from start to stop. 
-    If no such path exists, you should return an empty list. If START == STOP, returns a List with START. */
+    /* Returns the number of incoming Edges for vertex V. */
+    public int inDegree(int v) {
+        int inDegreeCount = 0;
+        for (int i = 0; i < vertexCount; i++) {
+            for (Edge e : adjLists[i]) {
+                if (e.to == v) {
+                    inDegreeCount++;
+                }
+            }
+        }
+        return inDegreeCount;
+    }
+
+    /* Returns a list of the vertices that lie on the shortest path from start to stop.
+       If no such path exists, you should return an empty list. If START == STOP, returns a List with START. */
     public List<Integer> shortestPath(int start, int stop) {
-        // TODO: YOUR CODE HERE
-        return null;
+        PriorityQueue<VertexDist> fringe = new PriorityQueue<>(Comparator.comparingInt(v -> v.dist));
+        Map<Integer, Integer> dist = new HashMap<>();
+        Map<Integer, Integer> predecessors = new HashMap<>();
+        Set<Integer> visited = new HashSet<>();
+
+        dist.put(start, 0);
+        fringe.add(new VertexDist(start, 0));
+
+        while (!fringe.isEmpty()) {
+            VertexDist vDist = fringe.poll();
+            int v = vDist.vertex;
+
+            if (visited.contains(v)) {
+                continue;
+            }
+
+            visited.add(v);
+
+            if (v == stop) {
+                break;
+            }
+
+            for (Edge e : adjLists[v]) {
+                int w = e.to;
+                int newDist = dist.get(v) + e.weight;
+
+                if (!dist.containsKey(w) || newDist < dist.get(w)) {
+                    dist.put(w, newDist);
+                    predecessors.put(w, v);
+                    fringe.add(new VertexDist(w, newDist));
+                }
+            }
+        }
+
+        List<Integer> path = new LinkedList<>();
+        if (!dist.containsKey(stop)) {
+            return path;
+        }
+
+        for (Integer at = stop; at != null; at = predecessors.get(at)) {
+            path.add(at);
+        }
+        Collections.reverse(path);
+
+        return path;
     }
 
     private Edge getEdge(int v1, int v2) {
-        // TODO: YOUR CODE HERE
+        for (Edge e : adjLists[v1]) {
+            if (e.to == v2) {
+                return e;
+            }
+        }
         return null;
     }
 
@@ -93,5 +150,13 @@ public class Graph {
 
     }
 
-    
+    private class VertexDist {
+        int vertex;
+        int dist;
+
+        VertexDist(int vertex, int dist) {
+            this.vertex = vertex;
+            this.dist = dist;
+        }
+    }
 }
