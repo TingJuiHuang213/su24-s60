@@ -9,10 +9,11 @@ import java.util.Collections;
 
 public class Graph implements Iterable<Integer> {
 
+    // 使用 LinkedList 存儲邊的鄰接表
     private LinkedList<Edge>[] adjLists;
     private int vertexCount;
 
-    /* Initializes a graph with NUMVERTICES vertices and no Edges. */
+    /* 初始化圖，具有 numVertices 個頂點，無邊 */
     public Graph(int numVertices) {
         adjLists = (LinkedList<Edge>[]) new LinkedList[numVertices];
         for (int k = 0; k < numVertices; k++) {
@@ -21,87 +22,60 @@ public class Graph implements Iterable<Integer> {
         vertexCount = numVertices;
     }
 
-    /* Adds a directed Edge (V1, V2) to the graph. That is, adds an edge
-       in ONE directions, from v1 to v2. */
+    /* 添加有向邊 (v1, v2) */
     public void addEdge(int v1, int v2) {
         addEdge(v1, v2, 0);
     }
 
-    /* Adds an undirected Edge (V1, V2) to the graph. That is, adds an edge
-       in BOTH directions, from v1 to v2 and from v2 to v1. */
+    /* 添加無向邊 (v1, v2) */
     public void addUndirectedEdge(int v1, int v2) {
         addUndirectedEdge(v1, v2, 0);
     }
 
-    /* Adds a directed Edge (V1, V2) to the graph with weight WEIGHT. If the
-       Edge already exists, replaces the current Edge with a new Edge with
-       weight WEIGHT.
-       Hint: you may want to use isAdjacent in this method. */
+    /* 添加有向邊 (v1, v2) 和權重 */
     public void addEdge(int v1, int v2, int weight) {
-        for (Edge edge : adjLists[v1]) {
-            if (edge.to == v2) {
-                edge.weight = weight;
-                return;
-            }
-        }
-        adjLists[v1].add(new Edge(v1, v2, weight));
+        removeExistingEdge(v1, v2); // 移除現有邊
+        adjLists[v1].add(new Edge(v1, v2, weight)); // 添加新邊
     }
 
-    /* Adds an undirected Edge (V1, V2) to the graph with weight WEIGHT. If the
-       Edge already exists, replaces the current Edge with a new Edge with
-       weight WEIGHT. */
+    /* 移除現有邊的方法 */
+    private void removeExistingEdge(int v1, int v2) {
+        adjLists[v1].removeIf(edge -> edge.to == v2);
+    }
+
+    /* 添加無向邊 (v1, v2) 和權重 */
     public void addUndirectedEdge(int v1, int v2, int weight) {
         addEdge(v1, v2, weight);
         addEdge(v2, v1, weight);
     }
 
-    /* Returns true if there exists an Edge from vertex FROM to vertex TO.
-       Returns false otherwise. */
+    /* 判斷頂點 FROM 到頂點 TO 是否有邊 */
     public boolean isAdjacent(int from, int to) {
-        for (Edge edge : adjLists[from]) {
-            if (edge.to == to) {
-                return true;
-            }
-        }
-        return false;
+        return adjLists[from].stream().anyMatch(edge -> edge.to == to);
     }
 
-    /* Returns a list of all the vertices u such that the Edge (V, u)
-       exists in the graph. */
+    /* 返回所有與頂點 v 相鄰的頂點列表 */
     public List<Integer> neighbors(int v) {
         List<Integer> result = new ArrayList<>();
-        for (Edge edge : adjLists[v]) {
-            result.add(edge.to);
-        }
+        adjLists[v].forEach(edge -> result.add(edge.to));
         return result;
     }
 
-    /* Returns the number of incoming Edges for vertex V. */
+    /* 返回頂點 v 的入度 */
     public int inDegree(int v) {
         int inDegree = 0;
         for (LinkedList<Edge> edges : adjLists) {
-            for (Edge edge : edges) {
-                if (edge.to == v) {
-                    inDegree++;
-                }
-            }
+            inDegree += edges.stream().filter(edge -> edge.to == v).count();
         }
         return inDegree;
     }
 
-    /* Returns an Iterator that outputs the vertices of the graph in topological
-       sorted order. */
+    /* 返回圖的拓撲排序 */
     public Iterator<Integer> iterator() {
         return new TopologicalIterator();
     }
 
-    /**
-     *  A class that iterates through the vertices of this graph,
-     *  starting with a given vertex. Does not necessarily iterate
-     *  through all vertices in the graph: if the iteration starts
-     *  at a vertex v, and there is no path from v to a vertex w,
-     *  then the iteration will not include w.
-     */
+    /* DFS 遍歷的內部類 */
     private class DFSIterator implements Iterator<Integer> {
 
         private Stack<Integer> fringe;
@@ -114,47 +88,33 @@ public class Graph implements Iterable<Integer> {
         }
 
         public boolean hasNext() {
-            if (!fringe.isEmpty()) {
-                int i = fringe.pop();
-                while (visited.contains(i)) {
-                    if (fringe.isEmpty()) {
-                        return false;
-                    }
-                    i = fringe.pop();
-                }
-                fringe.push(i);
-                return true;
-            }
-            return false;
+            return fringe.stream().anyMatch(v -> !visited.contains(v));
         }
 
         public Integer next() {
-            int curr = fringe.pop();
-            ArrayList<Integer> lst = new ArrayList<>();
-            for (int i : neighbors(curr)) {
-                lst.add(i);
+            while (!fringe.isEmpty()) {
+                int curr = fringe.pop();
+                if (visited.contains(curr)) continue;
+                visited.add(curr);
+                addNeighborsToFringe(curr);
+                return curr;
             }
-            lst.sort((Integer i1, Integer i2) -> -(i1 - i2));
-            for (Integer e : lst) {
-                fringe.push(e);
-            }
-            visited.add(curr);
-            return curr;
+            return null;
         }
 
-        //ignore this method
+        private void addNeighborsToFringe(int v) {
+            neighbors(v).forEach(fringe::push);
+        }
+
         public void remove() {
-            throw new UnsupportedOperationException(
-                    "vertex removal not implemented");
+            throw new UnsupportedOperationException("vertex removal not implemented");
         }
-
     }
 
-    /* Returns the collected result of performing a depth-first search on this
-       graph's vertices starting from V. */
+    /* 返回從 v 開始的 DFS 遍歷結果 */
     public List<Integer> dfs(int v) {
-        ArrayList<Integer> result = new ArrayList<Integer>();
-        Iterator<Integer> iter = new DFSIterator(v);
+        List<Integer> result = new ArrayList<>();
+        DFSIterator iter = new DFSIterator(v);
 
         while (iter.hasNext()) {
             result.add(iter.next());
@@ -162,44 +122,35 @@ public class Graph implements Iterable<Integer> {
         return result;
     }
 
-    /* Returns true iff there exists a path from START to STOP. Assumes both
-       START and STOP are in this graph. If START == STOP, returns true. */
+    /* 判斷從 START 到 STOP 是否存在路徑 */
     public boolean pathExists(int start, int stop) {
-        Stack<Integer> fringe = new Stack<>();
-        HashSet<Integer> visited = new HashSet<>();
-        fringe.push(start);
-
-        while (!fringe.isEmpty()) {
-            int v = fringe.pop();
-            if (v == stop) {
-                return true;
-            }
-            if (!visited.contains(v)) {
-                visited.add(v);
-                for (int neighbor : neighbors(v)) {
-                    if (!visited.contains(neighbor)) {
-                        fringe.push(neighbor);
-                    }
-                }
-            }
-        }
-        return false;
+        return findPath(start, stop).size() > 0;
     }
 
-
-    /* Returns the path from START to STOP. If no path exists, returns an empty
-       List. If START == STOP, returns a List with START. */
+    /* 返回從 START 到 STOP 的路徑 */
     public List<Integer> path(int start, int stop) {
+        List<Integer> path = findPath(start, stop);
+        if (path.size() > 1 && path.get(path.size() - 1) == stop) {
+            return path;
+        }
+        return new ArrayList<>();
+    }
+
+    /* 查找從 START 到 STOP 的路徑的輔助方法 */
+    private List<Integer> findPath(int start, int stop) {
         Stack<Integer> fringe = new Stack<>();
         HashSet<Integer> visited = new HashSet<>();
         HashMap<Integer, Integer> edgeTo = new HashMap<>();
+        List<Integer> path = new ArrayList<>();
+
         fringe.push(start);
         visited.add(start);
 
         while (!fringe.isEmpty()) {
             int v = fringe.pop();
             if (v == stop) {
-                break;
+                reconstructPath(path, edgeTo, start, stop);
+                return path;
             }
             for (int neighbor : neighbors(v)) {
                 if (!visited.contains(neighbor)) {
@@ -209,22 +160,22 @@ public class Graph implements Iterable<Integer> {
                 }
             }
         }
+        return path;
+    }
 
-        List<Integer> path = new ArrayList<>();
-        if (!edgeTo.containsKey(stop)) {
-            return path; // no path found
-        }
+    /* 重構路徑的輔助方法 */
+    private void reconstructPath(List<Integer> path, HashMap<Integer, Integer> edgeTo, int start, int stop) {
         for (int x = stop; x != start; x = edgeTo.get(x)) {
             path.add(x);
         }
         path.add(start);
         Collections.reverse(path);
-        return path;
     }
 
+    /* 返回圖的拓撲排序 */
     public List<Integer> topologicalSort() {
-        ArrayList<Integer> result = new ArrayList<Integer>();
-        Iterator<Integer> iter = new TopologicalIterator();
+        List<Integer> result = new ArrayList<>();
+        TopologicalIterator iter = new TopologicalIterator();
         while (iter.hasNext()) {
             result.add(iter.next());
         }
@@ -239,6 +190,10 @@ public class Graph implements Iterable<Integer> {
         TopologicalIterator() {
             fringe = new Stack<>();
             inDegrees = new int[vertexCount];
+            initializeInDegreesAndFringe();
+        }
+
+        private void initializeInDegreesAndFringe() {
             for (int v = 0; v < vertexCount; v++) {
                 inDegrees[v] = inDegree(v);
                 if (inDegrees[v] == 0) {
@@ -265,7 +220,6 @@ public class Graph implements Iterable<Integer> {
         public void remove() {
             throw new UnsupportedOperationException();
         }
-
     }
 
     private class Edge {
@@ -283,7 +237,6 @@ public class Graph implements Iterable<Integer> {
         public String toString() {
             return "(" + from + ", " + to + ", weight = " + weight + ")";
         }
-
     }
 
     private void generateG1() {
@@ -326,36 +279,25 @@ public class Graph implements Iterable<Integer> {
     private void printDFS(int start) {
         System.out.println("DFS traversal starting at " + start);
         List<Integer> result = dfs(start);
-        Iterator<Integer> iter = result.iterator();
-        while (iter.hasNext()) {
-            System.out.print(iter.next() + " ");
-        }
-        System.out.println();
-        System.out.println();
+        result.forEach(v -> System.out.print(v + " "));
+        System.out.println("\n");
     }
 
     private void printPath(int start, int end) {
         System.out.println("Path from " + start + " to " + end);
         List<Integer> result = path(start, end);
-        if (result.size() == 0) {
+        if (result.isEmpty()) {
             System.out.println("No path from " + start + " to " + end);
-            return;
+        } else {
+            result.forEach(v -> System.out.print(v + " "));
         }
-        Iterator<Integer> iter = result.iterator();
-        while (iter.hasNext()) {
-            System.out.print(iter.next() + " ");
-        }
-        System.out.println();
-        System.out.println();
+        System.out.println("\n");
     }
 
     private void printTopologicalSort() {
         System.out.println("Topological sort");
         List<Integer> result = topologicalSort();
-        Iterator<Integer> iter = result.iterator();
-        while (iter.hasNext()) {
-            System.out.print(iter.next() + " ");
-        }
+        result.forEach(v -> System.out.print(v + " "));
     }
 
     public static void main(String[] args) {
