@@ -128,6 +128,13 @@ public class Graph {
         return path;
     }
 
+    // Adds more edges and vertices for testing purposes
+    public void addAdditionalEdges(int[][] edges) {
+        for (int[] edge : edges) {
+            addEdge(edge[0], edge[1], edge[2]);
+        }
+    }
+
     private class Edge {
         private int from;
         private int to;
