@@ -72,6 +72,7 @@ public class Graph {
         return count;
     }
 
+<<<<<<< HEAD
     // Returns a list of the vertices that lie on the shortest path from start to stop.
     public List<Integer> shortestPath(int start, int stop) {
         PriorityQueue<VertexDist> fringe = new PriorityQueue<>(Comparator.comparingInt(v -> v.dist));
@@ -94,6 +95,13 @@ public class Graph {
         }
 
         return constructPath(start, stop, predecessors);
+=======
+    /* Returns a list of the vertices that lie on the shortest path from start to stop. 
+    If no such path exists, you should return an empty list. If START == STOP, returns a List with START. */
+    public ArrayList<Integer> shortestPath(int start, int stop) {
+        // TODO: YOUR CODE HERE
+        return null;
+>>>>>>> b079d5f1cad4f1bf1abf29ccdd085c4cf8b137d3
     }
 
     // Helper method to initialize fringe and distance map
