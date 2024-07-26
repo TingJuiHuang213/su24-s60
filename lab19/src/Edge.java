@@ -1,3 +1,9 @@
+/*
+ * Authors: Ting-Jui(Lyle) Huang
+ * Date: 2024-07-25
+ * Description: This class represents an edge in a graph, with a source vertex, a destination vertex, and a weight.
+ */
+
 /**
  * 表示图中的一条边，带有源顶点、目标顶点和权重。
  * 这个类实现了Comparable接口，用于边的排序。

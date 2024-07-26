@@ -1,3 +1,7 @@
+/*
+ * Authors: Ting-Jui(Lyle) Huang
+ * Date: 2024-07-25
+ */
 /**
  * 并查集（Union-Find）数据结构，用于管理连通性。
  */
