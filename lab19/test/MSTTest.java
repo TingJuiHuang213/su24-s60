@@ -7,6 +7,9 @@ import java.nio.file.Paths;
 import java.util.Random;
 import static com.google.common.truth.Truth.assertThat;
 
+/**
+ * 用于测试最小生成树（MST）算法的测试类。
+ */
 public class MSTTest {
 
     private final static String SEPARATOR = System.getProperty("file.separator");
@@ -19,7 +22,7 @@ public class MSTTest {
     @Test
     public void testBasic() {
         Graph g = loadFromText(NORMAL);
-        // Basic test to check the graph loading
+        // 基本测试：检查图的加载是否正确
         assertThat(g).isNotNull();
     }
 
@@ -39,8 +42,9 @@ public class MSTTest {
         assertThat(mst.spans(g)).isTrue();
     }
 
-    /* Returns a randomly generated graph with VERTICES number of vertices and
-       EDGES number of edges with max weight WEIGHT. */
+    /**
+     * 返回一个随机生成的图对象，包含指定数量的顶点和边，边的最大权重为指定值。
+     */
     public static Graph randomGraph(int vertices, int edges, int weight) {
         Graph g = new Graph();
         Random rng = new Random();
@@ -54,8 +58,9 @@ public class MSTTest {
         return g;
     }
 
-    /* Returns a Graph object with integer edge weights as parsed from
-       FILENAME. Talk about the setup of this file. */
+    /**
+     * 从指定的文件中解析图对象，文件中的边权重为整数。
+     */
     public static Graph loadFromText(String filename) {
         Charset cs = Charset.forName("US-ASCII");
         try (BufferedReader r = Files.newBufferedReader(Paths.get(filename), cs)) {
@@ -71,12 +76,12 @@ public class MSTTest {
                 } else if (fields.length == 1) {
                     g.addVertex(Integer.parseInt(fields[0]));
                 } else {
-                    throw new IllegalArgumentException("Bad input file!");
+                    throw new IllegalArgumentException("输入文件格式错误！");
                 }
             }
             return g;
         } catch (IOException e) {
-            System.err.println("Caught IOException: " + e.getMessage());
+            System.err.println("捕获 IOException: " + e.getMessage());
             System.exit(1);
             return null;
         }

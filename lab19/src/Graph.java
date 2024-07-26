@@ -10,107 +10,135 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.Collections;
 
+/**
+ * 表示一个可变的有限图对象。
+ * 边的标签通过 HashMap 存储。
+ * 图是无向的，顶点从 0 开始编号。
+ */
 public class Graph {
 
-    /* Maps vertices to a list of its neighboring vertices. */
-    private HashMap<Integer, Set<Integer>> neighbors = new HashMap<>();
-    /* Maps vertices to a list of its connected edges. */
-    private HashMap<Integer, Set<Edge>> edges = new HashMap<>();
-    /* A sorted set of all edges. */
-    private TreeSet<Edge> allEdges = new TreeSet<>();
+    private HashMap<Integer, Set<Integer>> neighbors = new HashMap<>(); // 邻接顶点
+    private HashMap<Integer, Set<Edge>> edges = new HashMap<>(); // 邻接边
+    private TreeSet<Edge> allEdges = new TreeSet<>(); // 所有边的集合
 
-    /* Returns the vertices that neighbor V. */
+    /**
+     * 返回顶点 V 的所有邻居顶点。
+     */
     public TreeSet<Integer> getNeighbors(int v) {
         return new TreeSet<>(neighbors.get(v));
     }
 
-    /* Returns all edges adjacent to V. */
+    /**
+     * 返回顶点 V 的所有邻接边。
+     */
     public TreeSet<Edge> getEdges(int v) {
         return new TreeSet<>(edges.get(v));
     }
 
-    /* Returns a sorted list of all vertices. */
+    /**
+     * 返回所有顶点的有序列表。
+     */
     public TreeSet<Integer> getAllVertices() {
         return new TreeSet<>(neighbors.keySet());
     }
 
-    /* Returns a sorted list of all edges. */
+    /**
+     * 返回所有边的有序列表。
+     */
     public TreeSet<Edge> getAllEdges() {
         return new TreeSet<>(allEdges);
     }
 
-    /* Adds vertex V to the graph. */
+    /**
+     * 将顶点 V 添加到图中。
+     */
     public void addVertex(Integer v) {
-        if (neighbors.get(v) == null) {
+        if (!neighbors.containsKey(v)) {
             neighbors.put(v, new HashSet<>());
             edges.put(v, new HashSet<>());
         }
     }
 
-    /* Adds Edge E to the graph. */
+    /**
+     * 将边 E 添加到图中。
+     */
     public void addEdge(Edge e) {
         addEdgeHelper(e.getSource(), e.getDest(), e.getWeight());
     }
 
-    /* Creates an Edge between V1 and V2 with no weight. */
+    /**
+     * 创建一条无权重的边 V1-V2。
+     */
     public void addEdge(int v1, int v2) {
         addEdgeHelper(v1, v2, 0);
     }
 
-    /* Creates an Edge between V1 and V2 with weight WEIGHT. */
+    /**
+     * 创建一条有权重的边 V1-V2。
+     */
     public void addEdge(int v1, int v2, int weight) {
         addEdgeHelper(v1, v2, weight);
     }
 
-    /* Returns true if V1 and V2 are connected by an edge. */
+    /**
+     * 返回 V1 和 V2 是否通过边相连。
+     */
     public boolean isNeighbor(int v1, int v2) {
         return neighbors.get(v1).contains(v2) && neighbors.get(v2).contains(v1);
     }
 
-    /* Returns true if the graph contains V as a vertex. */
+    /**
+     * 返回图中是否包含顶点 V。
+     */
     public boolean containsVertex(int v) {
-        return neighbors.get(v) != null;
+        return neighbors.containsKey(v);
     }
 
-    /* Returns true if the graph contains the edge E. */
+    /**
+     * 返回图中是否包含边 E。
+     */
     public boolean containsEdge(Edge e) {
         return allEdges.contains(e);
     }
 
-    /* Returns if this graph spans G. */
+    /**
+     * 返回该图是否包含所有顶点的生成树。
+     */
     public boolean spans(Graph g) {
-        TreeSet<Integer> all = getAllVertices();
-        if (all.size() != g.getAllVertices().size()) {
+        TreeSet<Integer> allVertices = getAllVertices();
+        if (allVertices.size() != g.getAllVertices().size()) {
             return false;
         }
-        Set<Integer> visited = new HashSet<>();
-        Queue<Integer> vertices = new ArrayDeque<>();
-        Integer curr;
 
-        vertices.add(all.first());
-        while ((curr = vertices.poll()) != null) {
+        Set<Integer> visited = new HashSet<>();
+        Queue<Integer> verticesQueue = new ArrayDeque<>();
+        verticesQueue.add(allVertices.first());
+        while (!verticesQueue.isEmpty()) {
+            Integer curr = verticesQueue.poll();
             if (!visited.contains(curr)) {
                 visited.add(curr);
-                for (int n : getNeighbors(curr)) {
-                    vertices.add(n);
+                for (int neighbor : getNeighbors(curr)) {
+                    verticesQueue.add(neighbor);
                 }
             }
         }
         return visited.size() == g.getAllVertices().size();
     }
 
-    /* Overrides objects equals method. */
+    /**
+     * 重写 equals 方法。
+     */
     @Override
     public boolean equals(Object o) {
-        if (!(o instanceof Graph)) {
-            return false;
-        }
+        if (this == o) return true;
+        if (!(o instanceof Graph)) return false;
         Graph other = (Graph) o;
         return neighbors.equals(other.neighbors) && edges.equals(other.edges);
     }
 
-    /* A helper function that adds a new edge from V1 to V2 with WEIGHT as the
-       label. */
+    /**
+     * 辅助方法：添加一条新边，从 V1 到 V2，带有权重 WEIGHT。
+     */
     private void addEdgeHelper(int v1, int v2, int weight) {
         addVertex(v1);
         addVertex(v2);
@@ -125,6 +153,9 @@ public class Graph {
         allEdges.add(e1);
     }
 
+    /**
+     * 实现 Prim 算法以找到最小生成树（MST）。
+     */
     public Graph prims(int start) {
         Graph mst = new Graph();
         PriorityQueue<Edge> pq = new PriorityQueue<>();
@@ -150,6 +181,9 @@ public class Graph {
         return mst.getAllEdges().size() == neighbors.size() - 1 ? mst : null;
     }
 
+    /**
+     * 实现 Kruskal 算法以找到最小生成树（MST）。
+     */
     public Graph kruskals() {
         Graph mst = new Graph();
         UnionFind uf = new UnionFind(neighbors.size());
