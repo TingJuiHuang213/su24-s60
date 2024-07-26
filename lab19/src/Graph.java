@@ -5,13 +5,11 @@ import java.util.LinkedList;
 import java.util.Queue;
 import java.util.ArrayDeque;
 import java.util.HashMap;
-import java.util.Queue;
-import java.util.ArrayDeque;
+import java.util.PriorityQueue;
+import java.util.List;
+import java.util.ArrayList;
+import java.util.Collections;
 
-/* A mutable and finite Graph object. Edge labels are stored via a HashMap
-   where labels are mapped to a key calculated by the following. The graph is
-   undirected (whenever an Edge is added, the dual Edge is also added). Vertices
-   are numbered starting from 0. */
 public class Graph {
 
     /* Maps vertices to a list of its neighboring vertices. */
@@ -23,29 +21,29 @@ public class Graph {
 
     /* Returns the vertices that neighbor V. */
     public TreeSet<Integer> getNeighbors(int v) {
-        return new TreeSet<Integer>(neighbors.get(v));
+        return new TreeSet<>(neighbors.get(v));
     }
 
     /* Returns all edges adjacent to V. */
     public TreeSet<Edge> getEdges(int v) {
-        return new TreeSet<Edge>(edges.get(v));
+        return new TreeSet<>(edges.get(v));
     }
 
     /* Returns a sorted list of all vertices. */
     public TreeSet<Integer> getAllVertices() {
-        return new TreeSet<Integer>(neighbors.keySet());
+        return new TreeSet<>(neighbors.keySet());
     }
 
     /* Returns a sorted list of all edges. */
     public TreeSet<Edge> getAllEdges() {
-        return new TreeSet<Edge>(allEdges);
+        return new TreeSet<>(allEdges);
     }
 
     /* Adds vertex V to the graph. */
     public void addVertex(Integer v) {
         if (neighbors.get(v) == null) {
-            neighbors.put(v, new HashSet<Integer>());
-            edges.put(v, new HashSet<Edge>());
+            neighbors.put(v, new HashSet<>());
+            edges.put(v, new HashSet<>());
         }
     }
 
@@ -102,6 +100,7 @@ public class Graph {
     }
 
     /* Overrides objects equals method. */
+    @Override
     public boolean equals(Object o) {
         if (!(o instanceof Graph)) {
             return false;
@@ -127,12 +126,49 @@ public class Graph {
     }
 
     public Graph prims(int start) {
-        // TODO: YOUR CODE HERE
-        return null;
+        Graph mst = new Graph();
+        PriorityQueue<Edge> pq = new PriorityQueue<>();
+        Set<Integer> visited = new HashSet<>();
+
+        visited.add(start);
+        pq.addAll(edges.get(start));
+
+        while (!pq.isEmpty() && mst.getAllEdges().size() < neighbors.size() - 1) {
+            Edge edge = pq.poll();
+            if (visited.contains(edge.getDest())) {
+                continue;
+            }
+            mst.addEdge(edge);
+            visited.add(edge.getDest());
+            for (Edge nextEdge : edges.get(edge.getDest())) {
+                if (!visited.contains(nextEdge.getDest())) {
+                    pq.add(nextEdge);
+                }
+            }
+        }
+
+        return mst.getAllEdges().size() == neighbors.size() - 1 ? mst : null;
     }
 
     public Graph kruskals() {
-        // TODO: YOUR CODE HERE
-        return null;
+        Graph mst = new Graph();
+        UnionFind uf = new UnionFind(neighbors.size());
+
+        List<Edge> sortedEdges = new ArrayList<>(allEdges);
+        Collections.sort(sortedEdges);
+
+        for (Edge edge : sortedEdges) {
+            int src = edge.getSource();
+            int dest = edge.getDest();
+            if (uf.find(src) != uf.find(dest)) {
+                mst.addEdge(edge);
+                uf.union(src, dest);
+            }
+            if (mst.getAllEdges().size() == neighbors.size() - 1) {
+                break;
+            }
+        }
+
+        return mst.getAllEdges().size() == neighbors.size() - 1 ? mst : null;
     }
 }

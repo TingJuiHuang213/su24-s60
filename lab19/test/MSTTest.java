@@ -1,12 +1,10 @@
 import org.junit.Test;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Random;
-
 import static com.google.common.truth.Truth.assertThat;
 
 public class MSTTest {
@@ -21,7 +19,24 @@ public class MSTTest {
     @Test
     public void testBasic() {
         Graph g = loadFromText(NORMAL);
-        // TODO: test it out!
+        // Basic test to check the graph loading
+        assertThat(g).isNotNull();
+    }
+
+    @Test
+    public void testPrims() {
+        Graph g = loadFromText(NORMAL);
+        Graph mst = g.prims(0);
+        assertThat(mst).isNotNull();
+        assertThat(mst.spans(g)).isTrue();
+    }
+
+    @Test
+    public void testKruskals() {
+        Graph g = loadFromText(NORMAL);
+        Graph mst = g.kruskals();
+        assertThat(mst).isNotNull();
+        assertThat(mst.spans(g)).isTrue();
     }
 
     /* Returns a randomly generated graph with VERTICES number of vertices and
@@ -67,4 +82,3 @@ public class MSTTest {
         }
     }
 }
-
