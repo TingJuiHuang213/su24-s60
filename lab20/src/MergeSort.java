@@ -1,6 +1,5 @@
 public class MergeSort {
 
-
     /**
      * @param arr
      *
@@ -12,8 +11,20 @@ public class MergeSort {
      *
      */
     public static int[] sort(int[] arr) {
-        // TODO: Implement merge sort
-        return arr;
+        if (arr.length < 2) {
+            return arr;
+        }
+        int mid = arr.length / 2;
+        int[] left = new int[mid];
+        int[] right = new int[arr.length - mid];
+
+        for (int i = 0; i < mid; i++) {
+            left[i] = arr[i];
+        }
+        for (int i = mid; i < arr.length; i++) {
+            right[i - mid] = arr[i];
+        }
+        return merge(sort(left), sort(right));
     }
 
     /**
@@ -26,8 +37,20 @@ public class MergeSort {
      */
     private static int[] merge(int[] a, int[] b) {
         int[] c = new int[a.length + b.length];
-        // TODO: Implement merge
+        int i = 0, j = 0, k = 0;
+        while (i < a.length && j < b.length) {
+            if (a[i] <= b[j]) {
+                c[k++] = a[i++];
+            } else {
+                c[k++] = b[j++];
+            }
+        }
+        while (i < a.length) {
+            c[k++] = a[i++];
+        }
+        while (j < b.length) {
+            c[k++] = b[j++];
+        }
         return c;
     }
 }
-

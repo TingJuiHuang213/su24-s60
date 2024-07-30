@@ -1,6 +1,5 @@
 public class HeapSort {
 
-
     /**
      * @param arr
      *
@@ -16,21 +15,35 @@ public class HeapSort {
      * Read through it carefully and try to understand how it works.
      */
     public static void sort(int[] arr) {
-        // TODO: Implement heap sort
+        int n = arr.length;
+
+        // 建立最大堆
+        heapify(arr, n);
+
+        // 一個一個地提取元素
+        for (int i = n - 1; i > 0; i--) {
+            // 將當前根（最大）移到末尾
+            swap(arr, 0, i);
+
+            // 呼叫 bubbleDown 以重新在縮小的堆上
+            bubbleDown(arr, 0, i);
+        }
     }
 
     /**
      * @param arr
+     * @param n
      *
      * Turn the array into a heap. Repeatedly calls bubble down on each element,
      * starting from the end of the array.
      *
      * Suggested helper method that will make it easier for you to implement heap sort.
      */
-    private static void heapify(int[] arr) {
-        // TODO: Implement heapify
+    private static void heapify(int[] arr, int n) {
+        for (int i = n / 2 - 1; i >= 0; i--) {
+            bubbleDown(arr, i, n);
+        }
     }
-
 
     /**
      * @param arr
@@ -83,7 +96,6 @@ public class HeapSort {
         return j;
     }
 
-
     /**
      * @param i
      * @return the index of the left child of the node at index i
@@ -105,7 +117,4 @@ public class HeapSort {
     private static int getRightChild(int i) {
         return 2 * i + 2;
     }
-
-
 }
-
