@@ -1,12 +1,9 @@
 public class QuickSort {
 
     /**
-     * @param arr
-     *
-     * Sort the array arr using quicksort with the 3-scan partition algorithm.
-     * The quicksort algorithm is as follows:
-     * 1. Select a pivot, partition array in place around the pivot.
-     * 2. Recursively call quicksort on each subsection of the modified array.
+     * 使用快速排序對數組進行排序
+     * @param arr 待排序數組
+     * @return 排序後的數組
      */
     public static int[] sort(int[] arr) {
         quickSort(arr, 0, arr.length - 1);
@@ -14,55 +11,54 @@ public class QuickSort {
     }
 
     /**
-     * @param arr
-     * @param start
-     * @param end
-     *
-     * Helper method for sort: runs quicksort algorithm on array from [start:end)
+     * 快速排序輔助方法
+     * @param arr 數組
+     * @param low 起始索引
+     * @param high 結束索引
      */
-    private static void quickSort(int[] arr, int start, int end) {
-        if (start < end) {
-            int[] pi = partition(arr, start, end);
+    private static void quickSort(int[] arr, int low, int high) {
+        if (low < high) {
+            int[] pi = partition(arr, low, high);
 
-            quickSort(arr, start, pi[0]);
-            quickSort(arr, pi[1], end);
+            quickSort(arr, low, pi[0]);
+            quickSort(arr, pi[1], high);
         }
     }
 
     /**
-     * @param arr
-     * @param start
-     * @param end
-     *
-     * Partition the array in-place following the 3-scan partitioning scheme.
-     * You may assume that first item is always selected as the pivot.
-     *
-     * Returns a length-2 int array of indices:
-     * [end index of "less than" section, start index of "greater than" section]
-     *
-     * Most of the code for quicksort is in this function
+     * 分區方法，使用3掃描分區算法
+     * @param arr 數組
+     * @param low 起始索引
+     * @param high 結束索引
+     * @return 分區後的索引
      */
-    private static int[] partition(int[] arr, int start, int end) {
-        int pivot = arr[start];
-        int i = start - 1, j = end + 1;
+    private static int[] partition(int[] arr, int low, int high) {
+        int pivot = arr[low];
+        int left = low;
+        int right = high;
 
-        while (true) {
-            do {
-                i++;
-            } while (arr[i] < pivot);
-
-            do {
-                j--;
-            } while (arr[j] > pivot);
-
-            if (i >= j) {
-                return new int[]{j, j + 1};
+        while (left <= right) {
+            while (left <= right && arr[left] < pivot) {
+                left++;
             }
-
-            swap(arr, i, j);
+            while (left <= right && arr[right] > pivot) {
+                right--;
+            }
+            if (left <= right) {
+                swap(arr, left, right);
+                left++;
+                right--;
+            }
         }
+        return new int[]{right, left};
     }
 
+    /**
+     * 交換數組中的兩個元素
+     * @param arr 數組
+     * @param i 索引1
+     * @param j 索引2
+     */
     private static void swap(int[] arr, int i, int j) {
         int temp = arr[i];
         arr[i] = arr[j];
