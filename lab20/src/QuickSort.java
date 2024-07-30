@@ -1,9 +1,12 @@
 public class QuickSort {
 
     /**
-     * 使用快速排序對數組進行排序
-     * @param arr 待排序數組
-     * @return 排序後的數組
+     * @param arr
+     *
+     * Sort the array arr using quicksort with the 3-scan partition algorithm.
+     * The quicksort algorithm is as follows:
+     * 1. Select a pivot, partition array in place around the pivot.
+     * 2. Recursively call quicksort on each subsection of the modified array.
      */
     public static int[] sort(int[] arr) {
         quickSort(arr, 0, arr.length - 1);
@@ -11,31 +14,38 @@ public class QuickSort {
     }
 
     /**
-     * 快速排序輔助方法
-     * @param arr 數組
-     * @param low 起始索引
-     * @param high 結束索引
+     * @param arr
+     * @param start
+     * @param end
+     *
+     * Helper method for sort: runs quicksort algorithm on array from [start:end)
      */
-    private static void quickSort(int[] arr, int low, int high) {
-        if (low < high) {
-            int[] pi = partition(arr, low, high);
+    private static void quickSort(int[] arr, int start, int end) {
+        if (start < end) {
+            int[] pi = partition(arr, start, end);
 
-            quickSort(arr, low, pi[0]);
-            quickSort(arr, pi[1], high);
+            quickSort(arr, start, pi[0]);
+            quickSort(arr, pi[1], end);
         }
     }
 
     /**
-     * 分區方法，使用3掃描分區算法
-     * @param arr 數組
-     * @param low 起始索引
-     * @param high 結束索引
-     * @return 分區後的索引
+     * @param arr
+     * @param start
+     * @param end
+     *
+     * Partition the array in-place following the 3-scan partitioning scheme.
+     * You may assume that first item is always selected as the pivot.
+     *
+     * Returns a length-2 int array of indices:
+     * [end index of "less than" section, start index of "greater than" section]
+     *
+     * Most of the code for quicksort is in this function
      */
-    private static int[] partition(int[] arr, int low, int high) {
-        int pivot = arr[low];
-        int left = low;
-        int right = high;
+    private static int[] partition(int[] arr, int start, int end) {
+        int pivot = arr[start];
+        int left = start;
+        int right = end;
 
         while (left <= right) {
             while (left <= right && arr[left] < pivot) {
