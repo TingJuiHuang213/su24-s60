@@ -5,7 +5,18 @@ public class DistributionSorts {
     /* Destructively sorts ARR using counting sort. Assumes that ARR contains
        only 0, 1, ..., 9. */
     public static void countingSort(int[] arr) {
-        // TODO: YOUR CODE HERE
+        int[] counts = new int[10];  // 假設 arr 中的數字範圍是 0 到 9
+        for (int num : arr) {
+            counts[num]++;
+        }
+
+        int index = 0;
+        for (int i = 0; i < counts.length; i++) {
+            while (counts[i] > 0) {
+                arr[index++] = i;
+                counts[i]--;
+            }
+        }
     }
 
     /* Destructively sorts ARR using LSD radix sort. */
@@ -20,7 +31,26 @@ public class DistributionSorts {
        DIGIT-th digit. When DIGIT is equal to 0, sort the numbers by the
        rightmost digit of each number. */
     private static void countingSortOnDigit(int[] arr, int digit) {
-        // TODO: YOUR CODE HERE
+        int[] counts = new int[10];
+        int[] sorted = new int[arr.length];
+
+        int divisor = (int) Math.pow(10, digit);
+
+        for (int num : arr) {
+            int digitValue = (num / divisor) % 10;
+            counts[digitValue]++;
+        }
+
+        for (int i = 1; i < counts.length; i++) {
+            counts[i] += counts[i - 1];
+        }
+
+        for (int i = arr.length - 1; i >= 0; i--) {
+            int digitValue = (arr[i] / divisor) % 10;
+            sorted[--counts[digitValue]] = arr[i];
+        }
+
+        System.arraycopy(sorted, 0, arr, 0, arr.length);
     }
 
     /* Returns the largest number of digits that any integer in ARR has. */
